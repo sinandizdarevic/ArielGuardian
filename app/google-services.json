@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "909359145978",
+    "firebase_url": "https://project-6055597653715509991.firebaseio.com",
+    "project_id": "project-6055597653715509991",
+    "storage_bucket": "project-6055597653715509991.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:909359145978:android:30ae30672b1cc652",
+        "android_client_info": {
+          "package_name": "com.ariel.guardian"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "909359145978-hunpo1icit7v7ta63ktoh0c3qaiue9cq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcfWrEtTIOo6xyyd8sSp33OEEjATQ5l2c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
