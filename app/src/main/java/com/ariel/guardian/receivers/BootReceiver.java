@@ -8,14 +8,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-public class ArielGuardianBootReceiver extends BroadcastReceiver {
+import ariel.providers.ArielSettings;
 
-    private static final String TAG = "ArielGuardianBootReceiver";
+public class BootReceiver extends BroadcastReceiver {
+
+    private static final String TAG = "BootReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "Boot received, should send data ");
         FirebaseHelper.getInstance().reportAction("Ariel system online");
+        //ArielSettings.Secure.putInt(context.getContentResolver(),ArielSettings.Secure.ARIEL_PROCESS_BLOCKER,1);
     }
 
 }

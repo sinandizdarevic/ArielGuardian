@@ -1,9 +1,15 @@
 package com.ariel.guardian.utils;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
+
+import java.util.Iterator;
 
 /**
  * Created by mikalackis on 2.6.16..
@@ -32,10 +38,24 @@ public class PackageManagerUtilities {
         }
     }
 
+    public static void killPackageProcess(final Context context, final String packageName) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Activity.ACTIVITY_SERVICE);
+        am.killBackgroundProcesses(packageName);
+//        Iterator<ActivityManager.RecentTaskInfo> it = am.getRecentTasks(100, ActivityManager.RECENT_WITH_EXCLUDED).iterator();
+//        while(it.hasNext()){
+//            ActivityManager.RecentTaskInfo task = it.next();
+//            Log.i("PackageManagerUtil", "Recent package name: "+task.baseIntent.getComponent().getPackageName());
+//            if(task.baseIntent.getComponent().getPackageName().contains(packageName)){
+//                am.remo
+//                break;
+//            }
+//        }
+    }
+
 //
 //    public void enableAllReceivers() {
 //        ComponentName bootReceiver = new ComponentName(getApplicationContext(),
-//                ArielGuardianBootReceiver.class);
+//                BootReceiver.class);
 //        getPackageManager().setComponentEnabledSetting(bootReceiver,
 //                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
 //        ComponentName smsReceiver = new ComponentName(getApplicationContext(),

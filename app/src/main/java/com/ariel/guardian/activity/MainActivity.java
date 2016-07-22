@@ -4,6 +4,7 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,8 @@ import com.ariel.guardian.ArielGuardianApplication;
 import com.ariel.guardian.R;
 import com.ariel.guardian.utils.Utilities;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -39,8 +42,18 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(ArielGuardianApplication.getInstance(),UsageLogActivity.class);
-                startActivity(i);
+                try {
+                    File rulesDir = new File("/data/system/ifw", "text.txt");
+                    FileOutputStream fos = new FileOutputStream(rulesDir);
+                    fos.write("Sava".getBytes());
+                    //                Intent i = new Intent(ArielGuardianApplication.getInstance(),UsageLogActivity.class);
+                    //                startActivity(i);
+                    fos.flush();
+                    fos.close();
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -57,13 +70,15 @@ public class MainActivity extends AppCompatActivity {
         btnReadState.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int arielSystemStatus = ArielSettings.Secure.getInt(getContentResolver(),
-                    ArielSettings.Secure.ARIEL_SYSTEM_STATUS, ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
-                Toast.makeText(MainActivity.this,"Ariel system status: "+arielSystemStatus,Toast.LENGTH_LONG).show();
-                ArielSettings.Secure.putInt(getContentResolver(),ArielSettings.Secure.ARIEL_SYSTEM_STATUS,ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
-                arielSystemStatus = ArielSettings.Secure.getInt(getContentResolver(),
-                        ArielSettings.Secure.ARIEL_SYSTEM_STATUS, ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
-                Toast.makeText(MainActivity.this,"Ariel system status NEW: "+arielSystemStatus,Toast.LENGTH_LONG).show();
+                String arielSystemStatus = ArielSettings.Secure.getString(getContentResolver(),
+                        ArielSettings.Secure.ARIEL_INTENT_FILTER_SERVICE);
+                Toast.makeText(MainActivity.this,"Ariel process blocker status: "+arielSystemStatus,Toast.LENGTH_LONG).show();
+//                try {
+//                    boolean packageStatus = ArielGuardian.ApplicationEntry.getPackageStatus(getContentResolver(), "net.trikoder.android.kurir");
+//                    Toast.makeText(MainActivity.this,"Package status is: "+packageStatus,Toast.LENGTH_LONG).show();
+//                } catch (ArielGuardian.ArielPackageNotFoundException e) {
+//                    e.printStackTrace();
+//                }
             }
         });
     }

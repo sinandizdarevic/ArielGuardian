@@ -14,6 +14,11 @@ public class DeviceConfiguration {
     private String clientId;
     private boolean active;
     private long locationTrackingInterval;
+    private String pubNubCipherKey;
+    private String pubNubSubscribeKey;
+    private String pubNubPublishKey;
+    private String pubNubSecretKey;
+    private boolean pubNubUseSSL;
 
     public DeviceConfiguration() {
         // default constructor required by firebase
@@ -51,4 +56,23 @@ public class DeviceConfiguration {
         return locationTrackingInterval;
     }
 
+    public String getPubNubCipherKey() {
+        return pubNubCipherKey;
+    }
+
+    public String getPubNubSubscribeKey() {
+        return pubNubSubscribeKey;
+    }
+
+    public String getPubNubPublishKey() {
+        return pubNubPublishKey;
+    }
+
+    public String getPubNubSecretKey() {
+        return pubNubSecretKey;
+    }
+
+    public boolean isPubNubUseSSL() {
+        return pubNubUseSSL;
+    }
 }

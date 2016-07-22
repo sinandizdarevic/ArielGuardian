@@ -1,19 +1,17 @@
 package com.ariel.guardian;
 
 import android.app.Application;
+import android.app.Service;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ariel.guardian.services.FirebaseAuthService;
-import com.ariel.guardian.services.FirebaseDeviceConfigService;
+import com.ariel.guardian.services.DeviceConfigService;
+import com.ariel.guardian.services.PubNubService;
 import com.ariel.guardian.utils.Utilities;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import ariel.providers.ArielSettings;
 
@@ -48,13 +46,18 @@ public class ArielGuardianApplication extends Application {
 
         //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
-        FirebaseMessaging.getInstance().subscribeToTopic(Utilities.getConfigFCMTopic());
+        //FirebaseMessaging.getInstance().subscribeToTopic(Utilities.getConfigFCMTopic());
+
+        Intent pubNubService = new Intent(ArielGuardianApplication.getInstance(), PubNubService.class);
+        startService(pubNubService);
 
         Log.i(TAG, "Calling anonym login for: "+ Utilities.getUniquePsuedoID());
 //        Intent authService = new Intent(this, FirebaseAuthService.class);
 //        startService(authService);
-        Intent configService = new Intent(ArielGuardianApplication.getInstance(), FirebaseDeviceConfigService.class);
-        startService(configService);
+        startService(DeviceConfigService.getStartingIntent());
+
+        ArielSettings.Secure.putString(getContentResolver(), ArielSettings.Secure.ARIEL_INTENT_FILTER_SERVICE, getString(R.string.intent_filter_service));
+
     }
 
     /**
@@ -68,4 +71,8 @@ public class ArielGuardianApplication extends Application {
         }
     };
 
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+    }
 }

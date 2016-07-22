@@ -1,6 +1,5 @@
 package com.ariel.guardian.services;
 
-import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -17,7 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 /**
  * Created by mikalackis on 7.6.16..
  */
-public class FirebaseAuthService extends Service {
+public class FirebaseAuthService extends ArielService {
 
     private static final String TAG = "FirebaseAuthService";
 
@@ -41,8 +40,7 @@ public class FirebaseAuthService extends Service {
                     /*
                       Start device config service
                      */
-                    Intent configService = new Intent(ArielGuardianApplication.getInstance(), FirebaseDeviceConfigService.class);
-                    startService(configService);
+                    startService(DeviceConfigService.getStartingIntent());
                 }
                 else{
                     Log.i(TAG, "User not anonymous!!!");
@@ -72,5 +70,10 @@ public class FirebaseAuthService extends Service {
         super.onDestroy();
         Log.i(TAG, "FirebaseAuthService destroyed");
         mAuth = null;
+    }
+
+    @Override
+    String getServiceName() {
+        return "FirebaseAuthService";
     }
 }

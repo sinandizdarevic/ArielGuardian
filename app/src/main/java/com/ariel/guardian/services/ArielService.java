@@ -12,7 +12,7 @@ import com.ariel.guardian.ArielGuardianApplication;
 /**
  * Created by mikalackis on 8.6.16..
  */
-abstract public class AntiTheftService extends Service {
+abstract public class ArielService extends Service {
 
     private static PowerManager.WakeLock sWakeLock;
 

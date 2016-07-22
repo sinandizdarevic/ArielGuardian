@@ -20,7 +20,9 @@ public class Utilities {
 
     public static final String UUID_PREFIX = "ariel";
 
-    private static final String CONFIG_TOPIC = "config_%s";
+    private static final String PUBNUB_CONFIG_CHANNEL = "config_%s";
+    private static final String PUBNUB_LOCATION_CHANNEL = "location_%s";
+    private static final String PUBNUB_APPLICATION_CHANNEL = "application_%s";
 
     public static String encodeAsFirebaseKey(final String toEncode) {
         return toEncode.replaceAll("\\.", "%2E");
@@ -41,9 +43,19 @@ public class Utilities {
         return date;
     }
 
-    public static String getConfigFCMTopic(){
-        Log.i(TAG, "Config topic: "+String.format(CONFIG_TOPIC, getUniquePsuedoID()));
-        return String.format(CONFIG_TOPIC, getUniquePsuedoID());
+    public static String getPubNubConfigChannel(){
+        Log.i(TAG, "Config topic: "+String.format(PUBNUB_CONFIG_CHANNEL, getUniquePsuedoID()));
+        return String.format(PUBNUB_CONFIG_CHANNEL, getUniquePsuedoID());
+    }
+
+    public static String getPubNubApplicationChannel(){
+        Log.i(TAG, "Config topic: "+String.format(PUBNUB_APPLICATION_CHANNEL, getUniquePsuedoID()));
+        return String.format(PUBNUB_APPLICATION_CHANNEL, getUniquePsuedoID());
+    }
+
+    public static String getPubNubLocationChannel(){
+        Log.i(TAG, "Location topic: "+String.format(PUBNUB_LOCATION_CHANNEL, getUniquePsuedoID()));
+        return String.format(PUBNUB_LOCATION_CHANNEL, getUniquePsuedoID());
     }
 
     public static String getUniquePsuedoID() {

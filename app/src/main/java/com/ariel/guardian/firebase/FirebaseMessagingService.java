@@ -1,19 +1,15 @@
 package com.ariel.guardian.firebase;
 
-import android.content.Intent;
 import android.util.Log;
 
-import com.ariel.guardian.ArielGuardianApplication;
-import com.ariel.guardian.services.FirebaseDeviceConfigService;
-import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 /**
  * Created by mikalackis on 23.5.16..
  */
-public class ArielFirebaseMessagingService extends FirebaseMessagingService {
+public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
 
-    private static final String TAG = ArielFirebaseMessagingService.class.getName();
+    private static final String TAG = FirebaseMessagingService.class.getName();
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -23,8 +19,17 @@ public class ArielFirebaseMessagingService extends FirebaseMessagingService {
         // message, here is where that should be initiated. See sendNotification method below.
         Log.d(TAG, "From: " + remoteMessage.getFrom());
         Log.d(TAG, "Notification Message Body: " + remoteMessage.getNotification().getBody());
-        Intent i = new Intent(ArielGuardianApplication.getInstance(), FirebaseDeviceConfigService.class);
-        ArielGuardianApplication.getInstance().startService(i);
+//        Intent i = new Intent(ArielGuardianApplication.getInstance(), DeviceConfigService.class);
+//        ArielGuardianApplication.getInstance().startService(i);
+    }
+
+    /**
+     * Create and show a simple notification containing the received FCM message.
+     *
+     * @param messageBody FCM message body received.
+     */
+    private void sendNotification(String messageBody) {
+        Log.i(TAG, "MESSAGE BODY: "+messageBody);
     }
 
 }

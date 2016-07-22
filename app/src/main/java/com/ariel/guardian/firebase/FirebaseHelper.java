@@ -2,8 +2,6 @@ package com.ariel.guardian.firebase;
 
 import android.util.ArrayMap;
 import android.util.Log;
-import android.util.SparseArray;
-
 import com.ariel.guardian.model.DeviceActivity;
 import com.ariel.guardian.model.DeviceLocation;
 import com.ariel.guardian.model.DevicePackage;
@@ -13,7 +11,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Date;
-import java.util.HashMap;
 
 /**
  * Created by mikalackis on 23.5.16..
@@ -21,6 +18,12 @@ import java.util.HashMap;
 public class FirebaseHelper {
 
     private static final String TAG = "FirebaseHelper";
+
+    // firebase config keys
+    public static final String UPDATE_CONFIG_COMMAND_KEY = "update_config_command";
+    public static final String LOCATE_COMMAND_KEY = "locate_command";
+    public static final String TRACK_START_COMMAND_KEY = "track_start_command";
+    public static final String TRACK_STOP_COMMAND_KEY = "track_stop_command";
 
     public static final String GOOGLE_MAPS_URL = "http://maps.google.com/?q=%1$f,%2$f";
 
@@ -39,6 +42,10 @@ public class FirebaseHelper {
     private FirebaseHelper(){
         Log.i(TAG, "FirebaseHelper instantiated");
         mFBDB = FirebaseDatabase.getInstance();
+    }
+
+    public FirebaseDatabase getFirebaseDatabase(){
+        return mFBDB;
     }
 
     public void reportAction(final String action){

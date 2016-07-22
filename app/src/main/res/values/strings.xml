@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ArielGuardian</string>
+    <string name="intent_filter_service">com.ariel.guardian/.services.IntentFirewallService</string>
 </resources>

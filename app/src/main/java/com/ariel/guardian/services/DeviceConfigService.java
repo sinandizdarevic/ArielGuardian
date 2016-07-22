@@ -7,24 +7,24 @@ import android.util.Log;
 
 import com.ariel.guardian.ArielGuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
+import com.ariel.guardian.firebase.FirebaseHelper;
 import com.ariel.guardian.model.DeviceConfiguration;
 import com.ariel.guardian.utils.Utilities;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.greenrobot.eventbus.EventBus;
 
 import ariel.providers.ArielSettings;
 
 /**
  * Created by mikalackis on 7.6.16..
  */
-public class FirebaseDeviceConfigService extends AntiTheftService {
+public class DeviceConfigService extends ArielService {
 
     private final String TAG = "FirebaseConfigService";
-
-    private FirebaseDatabase mFBDB;
 
     private DatabaseReference mDeviceConfiguration;
 
@@ -33,9 +33,8 @@ public class FirebaseDeviceConfigService extends AntiTheftService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "Created FirebaseDeviceConfigService");
-        mFBDB = FirebaseDatabase.getInstance();
-        mDeviceConfiguration = mFBDB.getReference("configuration").child(Utilities.getUniquePsuedoID());
+        Log.i(TAG, "Created DeviceConfigService");
+        mDeviceConfiguration = FirebaseHelper.getInstance().getFirebaseDatabase().getReference("configuration").child(Utilities.getUniquePsuedoID());
         mDeviceConfigListener = new DeviceConfigurationValueEventListener();
     }
 
@@ -44,8 +43,7 @@ public class FirebaseDeviceConfigService extends AntiTheftService {
         super.onDestroy();
         mDeviceConfiguration.removeEventListener(mDeviceConfigListener);
         mDeviceConfiguration = null;
-        mFBDB = null;
-        Log.i(TAG, "FirebaseDeviceConfigService destroyed");
+        Log.i(TAG, "DeviceConfigService destroyed");
     }
 
     @Override
@@ -65,6 +63,11 @@ public class FirebaseDeviceConfigService extends AntiTheftService {
         return TAG;
     }
 
+    public static Intent getStartingIntent(){
+        Intent configService = new Intent(ArielGuardianApplication.getInstance(), DeviceConfigService.class);
+        return configService;
+    }
+
     private class DeviceConfigurationValueEventListener implements ValueEventListener {
 
         private static final String TAG = "DeviceConfEventListener";
@@ -75,8 +78,9 @@ public class FirebaseDeviceConfigService extends AntiTheftService {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            Log.i(TAG, "Received device configuration");
-            DeviceConfiguration deviceConfig = dataSnapshot.getValue(DeviceConfiguration.class);
+            final DeviceConfiguration deviceConfig = dataSnapshot.getValue(DeviceConfiguration.class);
+            Log.i(TAG, "Received device configuration, ariel system status: "+deviceConfig.getArielSystemStatus());
+
             ArielSettings.Secure.putInt(ArielGuardianApplication.getInstance().getContentResolver(),ArielSettings.Secure.ARIEL_SYSTEM_STATUS,deviceConfig.getArielSystemStatus());
 
             // update scheduled location tracking job
@@ -85,6 +89,8 @@ public class FirebaseDeviceConfigService extends AntiTheftService {
                 Log.i(TAG, "Start device tracking job");
                 ArielJobScheduler.getInstance().registerNewJob(new DeviceFinderJobService(deviceConfig.getLocationTrackingInterval()));
             }
+
+            EventBus.getDefault().post(deviceConfig);
             stopSelf();
         }
 

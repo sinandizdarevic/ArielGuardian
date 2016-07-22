@@ -11,7 +11,7 @@ import com.ariel.guardian.ArielJobScheduler;
 /**
  * Created by mikalackis on 7.6.16..
  */
-public class RetryLoginJobService extends AntiTheftJobService {
+public class RetryLoginJobService extends ArielJobService {
     @Override
     public JobInfo getJobInfo() {
         ComponentName componentName = new ComponentName(ArielGuardianApplication.getInstance(), FirebaseAuthService.class);
