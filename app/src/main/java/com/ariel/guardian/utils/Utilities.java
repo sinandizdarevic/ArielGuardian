@@ -105,20 +105,4 @@ public class Utilities {
                 .toString();
     }
 
-    public static Bundle buildParamsBundle(final List<Param> params){
-        Bundle bundle = null;
-        if(params!=null && params.size()>0){
-            Log.i(TAG, "Params not null");
-            bundle = new Bundle();
-            Iterator<Param> it = params.iterator();
-            while (it.hasNext()){
-                Param param = it.next();
-                Log.i(TAG, "Param name: "+param.getParamName()+", with value: "+param.getValue());
-                bundle.putString(param.getParamName(), param.getValue().toString());
-            }
-        }
-        return bundle;
-    }
-
-
 }
