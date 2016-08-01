@@ -2,7 +2,7 @@ package com.ariel.guardian.pubnub.listeners;
 
 import android.util.Log;
 
-import com.ariel.guardian.command.CommandListener;
+import com.ariel.guardian.command.Command;
 import com.ariel.guardian.command.CommandProducer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,7 +13,7 @@ import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
-import ariel.commands.ArielCommandMessage;
+import ariel.commands.CommandMessage;
 
 /**
  * Created by mikalackis on 4.7.16..
@@ -41,8 +41,12 @@ public class ArielPubNubCallback extends SubscribeCallback {
     @Override
     public void message(PubNub pubnub, PNMessageResult message){
         Log.i(TAG, "Received pubnub message: "+ message.getMessage().toString());
-        ArielCommandMessage msg = gson.fromJson(message.getMessage().toString(), ArielCommandMessage.class);
-        CommandListener command = CommandProducer.getInstance().getCommand(message.getSubscribedChannel(), msg.getAction());
+        if(message == null || message.getMessage() == null){
+            Log.i(TAG, "MESSAGE OBJECT IS NULL!!!");
+            return;
+        }
+        CommandMessage msg = gson.fromJson(message.getMessage().toString(), CommandMessage.class);
+        Command command = CommandProducer.getInstance().getCommand(message.getSubscribedChannel(), msg.getAction());
         Log.i(TAG, "Received command from pubnub: "+msg.getAction()+" with params: "+msg.getParams());
         if(command!=null){
             Log.i(TAG, "Command not null");

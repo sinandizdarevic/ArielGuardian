@@ -40,7 +40,7 @@ public class FirebaseAuthService extends ArielService {
                     /*
                       Start device config service
                      */
-                    startService(DeviceConfigService.getStartingIntent());
+                    startService(DeviceConfigService.getCallingIntent());
                 }
                 else{
                     Log.i(TAG, "User not anonymous!!!");

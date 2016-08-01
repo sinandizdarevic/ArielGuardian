@@ -31,11 +31,21 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import ariel.commands.LocationCommands;
+import ariel.commands.Param;
+
 public class DeviceFinderService extends ArielService implements LocationManager.LocationManagerListener {
 
     private static final String TAG = DeviceFinderService.class.getSimpleName();
 
+    public static final String EXTRA_PARAM = "param";
+
     private boolean mIsRunning = false;
+
+    private boolean mReportBySms = false;
 
     private LocationManager mLocationManager;
 
@@ -49,6 +59,9 @@ public class DeviceFinderService extends ArielService implements LocationManager
                     .build();
             mLocationManager.initAndStartLocationUpdates();
         }
+
+        mReportBySms = Boolean.parseBoolean(intent.getStringExtra(LocationCommands.PARAM_SMS_LOCATION_REPORT));
+
         return START_STICKY;
     }
 
@@ -57,7 +70,7 @@ public class DeviceFinderService extends ArielService implements LocationManager
         super.onDestroy();
         mIsRunning = false;
         mLocationManager.stopUpdates();
-        mLocationManager=null;
+        mLocationManager = null;
     }
 
     @Nullable
@@ -73,9 +86,12 @@ public class DeviceFinderService extends ArielService implements LocationManager
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i(TAG, "Got location: "+location.toString());
-        DeviceLocation deviceLocation = new DeviceLocation(location.getTime(),location.getLatitude(),location.getLongitude());
+        Log.i(TAG, "Got location: " + location.toString());
+        DeviceLocation deviceLocation = new DeviceLocation(location.getTime(), location.getLatitude(), location.getLongitude());
         FirebaseHelper.getInstance().reportLocation(deviceLocation);
+        if (mReportBySms) {
+            // // TODO: 29.7.16. send SMS location with google maps URL
+        }
     }
 
     @Override
@@ -83,8 +99,15 @@ public class DeviceFinderService extends ArielService implements LocationManager
 
     }
 
-    public static Intent getStartingIntent(){
+    public static Intent getCallingIntent(final ArrayList<Param> params) {
         Intent finderService = new Intent(ArielGuardianApplication.getInstance(), DeviceFinderService.class);
+        if (params != null && params.size() > 0) {
+            Iterator<Param> it = params.iterator();
+            while (it.hasNext()) {
+                Param param = it.next();
+                finderService.putExtra(param.getParamName(), param.getValue().toString());
+            }
+        }
         return finderService;
     }
 

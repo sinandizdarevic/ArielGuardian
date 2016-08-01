@@ -1,14 +1,19 @@
 package com.ariel.guardian.utils;
 
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
+
+import ariel.commands.Param;
 
 /**
  * Created by mikalackis on 23.5.16..
@@ -100,11 +105,20 @@ public class Utilities {
                 .toString();
     }
 
-    public static int getArielSystemStatus(){
-//        ContentResolver resolver = ArielGuardianApplication.getInstance().getContentResolver();
-//        Log.i(TAG,"Ariel system status key: "+ ArielSettings.Secure.ARIEL_SYSTEM_STATUS+", length: "+ArielSettings.Secure.ARIEL_SYSTEM_STATUS.length());
-//        return ArielSettings.Secure.getInt(resolver, ArielSettings.Secure.ARIEL_SYSTEM_STATUS, ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
-        return 0;
+    public static Bundle buildParamsBundle(final List<Param> params){
+        Bundle bundle = null;
+        if(params!=null && params.size()>0){
+            Log.i(TAG, "Params not null");
+            bundle = new Bundle();
+            Iterator<Param> it = params.iterator();
+            while (it.hasNext()){
+                Param param = it.next();
+                Log.i(TAG, "Param name: "+param.getParamName()+", with value: "+param.getValue());
+                bundle.putString(param.getParamName(), param.getValue().toString());
+            }
+        }
+        return bundle;
     }
+
 
 }

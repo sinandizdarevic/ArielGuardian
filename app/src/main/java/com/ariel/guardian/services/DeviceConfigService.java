@@ -63,7 +63,7 @@ public class DeviceConfigService extends ArielService {
         return TAG;
     }
 
-    public static Intent getStartingIntent(){
+    public static Intent getCallingIntent(){
         Intent configService = new Intent(ArielGuardianApplication.getInstance(), DeviceConfigService.class);
         return configService;
     }

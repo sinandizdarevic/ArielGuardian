@@ -26,15 +26,12 @@ public class DevicePackageValueEventListener implements ValueEventListener {
         DevicePackage devicePackage = dataSnapshot.getValue(DevicePackage.class);
         if (devicePackage != null) {
             Log.i("DevicePackage", "device package not null");
-            if (devicePackage.isDisabled()) {
-                Log.i("DevicePackage", "device package is disabled");
-                PackageManagerUtilities.killPackageProcess(ArielGuardianApplication.getInstance(), devicePackage.getPackageName());
-            }
+//            if (devicePackage.isDisabled()) {
+//                Log.i("DevicePackage", "device package is disabled");
+//                PackageManagerUtilities.killPackageProcess(ArielGuardianApplication.getInstance(), devicePackage.getPackageName());
+//            }
 
-            Intent msgIntent = new Intent(ArielGuardianApplication.getInstance(), CreateIFRuleService.class);
-            msgIntent.putExtra(CreateIFRuleService.EXTRA_PACKAGE_NAME, devicePackage.getPackageName());
-            msgIntent.putExtra(CreateIFRuleService.EXTRA_PACKAGE_STATUS, devicePackage.isDisabled());
-            ArielGuardianApplication.getInstance().startService(msgIntent);
+            ArielGuardianApplication.getInstance().startService(CreateIFRuleService.getCallingIntent(devicePackage.getPackageName(), devicePackage.isDisabled()));
 
             if (mListener != null) {
                 Log.i("DevicePackage", "notify listeners");

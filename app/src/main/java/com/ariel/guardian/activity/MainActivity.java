@@ -15,6 +15,9 @@ import android.widget.Toast;
 
 import com.ariel.guardian.ArielGuardianApplication;
 import com.ariel.guardian.R;
+import com.ariel.guardian.command.Command;
+import com.ariel.guardian.command.CommandProducer;
+import com.ariel.guardian.command.TrackerStart;
 import com.ariel.guardian.utils.Utilities;
 
 import java.io.File;
@@ -23,7 +26,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import ariel.commands.ApplicationCommands;
+import ariel.commands.LocationCommands;
 import ariel.providers.ArielSettings;
+import ariel.security.LockPatternUtilsHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,18 +48,7 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    File rulesDir = new File("/data/system/ifw", "text.txt");
-                    FileOutputStream fos = new FileOutputStream(rulesDir);
-                    fos.write("Sava".getBytes());
-                    //                Intent i = new Intent(ArielGuardianApplication.getInstance(),UsageLogActivity.class);
-                    //                startActivity(i);
-                    fos.flush();
-                    fos.close();
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
+                LockPatternUtilsHelper.performAdminLock("123qwe", ArielGuardianApplication.getInstance());
             }
         });
 
@@ -61,8 +56,7 @@ public class MainActivity extends AppCompatActivity {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Device Unique ID: "+ Utilities.getUniquePsuedoID(), Toast.LENGTH_LONG).show();
-                Log.i("Main activity","Device Unique ID: "+ Utilities.getUniquePsuedoID());
+                LockPatternUtilsHelper.clearLock(ArielGuardianApplication.getInstance());
             }
         });
 
@@ -70,15 +64,27 @@ public class MainActivity extends AppCompatActivity {
         btnReadState.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String arielSystemStatus = ArielSettings.Secure.getString(getContentResolver(),
-                        ArielSettings.Secure.ARIEL_INTENT_FILTER_SERVICE);
-                Toast.makeText(MainActivity.this,"Ariel process blocker status: "+arielSystemStatus,Toast.LENGTH_LONG).show();
-//                try {
-//                    boolean packageStatus = ArielGuardian.ApplicationEntry.getPackageStatus(getContentResolver(), "net.trikoder.android.kurir");
-//                    Toast.makeText(MainActivity.this,"Package status is: "+packageStatus,Toast.LENGTH_LONG).show();
-//                } catch (ArielGuardian.ArielPackageNotFoundException e) {
-//                    e.printStackTrace();
-//                }
+//                Command appUpdate = CommandProducer.getInstance().getApplicationCommand(ApplicationCommands.APPLICATION_UPDATE_COMMAND);
+                //appUpdate.execute(new ApplicationCommands.ApplicationParamBuilder("net.trikoder.android.kurir").build());
+//                ArielSettings.Secure.putInt(getContentResolver(),
+//                        ArielSettings.Secure.ARIEL_SYSTEM_STATUS,
+//                        ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
+               // LockPatternUtilsHelper.performAdminLock("123qwe", MainActivity.this);
+                byte[] unlockPwd = LockPatternUtilsHelper.getUnlockPassword();
+                if(unlockPwd!=null && unlockPwd.length>0){
+                    Log.i("MainActivity", "Lock password exists");
+                }
+                else{
+                    Log.i("MainActivity", "No lock password exists");
+                }
+
+                byte[] unlockPattern = LockPatternUtilsHelper.getUnlockPattern();
+                if(unlockPattern!=null && unlockPattern.length>0){
+                    Log.i("MainActivity", "Lock pattern exists");
+                }
+                else{
+                    Log.i("MainActivity", "No lock pattern exists");
+                }
             }
         });
     }

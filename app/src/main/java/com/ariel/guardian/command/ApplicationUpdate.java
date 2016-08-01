@@ -5,18 +5,22 @@ import android.util.Log;
 import com.ariel.guardian.ArielGuardianApplication;
 import com.ariel.guardian.services.DeviceApplicationService;
 
-import ariel.commands.ArielCommands;
+import java.util.ArrayList;
+import java.util.List;
+
+import ariel.commands.ApplicationCommands;
+import ariel.commands.Param;
 
 /**
  * Created by mikalackis on 6.7.16..
  */
-public class ApplicationUpdate implements CommandListener {
-
-    public static final String APPLICATION_UPDATE_COMMAND = ArielCommands.APPLICATION_UPDATE_COMMAND;
+public class ApplicationUpdate extends Command {
 
     @Override
-    public void execute(final String params) {
+    public void execute(final ArrayList<Param> params) {
+        reportCommand("App update");
         Log.i("Application update", "Executing application update for package name: "+params);
-        ArielGuardianApplication.getInstance().startService(DeviceApplicationService.getStartingIntent(params));
+        ArielGuardianApplication.getInstance().startService(DeviceApplicationService.getCallingIntent(params));
     }
+
 }
