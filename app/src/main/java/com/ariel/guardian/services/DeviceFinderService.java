@@ -51,6 +51,7 @@ public class DeviceFinderService extends ArielService implements LocationManager
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "Service starting");
         if (!mIsRunning) {
             mLocationManager = new LocationManager.LocationManagerBuilder(this, this)
                     .locationAccuracyThreshold(5)
@@ -68,6 +69,7 @@ public class DeviceFinderService extends ArielService implements LocationManager
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.i(TAG, "Service stopped");
         mIsRunning = false;
         mLocationManager.stopUpdates();
         mLocationManager = null;

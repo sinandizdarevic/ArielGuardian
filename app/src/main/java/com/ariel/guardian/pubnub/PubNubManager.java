@@ -45,6 +45,10 @@ public class PubNubManager {
 
     public void init(final String publishKey, final String subscribeKey, final String secretKey, final String cipherKey){
 
+        if(pubnub!=null){
+            cleanUp();
+        }
+
         PNConfiguration pubNubConfig = new PNConfiguration();
         pubNubConfig.setPublishKey(publishKey);
         pubNubConfig.setSubscribeKey(subscribeKey);

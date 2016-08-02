@@ -72,6 +72,7 @@ public class ArielGuardianApplication extends Application {
         public void onChange(boolean selfChange, android.net.Uri uri, int userId) {
             int arielSystemStatus = ArielSettings.Secure.getInt(getContentResolver(),
                     ArielSettings.Secure.ARIEL_SYSTEM_STATUS, ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
+            Log.i(TAG, "Ariel system status changed: "+arielSystemStatus);
             switch (arielSystemStatus) {
                 case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_LOCKDOWN: {
                     // // TODO: 29.7.16.
@@ -124,6 +125,7 @@ public class ArielGuardianApplication extends Application {
                 }
                 default: {
                     // // TODO: 29.7.16.
+                    break;
                 }
             }
             Toast.makeText(ArielGuardianApplication.getInstance(), "Ariel System status changed: " + arielSystemStatus, Toast.LENGTH_LONG).show();
