@@ -1,17 +1,13 @@
 package com.ariel.guardian.receivers;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.ariel.guardian.database.DatabaseContract;
-import com.ariel.guardian.database.DatabaseHelper;
-import com.ariel.guardian.firebase.FirebaseHelper;
+import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.firebase.listeners.DevicePackageValueEventListener;
-import com.ariel.guardian.model.DevicePackage;
+import com.ariel.guardian.library.model.DevicePackage;
 import com.ariel.guardian.utils.PackageManagerUtilities;
 import com.google.firebase.database.DatabaseReference;
 
@@ -32,9 +28,6 @@ public class PackageReceiver extends BroadcastReceiver {
         final DevicePackage devicePackage = new DevicePackage();
         devicePackage.setDate(Calendar.getInstance().getTimeInMillis());
         devicePackage.setPackageName(packageName);
-
-        DatabaseHelper dbHelper = new DatabaseHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         if(intent.getAction().equals("android.intent.action.PACKAGE_ADDED")){
             // INSTALLED PACKAGE

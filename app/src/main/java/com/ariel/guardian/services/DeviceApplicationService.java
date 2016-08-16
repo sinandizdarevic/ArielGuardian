@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.ariel.guardian.ArielGuardianApplication;
-import com.ariel.guardian.firebase.FirebaseHelper;
+import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.firebase.listeners.DevicePackageValueEventListener;
 import com.ariel.guardian.utils.Utilities;
 import com.google.firebase.database.DatabaseReference;

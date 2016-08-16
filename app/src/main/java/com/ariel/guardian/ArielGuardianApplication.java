@@ -9,16 +9,12 @@ import android.widget.Toast;
 
 import com.ariel.guardian.command.Command;
 import com.ariel.guardian.command.CommandProducer;
-import com.ariel.guardian.command.TrackerStart;
+import com.ariel.guardian.library.services.PubNubService;
 import com.ariel.guardian.services.DeviceConfigService;
-import com.ariel.guardian.services.PubNubService;
 import com.ariel.guardian.utils.Utilities;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.util.ArrayList;
-
 import ariel.commands.LocationCommands;
-import ariel.commands.Param;
 import ariel.providers.ArielSettings;
 import ariel.security.LockPatternUtilsHelper;
 
@@ -55,7 +51,7 @@ public class ArielGuardianApplication extends Application {
 
         //FirebaseMessaging.getInstance().subscribeToTopic(Utilities.getConfigFCMTopic());
 
-        Intent pubNubService = new Intent(ArielGuardianApplication.getInstance(), PubNubService.class);
+        Intent pubNubService = new Intent(this, PubNubService.class);
         startService(pubNubService);
 
         Log.i(TAG, "Calling anonym login for: " + Utilities.getUniquePsuedoID());

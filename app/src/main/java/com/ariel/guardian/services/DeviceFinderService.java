@@ -20,8 +20,8 @@ package com.ariel.guardian.services;
  */
 
 import com.ariel.guardian.ArielGuardianApplication;
-import com.ariel.guardian.firebase.FirebaseHelper;
-import com.ariel.guardian.model.DeviceLocation;
+import com.ariel.guardian.library.firebase.FirebaseHelper;
+import com.ariel.guardian.library.model.DeviceLocation;
 import com.ariel.guardian.utils.LocationManager;
 import com.google.android.gms.common.ConnectionResult;
 

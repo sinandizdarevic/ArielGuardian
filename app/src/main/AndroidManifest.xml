@@ -181,12 +181,6 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".firebase.FirebaseMessagingService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
         <service
             android:name=".services.DeviceFinderJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
@@ -202,8 +196,6 @@
         <service android:name=".services.DeviceApplicationService"></service>
 
         <service android:name=".services.DeviceFinderService"></service>
-
-        <service android:name=".services.PubNubService"></service>
 
         <service
             android:name=".services.FirebaseAuthService"

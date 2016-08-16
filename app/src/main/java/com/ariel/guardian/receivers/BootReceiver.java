@@ -1,7 +1,7 @@
 
 package com.ariel.guardian.receivers;
 
-import com.ariel.guardian.firebase.FirebaseHelper;
+import com.ariel.guardian.library.firebase.FirebaseHelper;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

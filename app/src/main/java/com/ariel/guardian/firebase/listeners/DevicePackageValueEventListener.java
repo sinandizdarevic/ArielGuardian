@@ -1,12 +1,10 @@
 package com.ariel.guardian.firebase.listeners;
 
-import android.content.Intent;
 import android.util.Log;
 
 import com.ariel.guardian.ArielGuardianApplication;
-import com.ariel.guardian.model.DevicePackage;
+import com.ariel.guardian.library.model.DevicePackage;
 import com.ariel.guardian.services.CreateIFRuleService;
-import com.ariel.guardian.utils.PackageManagerUtilities;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;

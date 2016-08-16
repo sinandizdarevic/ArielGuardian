@@ -1,9 +1,9 @@
 package com.ariel.guardian.command;
 
-import com.ariel.guardian.firebase.FirebaseHelper;
+
+import com.ariel.guardian.library.firebase.FirebaseHelper;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import ariel.commands.Param;
 

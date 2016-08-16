@@ -7,8 +7,10 @@ import android.util.Log;
 
 import com.ariel.guardian.ArielGuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
-import com.ariel.guardian.firebase.FirebaseHelper;
-import com.ariel.guardian.model.DeviceConfiguration;
+import com.ariel.guardian.library.eventbus.DeviceConfigEvent;
+import com.ariel.guardian.library.firebase.FirebaseHelper;
+import com.ariel.guardian.library.model.DeviceConfiguration;
+import com.ariel.guardian.pubnub.listeners.ArielPubNubCallback;
 import com.ariel.guardian.utils.Utilities;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -90,7 +92,7 @@ public class DeviceConfigService extends ArielService {
                 ArielJobScheduler.getInstance().registerNewJob(new DeviceFinderJobService(deviceConfig.getLocationTrackingInterval()));
             }
 
-            EventBus.getDefault().post(deviceConfig);
+            EventBus.getDefault().post(new DeviceConfigEvent(deviceConfig, new ArielPubNubCallback()));
             stopSelf();
         }
 

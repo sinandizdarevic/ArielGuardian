@@ -6,9 +6,10 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.ariel.guardian.library.eventbus.DeviceConfigEvent;
+import com.ariel.guardian.library.model.DeviceConfiguration;
 import com.ariel.guardian.library.pubnub.PubNubManager;
 import com.ariel.guardian.library.utils.Utilities;
-import com.pubnub.api.callbacks.SubscribeCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -37,12 +38,15 @@ public class PubNubService extends Service {
     }
 
     @Subscribe
-    public void onEvent(final String publishKey, final String subscribeKey, final String secretKey,
-                        final String cipherKey, final SubscribeCallback listener) {
-        mPubNubManager.init(publishKey, subscribeKey, secretKey, cipherKey);
+    public void onEvent(final DeviceConfigEvent event) {
+        DeviceConfiguration deviceConfiguration = event.getDeviceConfig();
+        mPubNubManager.init(deviceConfiguration.getPubNubPublishKey(),
+                deviceConfiguration.getPubNubSubscribeKey(),
+                deviceConfiguration.getPubNubSecretKey(),
+                deviceConfiguration.getPubNubCipherKey());
         mPubNubManager.subscribeToChannels(Utilities.getPubNubConfigChannel(),
                 Utilities.getPubNubLocationChannel(), Utilities.getPubNubApplicationChannel());
-        mPubNubManager.addListener(listener);
+        mPubNubManager.addListener(event.getCallback());
     }
 
     @Override

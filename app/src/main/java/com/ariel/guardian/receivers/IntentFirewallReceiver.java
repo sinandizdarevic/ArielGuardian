@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ariel.guardian.firebase.FirebaseHelper;
-
 public class IntentFirewallReceiver extends BroadcastReceiver {
 
     private static final String TAG = "IntentFirewallReceiver";
