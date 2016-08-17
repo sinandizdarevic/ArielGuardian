@@ -2,13 +2,31 @@ package com.ariel.guardian.library.model;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+/**
+ * POJO class that represents device application object in firebase database
+ */
 @IgnoreExtraProperties
 public class DevicePackage {
 
+    /**
+     * Application package name
+     */
     public String packageName;
+    /**
+     * Human readable application name
+     */
     public String appName;
+    /**
+     * Last modification date (DO WE NEED THIS??)
+     */
     public long date;
+    /**
+     * Denotes if application is installed on the device or not
+     */
     public boolean installed;
+    /**
+     * Application status field
+     */
     public boolean disabled;
 
     public DevicePackage(){

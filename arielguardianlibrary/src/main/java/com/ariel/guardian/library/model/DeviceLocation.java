@@ -4,12 +4,18 @@ import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 /**
- * Created by mikalackis on 23.5.16..
+ * POJO class that represents device location object in firebase database
  */
 @IgnoreExtraProperties
 public class DeviceLocation {
 
+    /**
+     * Link to google maps pointing to device location
+     */
     public String googleMapsUrl;
+    /**
+     * Location timestamp
+     */
     public long timestamp;
     public double latitude;
     public double longitude;

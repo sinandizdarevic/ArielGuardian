@@ -2,11 +2,23 @@ package com.ariel.guardian.library.model;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+/**
+ * POJO class that represents activity object in Firebase database
+ */
 @IgnoreExtraProperties
 public class DeviceActivity {
 
+    /**
+     * Action to be reported
+     */
     public String action;
+    /**
+     * Timestamp when the action was performed
+     */
     public long timestamp;
+    /**
+     * true/false if action was executed or not
+     */
     public boolean actionExecuted;
 
     public DeviceActivity(){

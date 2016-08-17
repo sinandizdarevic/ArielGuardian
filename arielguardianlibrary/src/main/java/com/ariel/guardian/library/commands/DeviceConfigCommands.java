@@ -1,11 +1,14 @@
 package com.ariel.guardian.library.commands;
 
 /**
- * Created by mikalackis on 29.7.16..
+ * Class that contains commands for device configuration
  */
 public final class DeviceConfigCommands {
 
     // config commands
+    /**
+     * Activate device configuration update. Not active at the moment
+     */
     public static final String UPDATE_CONFIG_COMMAND = "update_config";
 
 //    protected enum PARAMS{

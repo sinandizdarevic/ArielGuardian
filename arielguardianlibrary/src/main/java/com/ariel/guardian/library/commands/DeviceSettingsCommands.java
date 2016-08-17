@@ -1,7 +1,7 @@
 package com.ariel.guardian.library.commands;
 
 /**
- * Created by mikalackis on 29.7.16..
+ * Class that contains commands for device settings. Not used right now
  */
 public final class DeviceSettingsCommands {
 

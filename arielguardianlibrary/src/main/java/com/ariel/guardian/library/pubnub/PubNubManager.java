@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 /**
- * Created by mikalackis on 2.7.16..
+ * Main PubNub manager class. Managed by PubNubService
  */
 public class PubNubManager {
 

@@ -6,18 +6,35 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
- * Created by mikalackis on 29.7.16..
+ * Class that contains commands related to Location services and a param builder
+ * class.
  */
 public final class LocationCommands {
 
     // location commands
+    /**
+     * Instant location
+     */
     public static final String LOCATE_NOW_COMMAND = "locate";
+    /**
+     * Start location tracking
+     */
     public static final String TRACKING_START_COMMAND = "track_start";
+    /**
+     * Stop location tracking
+     */
     public static final String TRACKING_STOP_COMMAND = "track_stop";
 
     // command parameters
+    /**
+     * Boolean parameter. If provided, location will be reported via SMS too.
+     * Not supported at the moment.
+     */
     public static final String PARAM_SMS_LOCATION_REPORT = "sms_location_report";
 
+    /**
+     * Location command parameter builder class
+     */
     public static class LocationParamBuilder{
         private ArrayList<Param> mParams;
 

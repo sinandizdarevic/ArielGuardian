@@ -15,7 +15,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 /**
- * Created by mikalackis on 2.7.16..
+ * Class responsible for managing PubNubManager instance. Runs in background and
+ * reinitializes PubNub instance when EventBus delivers new DeviceConfiguration class
  */
 public class PubNubService extends Service {
 

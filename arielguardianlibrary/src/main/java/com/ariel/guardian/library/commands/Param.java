@@ -1,10 +1,16 @@
 package com.ariel.guardian.library.commands;
 
 /**
- * Created by mikalackis on 29.7.16..
+ * PoJO class that holds parameters used by commands
  */
 public class Param {
+    /**
+     * Name of the parameters
+     */
     final String paramName;
+    /**
+     * String representation of the parameter value
+     */
     final String value;
 
     public Param(String paramName, String value) {
