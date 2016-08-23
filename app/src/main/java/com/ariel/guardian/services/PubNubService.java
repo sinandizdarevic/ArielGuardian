@@ -11,7 +11,10 @@ import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.firebase.model.DeviceConfiguration;
 import com.ariel.guardian.library.pubnub.PubNubManager;
+import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.models.consumer.PNPublishResult;
+import com.pubnub.api.models.consumer.PNStatus;
 
 import javax.inject.Inject;
 
@@ -48,8 +51,8 @@ public class PubNubService extends Service {
                 deviceConfiguration.getPubNubCipherKey(), callback);
     }
 
-    public void sendCommand(final CommandMessage command, final String channel){
-        pubNubManager.sendCommand(command, channel);
+    public void sendCommand(final CommandMessage command, final String channel, final PNCallback<PNPublishResult> callback){
+        pubNubManager.sendCommand(command, channel, callback);
     }
 
     @Override

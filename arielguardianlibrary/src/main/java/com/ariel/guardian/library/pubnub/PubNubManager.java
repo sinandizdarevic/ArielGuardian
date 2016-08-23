@@ -9,7 +9,9 @@ import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.endpoints.pubsub.Publish;
 import com.pubnub.api.enums.PNLogVerbosity;
+import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.presence.PNWhereNowResult;
 
@@ -108,8 +110,11 @@ public class PubNubManager {
      * @param command
      * @param channel
      */
-    public void sendCommand(final CommandMessage command, final String channel){
-        pubnub.publish().channel(channel).message(command);
+    public void sendCommand(final CommandMessage command, final String channel, final PNCallback<PNPublishResult> callback){
+        if(callback==null){
+            throw new NullPointerException("Callback must not be null");
+        }
+        pubnub.publish().channel(channel).message(command).async(callback);
     }
 
 }
