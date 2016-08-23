@@ -4,7 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
-import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.GuardianApplication;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,7 +27,7 @@ public class CreateIFRuleService extends IntentService {
     }
 
     public static Intent getCallingIntent(final String packageName, final boolean status){
-        Intent serviceIntent = new Intent(ArielGuardianApplication.getInstance(), CreateIFRuleService.class);
+        Intent serviceIntent = new Intent(GuardianApplication.getInstance(), CreateIFRuleService.class);
         serviceIntent.putExtra(CreateIFRuleService.EXTRA_PACKAGE_NAME, packageName);
         serviceIntent.putExtra(CreateIFRuleService.EXTRA_PACKAGE_STATUS, status);
         return serviceIntent;

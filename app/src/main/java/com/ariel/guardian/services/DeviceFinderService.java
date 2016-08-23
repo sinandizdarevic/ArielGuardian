@@ -19,7 +19,8 @@ package com.ariel.guardian.services;
  * limitations under the License.
  */
 
-import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.GuardianComponent;
 import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.library.model.DeviceLocation;
@@ -81,11 +82,16 @@ public class DeviceFinderService extends ArielService implements LocationManager
         return "DeviceFinderService";
     }
 
+//    @Override
+//    public void injectComponent(GuardianComponent component) {
+//        component.inject(this);
+//    }
+
     @Override
     public void onLocationChanged(Location location) {
         Log.i(TAG, "Got location: " + location.toString());
         DeviceLocation deviceLocation = new DeviceLocation(location.getTime(), location.getLatitude(), location.getLongitude());
-        FirebaseHelper.getInstance().reportLocation(deviceLocation);
+        mFirebaseHelper.reportLocation(deviceLocation);
         if (mReportBySms) {
             // // TODO: 29.7.16. send SMS location with google maps URL
         }
@@ -97,7 +103,7 @@ public class DeviceFinderService extends ArielService implements LocationManager
     }
 
     public static Intent getCallingIntent(final LocationParams params) {
-        Intent finderService = new Intent(ArielGuardianApplication.getInstance(), DeviceFinderService.class);
+        Intent finderService = new Intent(GuardianApplication.getInstance(), DeviceFinderService.class);
         if(params!=null) {
             finderService.putExtra(LocationParams.PARAM_SMS_LOCATION_REPORT, params.getSmsLocationReport());
         }

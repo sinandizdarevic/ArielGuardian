@@ -23,23 +23,11 @@ public class FirebaseHelper {
 
     public static final String GOOGLE_MAPS_URL = "http://maps.google.com/?q=%1$f,%2$f";
 
-    private static FirebaseHelper mInstance;
     private FirebaseDatabase mFBDB;
 
     private ArrayMap<String, ValueEventListener> mPackageListeners = new ArrayMap<String, ValueEventListener>();
 
-    /**
-     *
-     * @return current Firebase instance
-     */
-    public static FirebaseHelper getInstance(){
-        if (mInstance==null){
-            mInstance = new FirebaseHelper();
-        }
-        return mInstance;
-    }
-
-    private FirebaseHelper(){
+    public FirebaseHelper(){
         Log.i(TAG, "FirebaseHelper instantiated");
         mFBDB = FirebaseDatabase.getInstance();
     }

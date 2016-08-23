@@ -1,6 +1,7 @@
 package com.ariel.guardian;
 
 import android.app.Application;
+import android.content.Intent;
 import android.database.ContentObserver;
 import android.os.Handler;
 import android.util.Log;
@@ -8,12 +9,11 @@ import android.widget.Toast;
 
 import com.ariel.guardian.command.Command;
 import com.ariel.guardian.command.CommandProducer;
-import com.ariel.guardian.library.ArielLibrary;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.library.utils.Utilities;
 import com.ariel.guardian.services.DeviceConfigService;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.ariel.guardian.services.PubNubService;
 
 import ariel.providers.ArielSettings;
 import ariel.security.LockPatternUtilsHelper;
@@ -22,42 +22,54 @@ import ariel.security.LockPatternUtilsHelper;
  * @author mikalackis
  */
 
-public class ArielGuardianApplication extends Application {
+public class GuardianApplication extends Application {
 
-    public static final String TAG = "ArielGuardianApp";
+    public static final String TAG = "GuardianApplication";
 
-    private static ArielGuardianApplication mInstance;
+    private GuardianComponent mGuardianComponent;
 
-    private GoogleApiClient mGoogleApiClient;
+    private static GuardianApplication mInstance;
 
-    public static ArielGuardianApplication getInstance() {
+    public static GuardianApplication getInstance(){
         return mInstance;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "ArielGuardianApplication app created");
+        Log.i(TAG, "GuardianApplication app created");
 
         mInstance = this;
 
-//        DeviceInfo.getInstance().registerServiceStateListener();
-//
         getContentResolver().registerContentObserver(
                 ArielSettings.Secure.getUriFor(ArielSettings.Secure.ARIEL_SYSTEM_STATUS),
                 false, mSettingObserver);
+
+        prepareDagger();
 
         //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         //FirebaseMessaging.getInstance().subscribeToTopic(Utilities.getConfigFCMTopic());
 
-        ArielLibrary.prepare(this);
+        // start main pubnub service
+        Intent pubNubService = new Intent(this, PubNubService.class);
+        startService(pubNubService);
 
         Log.i(TAG, "Calling anonym login for: " + Utilities.getUniquePsuedoID());
 //        Intent authService = new Intent(this, FirebaseAuthService.class);
 //        startService(authService);
         startService(DeviceConfigService.getCallingIntent());
 
+    }
+
+    private void prepareDagger(){
+        mGuardianComponent = DaggerGuardianComponent.builder()
+                .guardianModule(new GuardianModule(this))
+                .build();
+    }
+
+    public GuardianComponent getGuardianComponent(){
+        return mGuardianComponent;
     }
 
     /**
@@ -89,7 +101,7 @@ public class ArielGuardianApplication extends Application {
                      */
 
                     // Lock the screen
-                    LockPatternUtilsHelper.performAdminLock("123qwe", ArielGuardianApplication.this);
+                    LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.this);
 
                     // Start location tracking
                     Command locationTracking = CommandProducer.getInstance().getLocationCommand(LocationCommands.TRACKING_START_COMMAND);
@@ -111,7 +123,7 @@ public class ArielGuardianApplication extends Application {
                      */
 
                     // Lock the screen
-                    LockPatternUtilsHelper.clearLock(ArielGuardianApplication.this);
+                    LockPatternUtilsHelper.clearLock(GuardianApplication.this);
 
                     // Stop location tracking
                     Command locationTracking = CommandProducer.getInstance().getLocationCommand(LocationCommands.TRACKING_STOP_COMMAND);
@@ -123,7 +135,7 @@ public class ArielGuardianApplication extends Application {
                     break;
                 }
             }
-            Toast.makeText(ArielGuardianApplication.getInstance(), "Ariel System status changed: " + arielSystemStatus, Toast.LENGTH_LONG).show();
+            Toast.makeText(GuardianApplication.this, "Ariel System status changed: " + arielSystemStatus, Toast.LENGTH_LONG).show();
         }
     };
 

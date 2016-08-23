@@ -3,17 +3,14 @@ package com.ariel.guardian.activity;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.R;
 import com.ariel.guardian.library.commands.application.ApplicationParams;
 import com.google.gson.Gson;
@@ -22,7 +19,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import ariel.providers.ArielSettings;
 import ariel.security.LockPatternUtilsHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LockPatternUtilsHelper.performAdminLock("123qwe", ArielGuardianApplication.getInstance());
+                LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.getInstance());
             }
         });
 
@@ -50,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //LockPatternUtilsHelper.clearLock(ArielGuardianApplication.getInstance());
+                //LockPatternUtilsHelper.clearLock(GuardianApplication.getInstance());
                 ApplicationParams ap = new ApplicationParams.ApplicationParamBuilder("com.example.android").build();
                 Gson gson = new Gson();
                 String json = gson.toJson(ap);

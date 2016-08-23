@@ -8,17 +8,19 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
+import com.ariel.guardian.GuardianComponent;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.library.model.DeviceConfiguration;
-import com.ariel.guardian.library.services.PubNubService;
 import com.ariel.guardian.library.utils.Utilities;
 import com.ariel.guardian.pubnub.listeners.ArielPubNubCallback;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+
+import javax.inject.Inject;
 
 import ariel.providers.ArielSettings;
 
@@ -37,7 +39,9 @@ public class DeviceConfigService extends ArielService {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "Created DeviceConfigService");
-        mDeviceConfiguration = FirebaseHelper.getInstance().getFirebaseDatabase().getReference("configuration").child(Utilities.getUniquePsuedoID());
+        ((GuardianApplication)getApplication()).getGuardianComponent().inject(this);
+
+        mDeviceConfiguration = mFirebaseHelper.getFirebaseDatabase().getReference("configuration").child(Utilities.getUniquePsuedoID());
         mDeviceConfigListener = new DeviceConfigurationValueEventListener();
     }
 
@@ -66,8 +70,13 @@ public class DeviceConfigService extends ArielService {
         return TAG;
     }
 
+//    @Override
+//    public void injectComponent(GuardianComponent component) {
+//        component.inject(this);
+//    }
+
     public static Intent getCallingIntent(){
-        Intent configService = new Intent(ArielGuardianApplication.getInstance(), DeviceConfigService.class);
+        Intent configService = new Intent(GuardianApplication.getInstance(), DeviceConfigService.class);
         return configService;
     }
 
@@ -84,18 +93,18 @@ public class DeviceConfigService extends ArielService {
             final DeviceConfiguration deviceConfig = dataSnapshot.getValue(DeviceConfiguration.class);
             Log.i(TAG, "Received device configuration, ariel system status: "+deviceConfig.getArielSystemStatus());
 
-            ArielSettings.Secure.putInt(ArielGuardianApplication.getInstance().getContentResolver(),ArielSettings.Secure.ARIEL_SYSTEM_STATUS,deviceConfig.getArielSystemStatus());
+            ArielSettings.Secure.putInt(GuardianApplication.getInstance().getContentResolver(),ArielSettings.Secure.ARIEL_SYSTEM_STATUS,deviceConfig.getArielSystemStatus());
 
             // update scheduled location tracking job
-            ArielJobScheduler.getInstance().cancelRunningJob(ArielJobScheduler.ArielJobID.LOCATION.ordinal());
+            mArielJobScheduler.cancelRunningJob(ArielJobScheduler.ArielJobID.LOCATION.ordinal());
             if(deviceConfig.getLocationTrackingInterval()>0) {
                 Log.i(TAG, "Start device tracking job");
-                ArielJobScheduler.getInstance().registerNewJob(new DeviceFinderJobService(deviceConfig.getLocationTrackingInterval()));
+                mArielJobScheduler.registerNewJob(new DeviceFinderJobService(deviceConfig.getLocationTrackingInterval()));
             }
 
             //EventBus.getDefault().post(new DeviceConfigEvent(deviceConfig, new ArielPubNubCallback()));
 
-            Intent intent = new Intent(ArielGuardianApplication.getInstance(), PubNubService.class);
+            Intent intent = new Intent(GuardianApplication.getInstance(), PubNubService.class);
             bindService(intent, new ServiceConnection() {
                 @Override
                 public void onServiceConnected(ComponentName componentName, IBinder iBinder) {

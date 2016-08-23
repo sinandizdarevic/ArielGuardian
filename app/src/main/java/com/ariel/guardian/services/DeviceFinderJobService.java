@@ -17,7 +17,7 @@
 package com.ariel.guardian.services;
 
 
-import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.library.model.DeviceLocation;
@@ -29,6 +29,8 @@ import android.app.job.JobParameters;
 import android.content.ComponentName;
 import android.location.Location;
 import android.util.Log;
+
+import javax.inject.Inject;
 
 public class DeviceFinderJobService extends ArielJobService implements LocationManager.LocationManagerListener {
 
@@ -42,12 +44,17 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
 
     private LocationManager mLocationManager;
 
-    public DeviceFinderJobService(){
+    @Inject
+    FirebaseHelper mFirebaseHelper;
 
+    public DeviceFinderJobService(){
+        GuardianApplication.getInstance().getGuardianComponent().inject(this);
     }
 
     public DeviceFinderJobService(final long locationUpdateInterval){
+        super();
         this.locationUpdateInterval=locationUpdateInterval;
+        GuardianApplication.getInstance().getGuardianComponent().inject(this);
     }
 
     @Override
@@ -77,7 +84,7 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
     public void onLocationChanged(Location location) {
         Log.i(TAG, "Got location: "+location.toString());
         DeviceLocation deviceLocation = new DeviceLocation(location.getTime(),location.getLatitude(),location.getLongitude());
-        FirebaseHelper.getInstance().reportLocation(deviceLocation);
+        mFirebaseHelper.reportLocation(deviceLocation);
     }
 
     @Override
@@ -92,7 +99,7 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
 
     @Override
     public JobInfo getJobInfo() {
-        ComponentName componentName = new ComponentName(ArielGuardianApplication.getInstance(), DeviceFinderJobService.class);
+        ComponentName componentName = new ComponentName(GuardianApplication.getInstance(), DeviceFinderJobService.class);
         if(locationUpdateInterval!=-1) {
             return new JobInfo.Builder(ArielJobScheduler.ArielJobID.LOCATION.ordinal(), componentName).setPersisted(true).setPeriodic(locationUpdateInterval).build();
         }

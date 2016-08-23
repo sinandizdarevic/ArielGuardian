@@ -5,7 +5,7 @@ import android.app.job.JobParameters;
 import android.content.ComponentName;
 import android.content.Intent;
 
-import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
 
 /**
@@ -14,7 +14,7 @@ import com.ariel.guardian.ArielJobScheduler;
 public class RetryLoginJobService extends ArielJobService {
     @Override
     public JobInfo getJobInfo() {
-        ComponentName componentName = new ComponentName(ArielGuardianApplication.getInstance(), FirebaseAuthService.class);
+        ComponentName componentName = new ComponentName(GuardianApplication.getInstance(), FirebaseAuthService.class);
         return new JobInfo.Builder(ArielJobScheduler.ArielJobID.LOGIN.ordinal(), componentName).setPersisted(true).setOverrideDeadline(60000).build();
     }
 

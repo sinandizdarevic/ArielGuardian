@@ -2,7 +2,7 @@ package com.ariel.guardian.firebase.listeners;
 
 import android.util.Log;
 
-import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.model.DevicePackage;
 import com.ariel.guardian.services.CreateIFRuleService;
 import com.google.firebase.database.DataSnapshot;
@@ -26,10 +26,12 @@ public class DevicePackageValueEventListener implements ValueEventListener {
             Log.i("DevicePackage", "device package not null");
 //            if (devicePackage.isDisabled()) {
 //                Log.i("DevicePackage", "device package is disabled");
-//                PackageManagerUtilities.killPackageProcess(ArielGuardianApplication.getInstance(), devicePackage.getPackageName());
+//                PackageManagerUtilities.killPackageProcess(GuardianApplication.getInstance(), devicePackage.getPackageName());
 //            }
 
-            ArielGuardianApplication.getInstance().startService(CreateIFRuleService.getCallingIntent(devicePackage.getPackageName(), devicePackage.isDisabled()));
+            GuardianApplication.getInstance().
+                    startService(CreateIFRuleService.getCallingIntent
+                            (devicePackage.getPackageName(), devicePackage.isDisabled()));
 
             if (mListener != null) {
                 Log.i("DevicePackage", "notify listeners");

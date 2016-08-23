@@ -8,6 +8,7 @@ import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.utils.Utilities;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNStatusCategory;
@@ -46,13 +47,19 @@ public class ArielPubNubCallback extends SubscribeCallback {
             return;
         }
 
-        CommandMessage msg = gson.fromJson(message.getMessage().toString(), CommandMessage.class);
-        Command command = CommandProducer.getInstance().getCommand(message.getSubscribedChannel(), msg.getAction());
-        Log.i(TAG, "Received command from pubnub: "+msg.getAction()+" with params: "+msg.getParams());
-        if(command!=null){
-            Log.i(TAG, "Command not null");
-            command.execute(msg.getParams());
+        try{
+            CommandMessage msg = gson.fromJson(message.getMessage().toString(), CommandMessage.class);
+            Command command = CommandProducer.getInstance().getCommand(message.getSubscribedChannel(), msg.getAction());
+            Log.i(TAG, "Received command from pubnub: "+msg.getAction()+" with params: "+msg.getParams());
+            if(command!=null){
+                Log.i(TAG, "Command not null");
+                command.execute(msg.getParams());
+            }
         }
+        catch(JsonSyntaxException exception){
+            Log.e(TAG, "Invlid JSON structure!");
+        }
+
     }
 
     @Override

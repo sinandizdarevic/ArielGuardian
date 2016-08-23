@@ -49,6 +49,8 @@ public class PubNubManager {
         pubNubConfig.setUuid(Utilities.getUniquePsuedoID());
         pubNubConfig.setLogVerbosity(PNLogVerbosity.BODY);
 
+        //pubNubConfig.setPresenceTimeout()
+
         pubnub = new PubNub(pubNubConfig);
     }
 

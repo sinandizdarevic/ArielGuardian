@@ -5,7 +5,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.GuardianComponent;
 import com.ariel.guardian.library.commands.application.ApplicationParams;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.firebase.listeners.DevicePackageValueEventListener;
@@ -46,7 +47,7 @@ public class DeviceApplicationService extends ArielService implements DevicePack
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mPackageName = intent.getStringExtra(ApplicationParams.PARAM_PACKAGE_NAME);
-        mDeviceApplication = FirebaseHelper.getInstance().getFirebaseDatabase().getReference("application").child(Utilities.getUniquePsuedoID()).child(Utilities.encodeAsFirebaseKey(mPackageName));
+        mDeviceApplication = mFirebaseHelper.getFirebaseDatabase().getReference("application").child(Utilities.getUniquePsuedoID()).child(Utilities.encodeAsFirebaseKey(mPackageName));
         mDeviceApplication.addListenerForSingleValueEvent(mDevicePackageListener);
         return START_STICKY;
     }
@@ -62,13 +63,18 @@ public class DeviceApplicationService extends ArielService implements DevicePack
         return TAG;
     }
 
+//    @Override
+//    public void injectComponent(GuardianComponent component) {
+//        component.inject(this);
+//    }
+
     @Override
     public void onDataLoadCompleted() {
         stopSelf();
     }
 
     public static Intent getCallingIntent(final ApplicationParams params){
-        Intent appService = new Intent(ArielGuardianApplication.getInstance(), DeviceApplicationService.class);
+        Intent appService = new Intent(GuardianApplication.getInstance(), DeviceApplicationService.class);
         appService.putExtra(ApplicationParams.PARAM_PACKAGE_NAME, params.getPackageName());
         return appService;
     }

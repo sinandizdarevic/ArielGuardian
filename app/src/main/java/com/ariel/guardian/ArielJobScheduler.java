@@ -24,15 +24,8 @@ public class ArielJobScheduler {
 
     private JobScheduler mJobScheduler;
 
-    public static ArielJobScheduler getInstance(){
-        if(mArielJobScheduler==null){
-            mArielJobScheduler = new ArielJobScheduler();
-        }
-        return mArielJobScheduler;
-    }
-
-    private ArielJobScheduler(){
-        mJobScheduler = (JobScheduler) ArielGuardianApplication.getInstance().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+    public ArielJobScheduler(final Context context){
+        mJobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
     }
 
     public void registerNewJob(final ArielJobService service){

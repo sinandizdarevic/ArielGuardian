@@ -6,7 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
+
+import javax.inject.Inject;
 
 import ariel.providers.ArielSettings;
 
@@ -14,10 +17,16 @@ public class ShutdownReceiver extends BroadcastReceiver {
 
     private static final String TAG = "ShutdownReceiver";
 
+    @Inject
+    FirebaseHelper mFirebaseHelper;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "Shutdown received, should send data ");
-        FirebaseHelper.getInstance().reportAction("Ariel system offline");
+
+        GuardianApplication.getInstance().getGuardianComponent().inject(this);
+
+        mFirebaseHelper.reportAction("Ariel system offline");
     }
 
 }

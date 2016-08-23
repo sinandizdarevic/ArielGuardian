@@ -1,4 +1,4 @@
-package com.ariel.guardian.library.services;
+package com.ariel.guardian.services;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,11 +7,17 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.library.ArielLibrary;
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.model.DeviceConfiguration;
 import com.ariel.guardian.library.pubnub.PubNubManager;
 import com.ariel.guardian.library.utils.Utilities;
 import com.pubnub.api.callbacks.SubscribeCallback;
+
+import java.security.Guard;
+
+import javax.inject.Inject;
 
 /**
  * Class responsible for managing PubNubManager instance. Runs in background and
@@ -21,14 +27,15 @@ public class PubNubService extends Service {
 
     private static final String TAG = "PubNubService";
 
-    private PubNubManager mPubNubManager;
+    @Inject
+    PubNubManager pubNubManager;
 
     private final IBinder mBinder = new PubNubServiceBinder();
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mPubNubManager = new PubNubManager();
+        GuardianApplication.getInstance().getGuardianComponent().inject(this);
     }
 
     @Override
@@ -38,38 +45,25 @@ public class PubNubService extends Service {
         return START_STICKY;
     }
 
-//    @Subscribe
-//    public void onEvent(final DeviceConfigEvent event) {
-//        DeviceConfiguration deviceConfiguration = event.getDeviceConfig();
-//        mPubNubManager.init(deviceConfiguration.getPubNubPublishKey(),
-//                deviceConfiguration.getPubNubSubscribeKey(),
-//                deviceConfiguration.getPubNubSecretKey(),
-//                deviceConfiguration.getPubNubCipherKey());
-//        mPubNubManager.subscribeToChannels(Utilities.getPubNubConfigChannel(),
-//                Utilities.getPubNubLocationChannel(), Utilities.getPubNubApplicationChannel());
-//        mPubNubManager.addListener(event.getCallback());
-//        //SharedPrefsManager.getInstance(getApplicationContext()).savePubNubData(deviceConfiguration);
-//    }
-
     public void initPubNub(final DeviceConfiguration deviceConfiguration, final SubscribeCallback callback){
-        mPubNubManager.init(deviceConfiguration.getPubNubPublishKey(),
+        pubNubManager.init(deviceConfiguration.getPubNubPublishKey(),
                 deviceConfiguration.getPubNubSubscribeKey(),
                 deviceConfiguration.getPubNubSecretKey(),
                 deviceConfiguration.getPubNubCipherKey());
-        mPubNubManager.subscribeToChannels(Utilities.getPubNubConfigChannel(),
+        pubNubManager.subscribeToChannels(Utilities.getPubNubConfigChannel(),
                 Utilities.getPubNubLocationChannel(), Utilities.getPubNubApplicationChannel());
-        mPubNubManager.addListener(callback);
+        pubNubManager.addListener(callback);
     }
 
     public void sendCommand(final CommandMessage command, final String channel){
-        mPubNubManager.sendCommand(command, channel);
+        pubNubManager.sendCommand(command, channel);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "PubNubService destroyed");
-        mPubNubManager.cleanUp();
+        pubNubManager.cleanUp();
     }
 
     /**

@@ -1,9 +1,7 @@
 package com.ariel.guardian.library;
 
-import android.content.Context;
+import android.app.Application;
 import android.content.Intent;
-
-import com.ariel.guardian.library.services.PubNubService;
 
 /**
  * Ariel library main entry point.
@@ -12,12 +10,22 @@ public class ArielLibrary {
 
     /**
      * Performs library initialization
-     * @param context
+     * @param Application
      */
-    public static void prepare(final Context context){
-        // starts pubnub service
-        Intent pubNubService = new Intent(context, PubNubService.class);
-        context.startService(pubNubService);
-    }
+//    public static void prepare(final Application application){
+//
+//        // prepare dagger
+//        arielModuleComponent = DaggerArielModuleComponent.builder()
+//                .arielLibraryModule(new ArielLibraryModule(application))
+//                .build();
+//
+//        // starts pubnub service
+//        Intent pubNubService = new Intent(application, PubNubService.class);
+//        application.startService(pubNubService);
+//    }
+//
+//    public static ArielModuleComponent getArielComponent(){
+//        return arielModuleComponent;
+//    }
 
 }

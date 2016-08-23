@@ -1,6 +1,7 @@
 package com.ariel.guardian.command;
 
-import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.GuardianComponent;
 import com.ariel.guardian.library.commands.Params;
 import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.services.DeviceFinderService;
@@ -13,6 +14,11 @@ public class TrackerStart extends Command {
     @Override
     public void execute(final Params params) {
         reportCommand("Start tracking");
-        ArielGuardianApplication.getInstance().startService(DeviceFinderService.getCallingIntent((LocationParams)params));
+        GuardianApplication.getInstance().startService(DeviceFinderService.getCallingIntent((LocationParams)params));
     }
+
+//    @Override
+//    public void injectComponent(GuardianComponent component) {
+//        component.inject(this);
+//    }
 }

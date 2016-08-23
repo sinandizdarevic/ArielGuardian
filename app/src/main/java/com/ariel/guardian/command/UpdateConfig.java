@@ -1,6 +1,7 @@
 package com.ariel.guardian.command;
 
-import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.GuardianComponent;
 import com.ariel.guardian.library.commands.Params;
 import com.ariel.guardian.services.DeviceConfigService;
 
@@ -12,6 +13,11 @@ public class UpdateConfig extends Command {
     @Override
     public void execute(final Params params) {
         reportCommand("Config file update");
-        ArielGuardianApplication.getInstance().startService(DeviceConfigService.getCallingIntent());
+        GuardianApplication.getInstance().startService(DeviceConfigService.getCallingIntent());
     }
+
+//    @Override
+//    public void injectComponent(GuardianComponent component) {
+//        component.inject(this);
+//    }
 }
