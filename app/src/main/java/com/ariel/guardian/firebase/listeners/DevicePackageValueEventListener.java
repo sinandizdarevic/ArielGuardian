@@ -3,7 +3,7 @@ package com.ariel.guardian.firebase.listeners;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.model.DevicePackage;
+import com.ariel.guardian.library.firebase.model.DevicePackage;
 import com.ariel.guardian.services.CreateIFRuleService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

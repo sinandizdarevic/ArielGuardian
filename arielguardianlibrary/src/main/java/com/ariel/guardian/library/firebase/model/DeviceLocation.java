@@ -1,4 +1,4 @@
-package com.ariel.guardian.library.model;
+package com.ariel.guardian.library.firebase.model;
 
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.google.firebase.database.IgnoreExtraProperties;

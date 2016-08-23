@@ -1,5 +1,5 @@
 
-package com.ariel.guardian.library.model;
+package com.ariel.guardian.library.firebase.model;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 

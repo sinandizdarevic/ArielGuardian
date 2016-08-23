@@ -9,6 +9,9 @@ import android.widget.Toast;
 
 import com.ariel.guardian.command.Command;
 import com.ariel.guardian.command.CommandProducer;
+import com.ariel.guardian.library.commands.CommandMessage;
+import com.ariel.guardian.library.commands.application.ApplicationCommands;
+import com.ariel.guardian.library.commands.application.ApplicationParams;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.library.utils.Utilities;
@@ -102,6 +105,10 @@ public class GuardianApplication extends Application {
 
                     // Lock the screen
                     LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.this);
+
+                    LocationParams lParams = new LocationParams.LocationParamBuilder().smsLocationReport(true).build();
+                    CommandMessage locateNow = new CommandMessage(LocationCommands.LOCATE_NOW_COMMAND, lParams);
+                    // send appUpdate object via PubNub to application channel
 
                     // Start location tracking
                     Command locationTracking = CommandProducer.getInstance().getLocationCommand(LocationCommands.TRACKING_START_COMMAND);

@@ -3,7 +3,7 @@ package com.ariel.guardian.library.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.ariel.guardian.library.model.DeviceConfiguration;
+import com.ariel.guardian.library.firebase.model.DeviceConfiguration;
 
 /**
  * Created by mikalackis on 17.8.16..

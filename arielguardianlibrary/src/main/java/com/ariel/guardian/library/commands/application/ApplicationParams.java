@@ -3,7 +3,7 @@ package com.ariel.guardian.library.commands.application;
 import com.ariel.guardian.library.commands.Params;
 
 /**
- * Created by mikalackis on 18.8.16..
+ * Application command available parameters
  */
 public class ApplicationParams extends Params {
 

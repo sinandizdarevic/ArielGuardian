@@ -8,14 +8,10 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.ArielLibrary;
 import com.ariel.guardian.library.commands.CommandMessage;
-import com.ariel.guardian.library.model.DeviceConfiguration;
+import com.ariel.guardian.library.firebase.model.DeviceConfiguration;
 import com.ariel.guardian.library.pubnub.PubNubManager;
-import com.ariel.guardian.library.utils.Utilities;
 import com.pubnub.api.callbacks.SubscribeCallback;
-
-import java.security.Guard;
 
 import javax.inject.Inject;
 
@@ -49,10 +45,7 @@ public class PubNubService extends Service {
         pubNubManager.init(deviceConfiguration.getPubNubPublishKey(),
                 deviceConfiguration.getPubNubSubscribeKey(),
                 deviceConfiguration.getPubNubSecretKey(),
-                deviceConfiguration.getPubNubCipherKey());
-        pubNubManager.subscribeToChannels(Utilities.getPubNubConfigChannel(),
-                Utilities.getPubNubLocationChannel(), Utilities.getPubNubApplicationChannel());
-        pubNubManager.addListener(callback);
+                deviceConfiguration.getPubNubCipherKey(), callback);
     }
 
     public void sendCommand(final CommandMessage command, final String channel){

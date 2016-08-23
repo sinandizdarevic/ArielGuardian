@@ -3,9 +3,9 @@ package com.ariel.guardian.library.firebase;
 import android.util.ArrayMap;
 import android.util.Log;
 
-import com.ariel.guardian.library.model.DeviceActivity;
-import com.ariel.guardian.library.model.DeviceLocation;
-import com.ariel.guardian.library.model.DevicePackage;
+import com.ariel.guardian.library.firebase.model.DeviceActivity;
+import com.ariel.guardian.library.firebase.model.DeviceLocation;
+import com.ariel.guardian.library.firebase.model.DevicePackage;
 import com.ariel.guardian.library.utils.Utilities;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;

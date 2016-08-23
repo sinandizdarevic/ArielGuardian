@@ -10,17 +10,13 @@ import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
-import com.ariel.guardian.GuardianComponent;
-import com.ariel.guardian.library.firebase.FirebaseHelper;
-import com.ariel.guardian.library.model.DeviceConfiguration;
+import com.ariel.guardian.library.firebase.model.DeviceConfiguration;
 import com.ariel.guardian.library.utils.Utilities;
 import com.ariel.guardian.pubnub.listeners.ArielPubNubCallback;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
-import javax.inject.Inject;
 
 import ariel.providers.ArielSettings;
 

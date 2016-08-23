@@ -8,7 +8,7 @@ import android.util.Log;
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.firebase.listeners.DevicePackageValueEventListener;
-import com.ariel.guardian.library.model.DevicePackage;
+import com.ariel.guardian.library.firebase.model.DevicePackage;
 import com.ariel.guardian.utils.PackageManagerUtilities;
 import com.google.firebase.database.DatabaseReference;
 

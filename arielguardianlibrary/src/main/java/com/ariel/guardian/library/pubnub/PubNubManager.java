@@ -34,7 +34,16 @@ public class PubNubManager {
         mSubscribedChannels = new ArrayList<>();
     }
 
-    public void init(final String publishKey, final String subscribeKey, final String secretKey, final String cipherKey){
+    /**
+     * Main initialization point of PubNubManager. You have to call this every time
+     * any of the parameters change
+     * @param publishKey
+     * @param subscribeKey
+     * @param secretKey
+     * @param cipherKey
+     * @param callback
+     */
+    public void init(final String publishKey, final String subscribeKey, final String secretKey, final String cipherKey, final SubscribeCallback callback){
 
         if(pubnub!=null){
             cleanUp();
@@ -52,8 +61,16 @@ public class PubNubManager {
         //pubNubConfig.setPresenceTimeout()
 
         pubnub = new PubNub(pubNubConfig);
+
+        subscribeToChannels(Utilities.getPubNubConfigChannel(),
+                Utilities.getPubNubLocationChannel(), Utilities.getPubNubApplicationChannel());
+
+        addListener(callback);
     }
 
+    /**
+     * Method that performs cleaning and destroys PubNub instance
+     */
     public void cleanUp(){
         if(pubnub!=null) {
             pubnub.unsubscribe().channels(mSubscribedChannels);
@@ -77,15 +94,20 @@ public class PubNubManager {
                 });
     }
 
-    public void subscribeToChannels(String... channels){
+    private void subscribeToChannels(String... channels){
         pubnub.subscribe().channels(Arrays.asList(channels)).execute();
         mSubscribedChannels.addAll(Arrays.asList(channels));
     }
 
-    public void addListener(final SubscribeCallback listener){
+    private void addListener(final SubscribeCallback listener){
         pubnub.addListener(listener);
     }
 
+    /**
+     * Method used to send a command to specific channel
+     * @param command
+     * @param channel
+     */
     public void sendCommand(final CommandMessage command, final String channel){
         pubnub.publish().channel(channel).message(command);
     }
