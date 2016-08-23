@@ -1,5 +1,6 @@
 package com.ariel.guardian.library.commands;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -17,13 +18,18 @@ public class CommandMessage {
     /**
      * List of parameters that go along with the command. Can be null.
      */
-    private ArrayList<Param> params;
+    private Params params;
+
+    public CommandMessage(final String action, final Params params){
+        this.action = action;
+        this.params = params;
+    }
 
     public String getAction() {
         return action;
     }
 
-    public ArrayList<Param> getParams() {
+    public Params getParams() {
         return params;
     }
 

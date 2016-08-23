@@ -68,6 +68,7 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
         mIsRunning = false;
+        mLocationManager.stopUpdates();
         mLocationManager = null;
         return false;
     }

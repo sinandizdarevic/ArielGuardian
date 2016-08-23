@@ -1,13 +1,9 @@
 package com.ariel.guardian.command;
 
 import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.library.commands.Params;
+import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.services.DeviceFinderService;
-
-import java.util.ArrayList;
-
-import ariel.commands.LocationCommands;
-import ariel.commands.Param;
-
 
 /**
  * Created by mikalackis on 6.7.16..
@@ -15,8 +11,8 @@ import ariel.commands.Param;
 public class TrackerStart extends Command {
 
     @Override
-    public void execute(final ArrayList<Param> params) {
+    public void execute(final Params params) {
         reportCommand("Start tracking");
-        ArielGuardianApplication.getInstance().startService(DeviceFinderService.getCallingIntent(params));
+        ArielGuardianApplication.getInstance().startService(DeviceFinderService.getCallingIntent((LocationParams)params));
     }
 }

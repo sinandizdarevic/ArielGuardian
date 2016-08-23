@@ -1,12 +1,11 @@
 package com.ariel.guardian.command;
 
-import com.ariel.guardian.utils.Utilities;
+import com.ariel.guardian.library.commands.application.ApplicationCommands;
+import com.ariel.guardian.library.commands.configuration.DeviceConfigCommands;
+import com.ariel.guardian.library.commands.location.LocationCommands;
+import com.ariel.guardian.library.utils.Utilities;
 
 import java.util.HashMap;
-
-import ariel.commands.ApplicationCommands;
-import ariel.commands.DeviceConfigCommands;
-import ariel.commands.LocationCommands;
 
 /**
  * Created by mikalackis on 6.7.16..

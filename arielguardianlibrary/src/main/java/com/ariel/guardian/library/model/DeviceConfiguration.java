@@ -78,4 +78,20 @@ public class DeviceConfiguration {
     public boolean isPubNubUseSSL() {
         return pubNubUseSSL;
     }
+
+    public void setPubNubCipherKey(String pubNubCipherKey) {
+        this.pubNubCipherKey = pubNubCipherKey;
+    }
+
+    public void setPubNubSubscribeKey(String pubNubSubscribeKey) {
+        this.pubNubSubscribeKey = pubNubSubscribeKey;
+    }
+
+    public void setPubNubPublishKey(String pubNubPublishKey) {
+        this.pubNubPublishKey = pubNubPublishKey;
+    }
+
+    public void setPubNubSecretKey(String pubNubSecretKey) {
+        this.pubNubSecretKey = pubNubSecretKey;
+    }
 }

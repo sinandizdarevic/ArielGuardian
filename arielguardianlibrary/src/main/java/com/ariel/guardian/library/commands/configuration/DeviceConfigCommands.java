@@ -1,4 +1,4 @@
-package com.ariel.guardian.library.commands;
+package com.ariel.guardian.library.commands.configuration;
 
 /**
  * Class that contains commands for device configuration

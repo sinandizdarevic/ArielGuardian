@@ -1,4 +1,4 @@
-package com.ariel.guardian.library.commands;
+package com.ariel.guardian.library.commands.settings;
 
 /**
  * Class that contains commands for device settings. Not used right now

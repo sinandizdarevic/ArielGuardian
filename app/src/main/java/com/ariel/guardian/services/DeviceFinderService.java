@@ -20,6 +20,7 @@ package com.ariel.guardian.services;
  */
 
 import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.library.model.DeviceLocation;
 import com.ariel.guardian.utils.LocationManager;
@@ -30,12 +31,6 @@ import android.location.Location;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import ariel.commands.LocationCommands;
-import ariel.commands.Param;
 
 public class DeviceFinderService extends ArielService implements LocationManager.LocationManagerListener {
 
@@ -61,7 +56,7 @@ public class DeviceFinderService extends ArielService implements LocationManager
             mLocationManager.initAndStartLocationUpdates();
         }
 
-        mReportBySms = Boolean.parseBoolean(intent.getStringExtra(LocationCommands.PARAM_SMS_LOCATION_REPORT));
+        mReportBySms = intent.getBooleanExtra(LocationParams.PARAM_SMS_LOCATION_REPORT, false);
 
         return START_STICKY;
     }
@@ -101,14 +96,10 @@ public class DeviceFinderService extends ArielService implements LocationManager
 
     }
 
-    public static Intent getCallingIntent(final ArrayList<Param> params) {
+    public static Intent getCallingIntent(final LocationParams params) {
         Intent finderService = new Intent(ArielGuardianApplication.getInstance(), DeviceFinderService.class);
-        if (params != null && params.size() > 0) {
-            Iterator<Param> it = params.iterator();
-            while (it.hasNext()) {
-                Param param = it.next();
-                finderService.putExtra(param.getParamName(), param.getValue().toString());
-            }
+        if(params!=null) {
+            finderService.putExtra(LocationParams.PARAM_SMS_LOCATION_REPORT, params.getSmsLocationReport());
         }
         return finderService;
     }

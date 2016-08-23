@@ -1,7 +1,6 @@
 package com.ariel.guardian;
 
 import android.app.Application;
-import android.content.Intent;
 import android.database.ContentObserver;
 import android.os.Handler;
 import android.util.Log;
@@ -9,12 +8,13 @@ import android.widget.Toast;
 
 import com.ariel.guardian.command.Command;
 import com.ariel.guardian.command.CommandProducer;
-import com.ariel.guardian.library.services.PubNubService;
+import com.ariel.guardian.library.ArielLibrary;
+import com.ariel.guardian.library.commands.location.LocationCommands;
+import com.ariel.guardian.library.commands.location.LocationParams;
+import com.ariel.guardian.library.utils.Utilities;
 import com.ariel.guardian.services.DeviceConfigService;
-import com.ariel.guardian.utils.Utilities;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import ariel.commands.LocationCommands;
 import ariel.providers.ArielSettings;
 import ariel.security.LockPatternUtilsHelper;
 
@@ -51,8 +51,7 @@ public class ArielGuardianApplication extends Application {
 
         //FirebaseMessaging.getInstance().subscribeToTopic(Utilities.getConfigFCMTopic());
 
-        Intent pubNubService = new Intent(this, PubNubService.class);
-        startService(pubNubService);
+        ArielLibrary.prepare(this);
 
         Log.i(TAG, "Calling anonym login for: " + Utilities.getUniquePsuedoID());
 //        Intent authService = new Intent(this, FirebaseAuthService.class);
@@ -94,7 +93,7 @@ public class ArielGuardianApplication extends Application {
 
                     // Start location tracking
                     Command locationTracking = CommandProducer.getInstance().getLocationCommand(LocationCommands.TRACKING_START_COMMAND);
-                    locationTracking.execute(new LocationCommands.LocationParamBuilder().smsLocationReport(true).build());
+                    locationTracking.execute(new LocationParams.LocationParamBuilder().smsLocationReport(true).build());
                     break;
                 }
                 case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_THEFT: {

@@ -1,22 +1,16 @@
 package com.ariel.guardian.services;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.ariel.guardian.ArielGuardianApplication;
+import com.ariel.guardian.library.commands.application.ApplicationParams;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.firebase.listeners.DevicePackageValueEventListener;
-import com.ariel.guardian.utils.Utilities;
+import com.ariel.guardian.library.utils.Utilities;
 import com.google.firebase.database.DatabaseReference;
-
-import java.util.Iterator;
-import java.util.List;
-
-import ariel.commands.ApplicationCommands;
-import ariel.commands.Param;
 
 /**
  * Created by mikalackis on 7.6.16..
@@ -51,7 +45,7 @@ public class DeviceApplicationService extends ArielService implements DevicePack
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mPackageName = intent.getStringExtra(ApplicationCommands.PARAM_PACKAGE_NAME);
+        mPackageName = intent.getStringExtra(ApplicationParams.PARAM_PACKAGE_NAME);
         mDeviceApplication = FirebaseHelper.getInstance().getFirebaseDatabase().getReference("application").child(Utilities.getUniquePsuedoID()).child(Utilities.encodeAsFirebaseKey(mPackageName));
         mDeviceApplication.addListenerForSingleValueEvent(mDevicePackageListener);
         return START_STICKY;
@@ -73,15 +67,9 @@ public class DeviceApplicationService extends ArielService implements DevicePack
         stopSelf();
     }
 
-    public static Intent getCallingIntent(final List<Param> params){
+    public static Intent getCallingIntent(final ApplicationParams params){
         Intent appService = new Intent(ArielGuardianApplication.getInstance(), DeviceApplicationService.class);
-        if (params != null && params.size() > 0) {
-            Iterator<Param> it = params.iterator();
-            while (it.hasNext()) {
-                Param param = it.next();
-                appService.putExtra(param.getParamName(), param.getValue().toString());
-            }
-        }
+        appService.putExtra(ApplicationParams.PARAM_PACKAGE_NAME, params.getPackageName());
         return appService;
     }
 

@@ -15,19 +15,13 @@ import android.widget.Toast;
 
 import com.ariel.guardian.ArielGuardianApplication;
 import com.ariel.guardian.R;
-import com.ariel.guardian.command.Command;
-import com.ariel.guardian.command.CommandProducer;
-import com.ariel.guardian.command.TrackerStart;
-import com.ariel.guardian.utils.Utilities;
+import com.ariel.guardian.library.commands.application.ApplicationParams;
+import com.google.gson.Gson;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import ariel.commands.ApplicationCommands;
-import ariel.commands.LocationCommands;
 import ariel.providers.ArielSettings;
 import ariel.security.LockPatternUtilsHelper;
 
@@ -56,7 +50,11 @@ public class MainActivity extends AppCompatActivity {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LockPatternUtilsHelper.clearLock(ArielGuardianApplication.getInstance());
+                //LockPatternUtilsHelper.clearLock(ArielGuardianApplication.getInstance());
+                ApplicationParams ap = new ApplicationParams.ApplicationParamBuilder("com.example.android").build();
+                Gson gson = new Gson();
+                String json = gson.toJson(ap);
+                Log.i("MainActivity", json);
             }
         });
 

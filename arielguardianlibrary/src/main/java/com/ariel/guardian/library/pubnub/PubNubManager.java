@@ -3,6 +3,7 @@ package com.ariel.guardian.library.pubnub;
 import android.content.Context;
 import android.util.Log;
 
+import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.utils.Utilities;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
@@ -32,13 +33,6 @@ public class PubNubManager {
     public PubNubManager() {
         mSubscribedChannels = new ArrayList<>();
     }
-
-//    public static synchronized PubNubManager getInstance() {
-//        if (sInstance == null) {
-//            sInstance = new PubNubManager();
-//        }
-//        return sInstance;
-//    }
 
     public void init(final String publishKey, final String subscribeKey, final String secretKey, final String cipherKey){
 
@@ -88,6 +82,10 @@ public class PubNubManager {
 
     public void addListener(final SubscribeCallback listener){
         pubnub.addListener(listener);
+    }
+
+    public void sendCommand(final CommandMessage command, final String channel){
+        pubnub.publish().channel(channel).message(command);
     }
 
 }

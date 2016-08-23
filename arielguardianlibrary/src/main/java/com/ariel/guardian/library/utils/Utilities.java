@@ -3,6 +3,10 @@ package com.ariel.guardian.library.utils;
 import android.os.Build;
 import android.util.Log;
 
+import com.ariel.guardian.library.commands.Params;
+import com.ariel.guardian.library.commands.application.ApplicationParams;
+import com.ariel.guardian.library.commands.location.LocationParams;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -99,5 +103,14 @@ public class Utilities {
         return new UUID(m_szDevIDShort.hashCode(), serial.hashCode())
                 .toString();
     }
+
+    public static RuntimeTypeAdapterFactory<Params> getParamsGsonTypeFactory(){
+        RuntimeTypeAdapterFactory<Params> shapeAdapterFactory
+                = RuntimeTypeAdapterFactory.of(Params.class, "type")
+                .registerSubtype(LocationParams.class)
+                .registerSubtype(ApplicationParams.class);
+        return shapeAdapterFactory;
+    }
+
 
 }

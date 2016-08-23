@@ -1,23 +1,24 @@
 package com.ariel.guardian.services;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.ariel.guardian.ArielGuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
-import com.ariel.guardian.library.eventbus.DeviceConfigEvent;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.library.model.DeviceConfiguration;
+import com.ariel.guardian.library.services.PubNubService;
+import com.ariel.guardian.library.utils.Utilities;
 import com.ariel.guardian.pubnub.listeners.ArielPubNubCallback;
-import com.ariel.guardian.utils.Utilities;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
-import org.greenrobot.eventbus.EventBus;
 
 import ariel.providers.ArielSettings;
 
@@ -26,7 +27,7 @@ import ariel.providers.ArielSettings;
  */
 public class DeviceConfigService extends ArielService {
 
-    private final String TAG = "FirebaseConfigService";
+    private final String TAG = "DeviceConfigService";
 
     private DatabaseReference mDeviceConfiguration;
 
@@ -92,7 +93,25 @@ public class DeviceConfigService extends ArielService {
                 ArielJobScheduler.getInstance().registerNewJob(new DeviceFinderJobService(deviceConfig.getLocationTrackingInterval()));
             }
 
-            EventBus.getDefault().post(new DeviceConfigEvent(deviceConfig, new ArielPubNubCallback()));
+            //EventBus.getDefault().post(new DeviceConfigEvent(deviceConfig, new ArielPubNubCallback()));
+
+            Intent intent = new Intent(ArielGuardianApplication.getInstance(), PubNubService.class);
+            bindService(intent, new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                    Log.i(TAG, "Bound to PubNubService");
+                    PubNubService.PubNubServiceBinder binder = (PubNubService.PubNubServiceBinder) iBinder;
+                    PubNubService service = binder.getService();
+                    service.initPubNub(deviceConfig, new ArielPubNubCallback());
+                    unbindService(this);
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName componentName) {
+                    Log.i(TAG, "Unbound from PubNubService");
+                }
+            }, Context.BIND_AUTO_CREATE);
+
             stopSelf();
         }
 

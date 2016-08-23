@@ -44,7 +44,6 @@ dependencies {
     compile 'com.google.firebase:firebase-auth:9.2.0'
     compile 'com.google.firebase:firebase-config:9.2.0'
     compile 'com.pubnub:pubnub:4.0.5'
-    compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.code.gson:gson:2.7'
     compile project(':arielguardianlibrary')
 }
