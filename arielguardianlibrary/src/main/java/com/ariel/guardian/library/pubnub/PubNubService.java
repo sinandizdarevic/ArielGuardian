@@ -1,4 +1,4 @@
-package com.ariel.guardian.services;
+package com.ariel.guardian.library.pubnub;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,16 +7,11 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.firebase.model.DeviceConfiguration;
-import com.ariel.guardian.library.pubnub.PubNubManager;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
-import com.pubnub.api.models.consumer.PNStatus;
-
-import javax.inject.Inject;
 
 /**
  * Class responsible for managing PubNubManager instance. Runs in background and
@@ -26,40 +21,32 @@ public class PubNubService extends Service {
 
     private static final String TAG = "PubNubService";
 
-    @Inject
-    PubNubManager pubNubManager;
+    private PubNubManager mPubNubManager;
 
     private final IBinder mBinder = new PubNubServiceBinder();
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        GuardianApplication.getInstance().getGuardianComponent().inject(this);
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Initating PubNubManager");
 
+        mPubNubManager = new PubNubManager(getApplicationContext());
+
         return START_STICKY;
     }
 
-    public void initPubNub(final DeviceConfiguration deviceConfiguration, final SubscribeCallback callback){
-        pubNubManager.init(deviceConfiguration.getPubNubPublishKey(),
-                deviceConfiguration.getPubNubSubscribeKey(),
-                deviceConfiguration.getPubNubSecretKey(),
-                deviceConfiguration.getPubNubCipherKey(), callback);
+    public void addSubscribeCallback(final SubscribeCallback callback){
+        mPubNubManager.addSubscribeCallback(callback);
     }
 
     public void sendCommand(final CommandMessage command, final String channel, final PNCallback<PNPublishResult> callback){
-        pubNubManager.sendCommand(command, channel, callback);
+        mPubNubManager.sendCommand(command, channel, callback);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "PubNubService destroyed");
-        pubNubManager.cleanUp();
+        mPubNubManager.cleanUp();
     }
 
     /**

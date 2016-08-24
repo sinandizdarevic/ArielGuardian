@@ -4,7 +4,6 @@ package com.ariel.guardian;
 import android.app.Application;
 
 import com.ariel.guardian.library.firebase.FirebaseHelper;
-import com.ariel.guardian.library.pubnub.PubNubManager;
 
 import javax.inject.Singleton;
 
@@ -34,13 +33,6 @@ public class GuardianModule {
     public FirebaseHelper providesFirebaseHelper() {
         FirebaseHelper fHelper = new FirebaseHelper();
         return fHelper;
-    }
-
-    @Provides
-    @Singleton
-    public PubNubManager providesPubNubManager() {
-        PubNubManager pnManager = new PubNubManager();
-        return pnManager;
     }
 
     @Provides

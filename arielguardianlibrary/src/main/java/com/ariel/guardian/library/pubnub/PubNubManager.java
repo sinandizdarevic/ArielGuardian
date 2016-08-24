@@ -3,13 +3,13 @@ package com.ariel.guardian.library.pubnub;
 import android.content.Context;
 import android.util.Log;
 
+import com.ariel.guardian.library.R;
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.utils.Utilities;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
-import com.pubnub.api.endpoints.pubsub.Publish;
 import com.pubnub.api.enums.PNLogVerbosity;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
@@ -32,30 +32,17 @@ public class PubNubManager {
 
     private ArrayList<String> mSubscribedChannels;
 
-    public PubNubManager() {
+    public PubNubManager(final Context context) {
         mSubscribedChannels = new ArrayList<>();
-    }
-
-    /**
-     * Main initialization point of PubNubManager. You have to call this every time
-     * any of the parameters change
-     * @param publishKey
-     * @param subscribeKey
-     * @param secretKey
-     * @param cipherKey
-     * @param callback
-     */
-    public void init(final String publishKey, final String subscribeKey, final String secretKey, final String cipherKey, final SubscribeCallback callback){
-
         if(pubnub!=null){
             cleanUp();
         }
 
         PNConfiguration pubNubConfig = new PNConfiguration();
-        pubNubConfig.setPublishKey(publishKey);
-        pubNubConfig.setSubscribeKey(subscribeKey);
+        pubNubConfig.setPublishKey(context.getString(R.string.pubnub_publish_key));
+        pubNubConfig.setSubscribeKey(context.getString(R.string.pubnub_subscribe_key));
         //pubNubConfig.setSecretKey(secretKey);
-        pubNubConfig.setCipherKey(cipherKey);
+        pubNubConfig.setCipherKey(context.getString(R.string.pubnub_cipher_key));
         pubNubConfig.setSecure(true);
         pubNubConfig.setUuid(Utilities.getUniquePsuedoID());
         pubNubConfig.setLogVerbosity(PNLogVerbosity.BODY);
@@ -67,6 +54,13 @@ public class PubNubManager {
         subscribeToChannels(Utilities.getPubNubConfigChannel(),
                 Utilities.getPubNubLocationChannel(), Utilities.getPubNubApplicationChannel());
 
+    }
+
+    /**
+     * Register SubscribeCallback
+     * @param callback
+     */
+    public void addSubscribeCallback(final SubscribeCallback callback){
         addListener(callback);
     }
 
