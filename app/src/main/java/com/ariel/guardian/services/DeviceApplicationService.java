@@ -6,9 +6,10 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.GuardianComponent;
+import com.ariel.guardian.firebase.listeners.DataLoadCompletedListener;
+import com.ariel.guardian.library.commands.application.ApplicationCommands;
 import com.ariel.guardian.library.commands.application.ApplicationParams;
-import com.ariel.guardian.library.firebase.FirebaseHelper;
+import com.ariel.guardian.library.commands.report.ReportParams;
 import com.ariel.guardian.firebase.listeners.DevicePackageValueEventListener;
 import com.ariel.guardian.library.utils.Utilities;
 import com.google.firebase.database.DatabaseReference;
@@ -16,7 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 /**
  * Created by mikalackis on 7.6.16..
  */
-public class DeviceApplicationService extends ArielService implements DevicePackageValueEventListener.DataLoadCompletedListener{
+public class DeviceApplicationService extends ArielService implements DataLoadCompletedListener {
 
     public static final String EXTRA_PARAM = "param";
 
@@ -63,13 +64,23 @@ public class DeviceApplicationService extends ArielService implements DevicePack
         return TAG;
     }
 
-//    @Override
-//    public void injectComponent(GuardianComponent component) {
-//        component.inject(this);
-//    }
-
     @Override
     public void onDataLoadCompleted() {
+        reportCommandExecution(new ReportParams.ReportParamBuilder()
+                .invokedCommand(ApplicationCommands.APPLICATION_UPDATE_COMMAND)
+                .commandStatus(true)
+                .errorMsg(null)
+                .build(), Utilities.getPubNubApplicationChannel());
+        stopSelf();
+    }
+
+    @Override
+    public void onDataLoadError(String errorMessage) {
+        reportCommandExecution(new ReportParams.ReportParamBuilder()
+                .invokedCommand(ApplicationCommands.APPLICATION_UPDATE_COMMAND)
+                .commandStatus(false)
+                .errorMsg(errorMessage)
+                .build(), Utilities.getPubNubApplicationChannel());
         stopSelf();
     }
 

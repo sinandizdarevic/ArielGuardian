@@ -38,13 +38,16 @@ public class DevicePackageValueEventListener implements ValueEventListener {
                 mListener.onDataLoadCompleted();
             }
         }
+        else{
+            mListener.onDataLoadError("Device package information was null");
+        }
     }
 
     @Override
     public void onCancelled(DatabaseError databaseError) {
         Log.i(TAG, "loadConfig:onCancelled", databaseError.toException());
         if(mListener != null){
-            mListener.onDataLoadCompleted();
+            mListener.onDataLoadError(databaseError.getMessage());
         }
     }
 
@@ -52,7 +55,4 @@ public class DevicePackageValueEventListener implements ValueEventListener {
         mListener = listener;
     }
 
-    public interface DataLoadCompletedListener {
-        void onDataLoadCompleted();
-    }
 }

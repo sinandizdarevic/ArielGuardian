@@ -6,6 +6,9 @@ import android.util.Log;
 import com.ariel.guardian.library.commands.Params;
 import com.ariel.guardian.library.commands.application.ApplicationParams;
 import com.ariel.guardian.library.commands.location.LocationParams;
+import com.ariel.guardian.library.commands.report.ReportParams;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,6 +31,8 @@ public class Utilities {
     private static final String PUBNUB_LOCATION_CHANNEL = "location_%s";
     private static final String PUBNUB_APPLICATION_CHANNEL = "application_%s";
 
+    private static String sDeviceId;
+
     public static String encodeAsFirebaseKey(final String toEncode) {
         return toEncode.replaceAll("\\.", "%2E");
     }
@@ -48,18 +53,18 @@ public class Utilities {
     }
 
     public static String getPubNubConfigChannel(){
-        Log.i(TAG, "Config topic: "+String.format(PUBNUB_CONFIG_CHANNEL, getUniquePsuedoID()));
-        return String.format(PUBNUB_CONFIG_CHANNEL, getUniquePsuedoID());
+        Log.i(TAG, "Config topic: "+String.format(PUBNUB_CONFIG_CHANNEL, sDeviceId));
+        return String.format(PUBNUB_CONFIG_CHANNEL, sDeviceId);
     }
 
     public static String getPubNubApplicationChannel(){
-        Log.i(TAG, "Config topic: "+String.format(PUBNUB_APPLICATION_CHANNEL, getUniquePsuedoID()));
-        return String.format(PUBNUB_APPLICATION_CHANNEL, getUniquePsuedoID());
+        Log.i(TAG, "Config topic: "+String.format(PUBNUB_APPLICATION_CHANNEL, sDeviceId));
+        return String.format(PUBNUB_APPLICATION_CHANNEL, sDeviceId);
     }
 
     public static String getPubNubLocationChannel(){
-        Log.i(TAG, "Location topic: "+String.format(PUBNUB_LOCATION_CHANNEL, getUniquePsuedoID()));
-        return String.format(PUBNUB_LOCATION_CHANNEL, getUniquePsuedoID());
+        Log.i(TAG, "Location topic: "+String.format(PUBNUB_LOCATION_CHANNEL, sDeviceId));
+        return String.format(PUBNUB_LOCATION_CHANNEL, sDeviceId);
     }
 
     public static String getUniquePsuedoID() {
@@ -104,12 +109,17 @@ public class Utilities {
                 .toString();
     }
 
-    public static RuntimeTypeAdapterFactory<Params> getParamsGsonTypeFactory(){
-        RuntimeTypeAdapterFactory<Params> shapeAdapterFactory
+    public static Gson getGson(){
+        RuntimeTypeAdapterFactory<Params> paramsAdapterFactory
                 = RuntimeTypeAdapterFactory.of(Params.class, "type")
                 .registerSubtype(LocationParams.class)
-                .registerSubtype(ApplicationParams.class);
-        return shapeAdapterFactory;
+                .registerSubtype(ApplicationParams.class)
+                .registerSubtype(ReportParams.class);
+        return new GsonBuilder().registerTypeAdapterFactory(paramsAdapterFactory).create();
+    }
+
+    public static void setDeviceId(final String deviceId){
+        sDeviceId = deviceId;
     }
 
 

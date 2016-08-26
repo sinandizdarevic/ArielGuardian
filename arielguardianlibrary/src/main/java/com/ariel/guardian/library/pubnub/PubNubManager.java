@@ -32,7 +32,7 @@ public class PubNubManager {
 
     private ArrayList<String> mSubscribedChannels;
 
-    public PubNubManager(final Context context) {
+    public PubNubManager(final Context context, final String deviceId) {
         mSubscribedChannels = new ArrayList<>();
         if(pubnub!=null){
             cleanUp();
@@ -51,9 +51,13 @@ public class PubNubManager {
 
         pubnub = new PubNub(pubNubConfig);
 
+        initializeChannels();
+
+    }
+
+    private void initializeChannels(){
         subscribeToChannels(Utilities.getPubNubConfigChannel(),
                 Utilities.getPubNubLocationChannel(), Utilities.getPubNubApplicationChannel());
-
     }
 
     /**
@@ -91,6 +95,9 @@ public class PubNubManager {
     }
 
     private void subscribeToChannels(String... channels){
+        pubnub.unsubscribe().channels(mSubscribedChannels);
+        mSubscribedChannels.clear();
+        Log.i(TAG, "Subscribing to channels: "+channels.toString());
         pubnub.subscribe().channels(Arrays.asList(channels)).execute();
         mSubscribedChannels.addAll(Arrays.asList(channels));
     }
@@ -105,10 +112,12 @@ public class PubNubManager {
      * @param channel
      */
     public void sendCommand(final CommandMessage command, final String channel, final PNCallback<PNPublishResult> callback){
-        if(callback==null){
-            throw new NullPointerException("Callback must not be null");
+        if(callback!=null){
+            pubnub.publish().channel(channel).message(command).async(callback);
         }
-        pubnub.publish().channel(channel).message(command).async(callback);
+        else{
+            pubnub.publish().channel(channel).message(command);
+        }
     }
 
 }

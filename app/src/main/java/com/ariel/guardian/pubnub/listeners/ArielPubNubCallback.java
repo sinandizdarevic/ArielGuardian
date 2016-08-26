@@ -23,8 +23,6 @@ public class ArielPubNubCallback extends SubscribeCallback {
 
     private final String TAG = "ArielPubNubCallback";
 
-    static Gson gson = new GsonBuilder().registerTypeAdapterFactory(Utilities.getParamsGsonTypeFactory()).create();
-
     @Override
     public void status(PubNub pubnub, PNStatus status) {
         Log.i(this.getClass().getName(), "Status: " + status.getStatusCode());
@@ -48,7 +46,7 @@ public class ArielPubNubCallback extends SubscribeCallback {
         }
 
         try{
-            CommandMessage msg = gson.fromJson(message.getMessage().toString(), CommandMessage.class);
+            CommandMessage msg = Utilities.getGson().fromJson(message.getMessage().toString(), CommandMessage.class);
             Command command = CommandProducer.getInstance().getCommand(message.getSubscribedChannel(), msg.getAction());
             Log.i(TAG, "Received command from pubnub: "+msg.getAction()+" with params: "+msg.getParams());
             if(command!=null){

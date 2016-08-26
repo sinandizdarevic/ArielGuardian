@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.ariel.guardian.library.commands.CommandMessage;
-import com.ariel.guardian.library.firebase.model.DeviceConfiguration;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
@@ -21,7 +20,11 @@ public class PubNubService extends Service {
 
     private static final String TAG = "PubNubService";
 
+    public static final String PARAM_DEVICE_ID = "device_id";
+
     private PubNubManager mPubNubManager;
+
+    private boolean mIsRunning;
 
     private final IBinder mBinder = new PubNubServiceBinder();
 
@@ -29,17 +32,22 @@ public class PubNubService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Initating PubNubManager");
 
-        mPubNubManager = new PubNubManager(getApplicationContext());
+        if(!mIsRunning) {
+            String deviceId = intent.getStringExtra(PARAM_DEVICE_ID);
+            mPubNubManager = new PubNubManager(getApplicationContext(), deviceId);
+            mIsRunning = true;
+        }
 
         return START_STICKY;
     }
 
-    public void addSubscribeCallback(final SubscribeCallback callback){
+    public void addSubscribeCallback(SubscribeCallback callback){
         mPubNubManager.addSubscribeCallback(callback);
     }
 
-    public void sendCommand(final CommandMessage command, final String channel, final PNCallback<PNPublishResult> callback){
-        mPubNubManager.sendCommand(command, channel, callback);
+    public void sendCommand(final CommandMessage commandMessage, final String channel, final PNCallback<PNPublishResult> callback){
+        Log.i(TAG, "Sending command");
+        mPubNubManager.sendCommand(commandMessage,channel,callback);
     }
 
     @Override
@@ -47,15 +55,12 @@ public class PubNubService extends Service {
         super.onDestroy();
         Log.i(TAG, "PubNubService destroyed");
         mPubNubManager.cleanUp();
+        mIsRunning = false;
     }
 
-    /**
-     * Class used for the client Binder.  Because we know this service always
-     * runs in the same process as its clients, we don't need to deal with IPC.
-     */
     public class PubNubServiceBinder extends Binder {
         public PubNubService getService() {
-            // Return this instance of PubNubService so clients can call public methods
+            // Return this instance of LocalService so clients can call public methods
             return PubNubService.this;
         }
     }

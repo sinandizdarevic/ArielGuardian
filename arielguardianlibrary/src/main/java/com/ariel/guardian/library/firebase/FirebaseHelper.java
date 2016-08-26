@@ -1,6 +1,6 @@
 package com.ariel.guardian.library.firebase;
 
-import android.util.ArrayMap;
+import android.support.v4.util.ArrayMap;
 import android.util.Log;
 
 import com.ariel.guardian.library.firebase.model.DeviceActivity;

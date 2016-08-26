@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.R;
 import com.ariel.guardian.library.commands.application.ApplicationParams;
 import com.google.gson.Gson;
@@ -38,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.getInstance());
+                //LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.getInstance());
             }
         });
 

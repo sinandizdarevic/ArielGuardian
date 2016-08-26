@@ -7,8 +7,13 @@ import android.util.Log;
 
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.GuardianComponent;
+import com.ariel.guardian.library.ArielLibrary;
+import com.ariel.guardian.library.commands.CommandMessage;
+import com.ariel.guardian.library.commands.report.ReportParams;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
+import com.pubnub.api.callbacks.PNCallback;
+import com.pubnub.api.models.consumer.PNPublishResult;
+import com.pubnub.api.models.consumer.PNStatus;
 
 import javax.inject.Inject;
 
@@ -50,6 +55,16 @@ abstract public class ArielService extends Service {
             Log.i(getServiceName(), "sWakeLock existing");
             sWakeLock.release();
         }
+    }
+
+    protected void reportCommandExecution(final ReportParams params, final String channel) {
+//        CommandMessage cm = new CommandMessage(params.getInvokedCommand(), params);
+//        ArielLibrary.action().sendCommand(cm, channel, new PNCallback<PNPublishResult>() {
+//            @Override
+//            public void onResponse(PNPublishResult result, PNStatus status) {
+//
+//            }
+//        });
     }
 
     abstract String getServiceName();

@@ -1,26 +1,19 @@
 package com.ariel.guardian;
 
 import android.app.Application;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.database.ContentObserver;
 import android.os.Handler;
-import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.ariel.guardian.command.Command;
 import com.ariel.guardian.command.CommandProducer;
 import com.ariel.guardian.library.ArielLibrary;
-import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.library.utils.Utilities;
 import com.ariel.guardian.pubnub.listeners.ArielPubNubCallback;
 import com.ariel.guardian.services.DeviceConfigService;
-import com.ariel.guardian.library.pubnub.PubNubService;
 
 import ariel.providers.ArielSettings;
 import ariel.security.LockPatternUtilsHelper;
@@ -59,7 +52,7 @@ public class GuardianApplication extends Application {
         //FirebaseMessaging.getInstance().subscribeToTopic(Utilities.getConfigFCMTopic());
 
         // start main pubnub service
-        ArielLibrary.prepare(this, new ArielPubNubCallback());
+        ArielLibrary.prepare(this, Utilities.getUniquePsuedoID(), new ArielPubNubCallback());
 
         Log.i(TAG, "Calling anonym login for: " + Utilities.getUniquePsuedoID());
 //        Intent authService = new Intent(this, FirebaseAuthService.class);
@@ -108,10 +101,6 @@ public class GuardianApplication extends Application {
 
                     // Lock the screen
                     LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.this);
-
-                    LocationParams lParams = new LocationParams.LocationParamBuilder().smsLocationReport(true).build();
-                    CommandMessage locateNow = new CommandMessage(LocationCommands.LOCATE_NOW_COMMAND, lParams);
-                    // send appUpdate object via PubNub to application channel
 
                     // Start location tracking
                     Command locationTracking = CommandProducer.getInstance().getLocationCommand(LocationCommands.TRACKING_START_COMMAND);

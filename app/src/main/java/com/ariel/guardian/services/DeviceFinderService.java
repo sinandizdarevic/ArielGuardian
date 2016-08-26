@@ -20,8 +20,11 @@ package com.ariel.guardian.services;
  */
 
 import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
+import com.ariel.guardian.library.commands.report.ReportParams;
 import com.ariel.guardian.library.firebase.model.DeviceLocation;
+import com.ariel.guardian.library.utils.Utilities;
 import com.ariel.guardian.utils.LocationManager;
 import com.google.android.gms.common.ConnectionResult;
 
@@ -53,6 +56,12 @@ public class DeviceFinderService extends ArielService implements LocationManager
                     .locationUpdateInterval(5000)
                     .build();
             mLocationManager.initAndStartLocationUpdates();
+
+            reportCommandExecution(new ReportParams.ReportParamBuilder()
+                    .invokedCommand(LocationCommands.TRACKING_START_COMMAND)
+                    .commandStatus(true)
+                    .errorMsg(null)
+                    .build(), Utilities.getPubNubLocationChannel());
         }
 
         mReportBySms = intent.getBooleanExtra(LocationParams.PARAM_SMS_LOCATION_REPORT, false);
@@ -110,6 +119,12 @@ public class DeviceFinderService extends ArielService implements LocationManager
 
     @Override
     public void onGoogleClientError(ConnectionResult connectionResult) {
+        reportCommandExecution(new ReportParams.ReportParamBuilder()
+                .invokedCommand(LocationCommands.TRACKING_START_COMMAND +
+                        " or "+ LocationCommands.TRACKING_STOP_COMMAND)
+                .commandStatus(false)
+                .errorMsg("Error starting google client")
+                .build(), Utilities.getPubNubLocationChannel());
         stopSelf();
     }
 }

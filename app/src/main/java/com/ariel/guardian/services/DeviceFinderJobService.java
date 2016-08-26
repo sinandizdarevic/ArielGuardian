@@ -19,8 +19,11 @@ package com.ariel.guardian.services;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
+import com.ariel.guardian.library.commands.location.LocationCommands;
+import com.ariel.guardian.library.commands.report.ReportParams;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.library.firebase.model.DeviceLocation;
+import com.ariel.guardian.library.utils.Utilities;
 import com.ariel.guardian.utils.LocationManager;
 import com.google.android.gms.common.ConnectionResult;
 
@@ -68,6 +71,11 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
                                    .locationUpdateInterval(5000)
                                    .build();
             mLocationManager.initAndStartLocationUpdates();
+            reportCommandExecution(new ReportParams.ReportParamBuilder()
+                    .invokedCommand(LocationCommands.LOCATE_NOW_COMMAND)
+                    .commandStatus(true)
+                    .errorMsg(null)
+                    .build(), Utilities.getPubNubLocationChannel());
         }
         return true;
     }
@@ -94,6 +102,11 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
 
     @Override
     public void onGoogleClientError(ConnectionResult connectionResult) {
+        reportCommandExecution(new ReportParams.ReportParamBuilder()
+                .invokedCommand(LocationCommands.LOCATE_NOW_COMMAND)
+                .commandStatus(false)
+                .errorMsg("Error starting google client")
+                .build(), Utilities.getPubNubLocationChannel());
         jobFinished(mJobParams, true);
     }
 
