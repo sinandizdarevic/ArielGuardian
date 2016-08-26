@@ -6,11 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.library.pubnub.PubNubService;
+import com.ariel.guardian.library.utils.Constants;
 import com.ariel.guardian.library.utils.Utilities;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
@@ -19,7 +21,7 @@ import com.pubnub.api.models.consumer.PNPublishResult;
 /**
  * Ariel library main entry point.
  */
-public final class ArielLibrary implements ArielLibraryInterface{
+public final class ArielLibrary implements ArielLibraryInterface {
 
     private static final String TAG = "ArielLibrary";
 
@@ -34,9 +36,7 @@ public final class ArielLibrary implements ArielLibraryInterface{
 
     private static ArielLibraryInterface mInstance;
 
-    private static SubscribeCallback mCallback;
-
-    private ArielLibrary(){
+    private ArielLibrary() {
         // prevent this class from being instantiable
     }
 
@@ -45,21 +45,15 @@ public final class ArielLibrary implements ArielLibraryInterface{
      *
      * @param Application
      */
-    public static void prepare(final Application application, final String deviceId, final SubscribeCallback callback) {
-
-        if(!mPrepared) {
+    public static void prepare(final Application application) {
+        if (!mPrepared) {
 
             mInstance = new ArielLibrary();
 
-            Utilities.setDeviceId(deviceId);
-
             mApplication = application;
-
-            mCallback = callback;
 
             // starts pubnub service
             Intent pubNubService = new Intent(application, PubNubService.class);
-            pubNubService.putExtra(PubNubService.PARAM_DEVICE_ID, deviceId);
             application.startService(pubNubService);
 
             // init firebase
@@ -69,17 +63,16 @@ public final class ArielLibrary implements ArielLibraryInterface{
             application.bindService(pubNubService, mConnection, Context.BIND_AUTO_CREATE);
 
             mPrepared = true;
-
         }
     }
 
     @Override
-    public void destroy(){
+    public void destroy() {
         mApplication.unbindService(mConnection);
     }
 
-    public static ArielLibraryInterface action(){
-        if(!mPrepared){
+    public static ArielLibraryInterface action() {
+        if (!mPrepared || !mPubNubServiceBound) {
             throw new RuntimeException("Library not prepared! Call prepare() first!!!");
         }
         return mInstance;
@@ -87,24 +80,29 @@ public final class ArielLibrary implements ArielLibraryInterface{
 
     @Override
     public void sendCommand(final CommandMessage command, final String channel,
-                            final PNCallback<PNPublishResult> callback){
-        if(mPubNubServiceBound){
-            mPubNubService.sendCommand(command, channel, callback);
-        }
+                            final PNCallback<PNPublishResult> callback) {
+        mPubNubService.sendCommand(command, channel, callback);
     }
 
     @Override
-    public void addPubNubSubscribeCallback(final SubscribeCallback callback){
+    public void addPubNubSubscribeCallback(final SubscribeCallback callback) {
         Log.i(TAG, "Adding callback");
-        if(mPubNubServiceBound){
-            Log.i(TAG, "Adding callback, service bound");
-            mPubNubService.addSubscribeCallback(callback);
-        }
+        mPubNubService.addSubscribeCallback(callback);
     }
 
     @Override
-    public FirebaseHelper firebase(){
+    public FirebaseHelper firebase() {
         return mFireBaseHelper;
+    }
+
+    @Override
+    public void subscribeToChannels(String... channels) {
+        mPubNubService.subscribeToChannels(channels);
+    }
+
+    @Override
+    public void subscribeToChannelsWithCallback(SubscribeCallback callback, String... channels) {
+        mPubNubService.subscribeToChannelsWithCallback(callback, channels);
     }
 
     private static ServiceConnection mConnection = new ServiceConnection() {
@@ -116,8 +114,10 @@ public final class ArielLibrary implements ArielLibraryInterface{
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             PubNubService.PubNubServiceBinder binder = (PubNubService.PubNubServiceBinder) service;
             mPubNubService = binder.getService();
-            mPubNubService.addSubscribeCallback(mCallback);
             mPubNubServiceBound = true;
+
+            Intent intent = new Intent(Constants.BROADCAST_LIBRARY_READY);
+            LocalBroadcastManager.getInstance(mApplication).sendBroadcast(intent);
         }
 
         @Override

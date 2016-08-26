@@ -63,7 +63,7 @@ public class DeviceConfigService extends ArielService implements DataLoadComplet
                 .invokedCommand(DeviceConfigCommands.UPDATE_CONFIG_COMMAND)
                 .commandStatus(true)
                 .errorMsg(null)
-                .build(), Utilities.getPubNubConfigChannel());
+                .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
         stopSelf();
     }
 
@@ -73,7 +73,7 @@ public class DeviceConfigService extends ArielService implements DataLoadComplet
                 .invokedCommand(DeviceConfigCommands.UPDATE_CONFIG_COMMAND)
                 .commandStatus(false)
                 .errorMsg(errorMessage)
-                .build(), Utilities.getPubNubConfigChannel());
+                .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
         stopSelf();
     }
 

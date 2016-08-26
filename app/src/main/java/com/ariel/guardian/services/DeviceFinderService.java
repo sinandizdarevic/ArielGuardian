@@ -61,7 +61,7 @@ public class DeviceFinderService extends ArielService implements LocationManager
                     .invokedCommand(LocationCommands.TRACKING_START_COMMAND)
                     .commandStatus(true)
                     .errorMsg(null)
-                    .build(), Utilities.getPubNubLocationChannel());
+                    .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
         }
 
         mReportBySms = intent.getBooleanExtra(LocationParams.PARAM_SMS_LOCATION_REPORT, false);
@@ -124,7 +124,7 @@ public class DeviceFinderService extends ArielService implements LocationManager
                         " or "+ LocationCommands.TRACKING_STOP_COMMAND)
                 .commandStatus(false)
                 .errorMsg("Error starting google client")
-                .build(), Utilities.getPubNubLocationChannel());
+                .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
         stopSelf();
     }
 }

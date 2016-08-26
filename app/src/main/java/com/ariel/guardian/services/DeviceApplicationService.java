@@ -70,7 +70,7 @@ public class DeviceApplicationService extends ArielService implements DataLoadCo
                 .invokedCommand(ApplicationCommands.APPLICATION_UPDATE_COMMAND)
                 .commandStatus(true)
                 .errorMsg(null)
-                .build(), Utilities.getPubNubApplicationChannel());
+                .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
         stopSelf();
     }
 
@@ -80,7 +80,7 @@ public class DeviceApplicationService extends ArielService implements DataLoadCo
                 .invokedCommand(ApplicationCommands.APPLICATION_UPDATE_COMMAND)
                 .commandStatus(false)
                 .errorMsg(errorMessage)
-                .build(), Utilities.getPubNubApplicationChannel());
+                .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
         stopSelf();
     }
 

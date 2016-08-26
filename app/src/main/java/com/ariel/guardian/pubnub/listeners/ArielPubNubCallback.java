@@ -47,7 +47,7 @@ public class ArielPubNubCallback extends SubscribeCallback {
 
         try{
             CommandMessage msg = Utilities.getGson().fromJson(message.getMessage().toString(), CommandMessage.class);
-            Command command = CommandProducer.getInstance().getCommand(message.getSubscribedChannel(), msg.getAction());
+            Command command = CommandProducer.getInstance().getCommand(msg.getAction());
             Log.i(TAG, "Received command from pubnub: "+msg.getAction()+" with params: "+msg.getParams());
             if(command!=null){
                 Log.i(TAG, "Command not null");

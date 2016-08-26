@@ -1,8 +1,13 @@
 package com.ariel.guardian;
 
 import android.app.Application;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -11,6 +16,7 @@ import com.ariel.guardian.command.CommandProducer;
 import com.ariel.guardian.library.ArielLibrary;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
+import com.ariel.guardian.library.utils.Constants;
 import com.ariel.guardian.library.utils.Utilities;
 import com.ariel.guardian.pubnub.listeners.ArielPubNubCallback;
 import com.ariel.guardian.services.DeviceConfigService;
@@ -30,7 +36,7 @@ public class GuardianApplication extends Application {
 
     private static GuardianApplication mInstance;
 
-    public static GuardianApplication getInstance(){
+    public static GuardianApplication getInstance() {
         return mInstance;
     }
 
@@ -51,23 +57,36 @@ public class GuardianApplication extends Application {
 
         //FirebaseMessaging.getInstance().subscribeToTopic(Utilities.getConfigFCMTopic());
 
-        // start main pubnub service
-        ArielLibrary.prepare(this, Utilities.getUniquePsuedoID(), new ArielPubNubCallback());
+        ArielLibrary.prepare(this);
+
+        registerLibraryReadyReceiver();
 
         Log.i(TAG, "Calling anonym login for: " + Utilities.getUniquePsuedoID());
 //        Intent authService = new Intent(this, FirebaseAuthService.class);
 //        startService(authService);
-        startService(DeviceConfigService.getCallingIntent());
-
     }
 
-    private void prepareDagger(){
+    private void registerLibraryReadyReceiver() {
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(new BroadcastReceiver() {
+                                      @Override
+                                      public void onReceive(Context context, Intent intent) {
+                                          Log.i(TAG, "RECEIVE LOCAL BROADCAST "+intent.getAction());
+                                          startService(DeviceConfigService.getCallingIntent());
+                                          ArielLibrary.action().subscribeToChannelsWithCallback(new ArielPubNubCallback(),
+                                                  Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
+                                      }
+                                  },
+                        new IntentFilter(Constants.BROADCAST_LIBRARY_READY));
+    }
+
+    private void prepareDagger() {
         mGuardianComponent = DaggerGuardianComponent.builder()
                 .guardianModule(new GuardianModule(this))
                 .build();
     }
 
-    public GuardianComponent getGuardianComponent(){
+    public GuardianComponent getGuardianComponent() {
         return mGuardianComponent;
     }
 
@@ -78,7 +97,7 @@ public class GuardianApplication extends Application {
         public void onChange(boolean selfChange, android.net.Uri uri, int userId) {
             int arielSystemStatus = ArielSettings.Secure.getInt(getContentResolver(),
                     ArielSettings.Secure.ARIEL_SYSTEM_STATUS, ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
-            Log.i(TAG, "Ariel system status changed: "+arielSystemStatus);
+            Log.i(TAG, "Ariel system status changed: " + arielSystemStatus);
             switch (arielSystemStatus) {
                 case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_LOCKDOWN: {
                     // // TODO: 29.7.16.
@@ -103,7 +122,7 @@ public class GuardianApplication extends Application {
                     LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.this);
 
                     // Start location tracking
-                    Command locationTracking = CommandProducer.getInstance().getLocationCommand(LocationCommands.TRACKING_START_COMMAND);
+                    Command locationTracking = CommandProducer.getInstance().getCommand(LocationCommands.TRACKING_START_COMMAND);
                     locationTracking.execute(new LocationParams.LocationParamBuilder().smsLocationReport(true).build());
                     break;
                 }
@@ -125,7 +144,7 @@ public class GuardianApplication extends Application {
                     LockPatternUtilsHelper.clearLock(GuardianApplication.this);
 
                     // Stop location tracking
-                    Command locationTracking = CommandProducer.getInstance().getLocationCommand(LocationCommands.TRACKING_STOP_COMMAND);
+                    Command locationTracking = CommandProducer.getInstance().getCommand(LocationCommands.TRACKING_STOP_COMMAND);
                     locationTracking.execute(null);
                     break;
                 }

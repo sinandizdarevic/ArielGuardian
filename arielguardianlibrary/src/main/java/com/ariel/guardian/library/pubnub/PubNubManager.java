@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.ariel.guardian.library.R;
 import com.ariel.guardian.library.commands.CommandMessage;
+import com.ariel.guardian.library.utils.SharedPrefsManager;
 import com.ariel.guardian.library.utils.Utilities;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
@@ -18,6 +19,7 @@ import com.pubnub.api.models.consumer.presence.PNWhereNowResult;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 
 /**
@@ -32,11 +34,15 @@ public class PubNubManager {
 
     private ArrayList<String> mSubscribedChannels;
 
-    public PubNubManager(final Context context, final String deviceId) {
+    private SubscribeCallback mSubscribeListener;
+
+    public PubNubManager(final Context context) {
         mSubscribedChannels = new ArrayList<>();
         if(pubnub!=null){
             cleanUp();
         }
+
+        refContext = new WeakReference<>(context);
 
         PNConfiguration pubNubConfig = new PNConfiguration();
         pubNubConfig.setPublishKey(context.getString(R.string.pubnub_publish_key));
@@ -51,13 +57,6 @@ public class PubNubManager {
 
         pubnub = new PubNub(pubNubConfig);
 
-        initializeChannels();
-
-    }
-
-    private void initializeChannels(){
-        subscribeToChannels(Utilities.getPubNubConfigChannel(),
-                Utilities.getPubNubLocationChannel(), Utilities.getPubNubApplicationChannel());
     }
 
     /**
@@ -65,7 +64,11 @@ public class PubNubManager {
      * @param callback
      */
     public void addSubscribeCallback(final SubscribeCallback callback){
-        addListener(callback);
+        if(mSubscribeListener!=null){
+            pubnub.removeListener(mSubscribeListener);
+        }
+        mSubscribeListener = callback;
+        pubnub.addListener(callback);
     }
 
     /**
@@ -74,7 +77,15 @@ public class PubNubManager {
     public void cleanUp(){
         if(pubnub!=null) {
             pubnub.unsubscribe().channels(mSubscribedChannels);
+            pubnub.removeListener(mSubscribeListener);
         }
+
+//        if(refContext.get()!=null) {
+//            SharedPrefsManager.getInstance(refContext.get()).
+//                    setStringSetPreference(SharedPrefsManager.PUBNUB_CHANNELS,
+//                            new HashSet<>(mSubscribedChannels));
+//        }
+
         mSubscribedChannels.clear();
         pubnub.stop();
     }
@@ -94,16 +105,12 @@ public class PubNubManager {
                 });
     }
 
-    private void subscribeToChannels(String... channels){
+    public void subscribeToChannels(String... channels){
         pubnub.unsubscribe().channels(mSubscribedChannels);
         mSubscribedChannels.clear();
         Log.i(TAG, "Subscribing to channels: "+channels.toString());
         pubnub.subscribe().channels(Arrays.asList(channels)).execute();
         mSubscribedChannels.addAll(Arrays.asList(channels));
-    }
-
-    private void addListener(final SubscribeCallback listener){
-        pubnub.addListener(listener);
     }
 
     /**

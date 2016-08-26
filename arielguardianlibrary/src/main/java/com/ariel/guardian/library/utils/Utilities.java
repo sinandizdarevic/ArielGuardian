@@ -27,11 +27,7 @@ public class Utilities {
 
     public static final String UUID_PREFIX = "ariel";
 
-    private static final String PUBNUB_CONFIG_CHANNEL = "config_%s";
-    private static final String PUBNUB_LOCATION_CHANNEL = "location_%s";
-    private static final String PUBNUB_APPLICATION_CHANNEL = "application_%s";
-
-    private static String sDeviceId;
+    private static final String PUBNUB_ARIEL_CHANNEL = "ariel_%s";
 
     public static String encodeAsFirebaseKey(final String toEncode) {
         return toEncode.replaceAll("\\.", "%2E");
@@ -52,19 +48,9 @@ public class Utilities {
         return date;
     }
 
-    public static String getPubNubConfigChannel(){
-        Log.i(TAG, "Config topic: "+String.format(PUBNUB_CONFIG_CHANNEL, sDeviceId));
-        return String.format(PUBNUB_CONFIG_CHANNEL, sDeviceId);
-    }
-
-    public static String getPubNubApplicationChannel(){
-        Log.i(TAG, "Config topic: "+String.format(PUBNUB_APPLICATION_CHANNEL, sDeviceId));
-        return String.format(PUBNUB_APPLICATION_CHANNEL, sDeviceId);
-    }
-
-    public static String getPubNubLocationChannel(){
-        Log.i(TAG, "Location topic: "+String.format(PUBNUB_LOCATION_CHANNEL, sDeviceId));
-        return String.format(PUBNUB_LOCATION_CHANNEL, sDeviceId);
+    public static String getPubNubArielChannel(final String deviceId){
+        Log.i(TAG, "Config topic: "+String.format(PUBNUB_ARIEL_CHANNEL, deviceId));
+        return String.format(PUBNUB_ARIEL_CHANNEL, deviceId);
     }
 
     public static String getUniquePsuedoID() {
@@ -117,10 +103,5 @@ public class Utilities {
                 .registerSubtype(ReportParams.class);
         return new GsonBuilder().registerTypeAdapterFactory(paramsAdapterFactory).create();
     }
-
-    public static void setDeviceId(final String deviceId){
-        sDeviceId = deviceId;
-    }
-
 
 }

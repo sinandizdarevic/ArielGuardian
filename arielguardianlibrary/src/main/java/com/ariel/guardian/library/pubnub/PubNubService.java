@@ -20,8 +20,6 @@ public class PubNubService extends Service {
 
     private static final String TAG = "PubNubService";
 
-    public static final String PARAM_DEVICE_ID = "device_id";
-
     private PubNubManager mPubNubManager;
 
     private boolean mIsRunning;
@@ -33,8 +31,7 @@ public class PubNubService extends Service {
         Log.i(TAG, "Initating PubNubManager");
 
         if(!mIsRunning) {
-            String deviceId = intent.getStringExtra(PARAM_DEVICE_ID);
-            mPubNubManager = new PubNubManager(getApplicationContext(), deviceId);
+            mPubNubManager = new PubNubManager(getApplicationContext());
             mIsRunning = true;
         }
 
@@ -42,12 +39,24 @@ public class PubNubService extends Service {
     }
 
     public void addSubscribeCallback(SubscribeCallback callback){
+        Log.i(TAG, "Adding subscribe callback");
         mPubNubManager.addSubscribeCallback(callback);
     }
 
     public void sendCommand(final CommandMessage commandMessage, final String channel, final PNCallback<PNPublishResult> callback){
         Log.i(TAG, "Sending command");
         mPubNubManager.sendCommand(commandMessage,channel,callback);
+    }
+
+    public void subscribeToChannels(final String... channels){
+        Log.i(TAG, "Subscribing to channels: "+channels);
+        mPubNubManager.subscribeToChannels(channels);
+    }
+
+    public void subscribeToChannelsWithCallback(SubscribeCallback callback, final String... channels){
+        Log.i(TAG, "Subscribing to channels: "+channels);
+        addSubscribeCallback(callback);
+        mPubNubManager.subscribeToChannels(channels);
     }
 
     @Override

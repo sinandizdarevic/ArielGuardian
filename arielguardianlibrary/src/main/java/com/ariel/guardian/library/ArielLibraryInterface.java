@@ -22,4 +22,8 @@ public interface ArielLibraryInterface {
 
     FirebaseHelper firebase();
 
+    void subscribeToChannels(String... channels);
+
+    void subscribeToChannelsWithCallback(SubscribeCallback callback, String... channels);
+
 }

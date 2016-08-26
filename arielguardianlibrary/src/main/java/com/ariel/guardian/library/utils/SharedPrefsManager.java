@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import com.ariel.guardian.library.firebase.model.DeviceConfiguration;
 
+import java.util.Set;
+
 /**
  * Created by mikalackis on 17.8.16..
  */
@@ -17,6 +19,8 @@ public class SharedPrefsManager {
     public static final String PUBNUB_SECRET_KEY = "pubnub_publish_key";
     public static final String PUBNUB_CIPHER_KEY = "pubnub_publish_key";
     public static final String PUBNUB_DATA_SET = "pubnub_data_set";
+
+    public static final String PUBNUB_CHANNELS = "pubnub_channels";
 
 
     private static SharedPrefsManager sInstance;
@@ -36,6 +40,16 @@ public class SharedPrefsManager {
 
     public String getStringPreference(final String key, final String defaultValue) {
         return mSharedPreferences.getString(key, defaultValue);
+    }
+
+    public Set<String> getStringSetPreference(final String key, final Set<String> value) {
+        return mSharedPreferences.getStringSet(key, null);
+    }
+
+    public void setStringSetPreference(final String key, final Set<String> value) {
+        final SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putStringSet(key, value);
+        editor.commit();
     }
 
     public void setStringPreference(final String key, final String value) {

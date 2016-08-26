@@ -75,7 +75,7 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
                     .invokedCommand(LocationCommands.LOCATE_NOW_COMMAND)
                     .commandStatus(true)
                     .errorMsg(null)
-                    .build(), Utilities.getPubNubLocationChannel());
+                    .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
         }
         return true;
     }
@@ -106,7 +106,7 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
                 .invokedCommand(LocationCommands.LOCATE_NOW_COMMAND)
                 .commandStatus(false)
                 .errorMsg("Error starting google client")
-                .build(), Utilities.getPubNubLocationChannel());
+                .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
         jobFinished(mJobParams, true);
     }
 
