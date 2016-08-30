@@ -24,7 +24,7 @@ import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.library.commands.report.ReportParams;
 import com.ariel.guardian.library.firebase.model.DeviceLocation;
-import com.ariel.guardian.library.utils.Utilities;
+import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.utils.LocationManager;
 import com.google.android.gms.common.ConnectionResult;
 
@@ -57,11 +57,10 @@ public class DeviceFinderService extends ArielService implements LocationManager
                     .build();
             mLocationManager.initAndStartLocationUpdates();
 
-            reportCommandExecution(new ReportParams.ReportParamBuilder()
-                    .invokedCommand(LocationCommands.TRACKING_START_COMMAND)
-                    .commandStatus(true)
-                    .errorMsg(null)
-                    .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
+            reportCommandExecuted(mInvoker,
+                    LocationCommands.TRACKING_START_COMMAND,
+                    null);
+
         }
 
         mReportBySms = intent.getBooleanExtra(LocationParams.PARAM_SMS_LOCATION_REPORT, false);
@@ -76,6 +75,9 @@ public class DeviceFinderService extends ArielService implements LocationManager
         mIsRunning = false;
         mLocationManager.stopUpdates();
         mLocationManager = null;
+        reportCommandExecuted(mInvoker,
+                LocationCommands.TRACKING_STOP_COMMAND,
+                null);
     }
 
     @Nullable
@@ -119,12 +121,9 @@ public class DeviceFinderService extends ArielService implements LocationManager
 
     @Override
     public void onGoogleClientError(ConnectionResult connectionResult) {
-        reportCommandExecution(new ReportParams.ReportParamBuilder()
-                .invokedCommand(LocationCommands.TRACKING_START_COMMAND +
-                        " or "+ LocationCommands.TRACKING_STOP_COMMAND)
-                .commandStatus(false)
-                .errorMsg("Error starting google client")
-                .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
+        reportCommandExecuted(mInvoker,
+                LocationCommands.TRACKING_START_COMMAND +" or "+LocationCommands.TRACKING_STOP_COMMAND,
+                "Google client error: "+connectionResult.getErrorMessage());
         stopSelf();
     }
 }

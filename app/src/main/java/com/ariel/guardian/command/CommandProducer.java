@@ -3,7 +3,6 @@ package com.ariel.guardian.command;
 import com.ariel.guardian.library.commands.application.ApplicationCommands;
 import com.ariel.guardian.library.commands.configuration.DeviceConfigCommands;
 import com.ariel.guardian.library.commands.location.LocationCommands;
-import com.ariel.guardian.library.utils.Utilities;
 
 import java.util.HashMap;
 
@@ -38,6 +37,7 @@ public class CommandProducer {
         mChannelCommandMap.put(LocationCommands.TRACKING_STOP_COMMAND, new TrackerStop());
 
         mChannelCommandMap.put(DeviceConfigCommands.UPDATE_CONFIG_COMMAND, new UpdateConfig());
+        mChannelCommandMap.put(DeviceConfigCommands.ADD_MASTER_COMMAND, new AddMaster());
 
         mChannelCommandMap.put(ApplicationCommands.APPLICATION_UPDATE_COMMAND, new ApplicationUpdate());
     }

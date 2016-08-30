@@ -43,9 +43,9 @@ public class PubNubService extends Service {
         mPubNubManager.addSubscribeCallback(callback);
     }
 
-    public void sendCommand(final CommandMessage commandMessage, final String channel, final PNCallback<PNPublishResult> callback){
+    public void sendCommand(final CommandMessage commandMessage, final PNCallback<PNPublishResult> callback, final String... channels){
         Log.i(TAG, "Sending command");
-        mPubNubManager.sendCommand(commandMessage,channel,callback);
+        mPubNubManager.sendCommand(commandMessage,callback,channels);
     }
 
     public void subscribeToChannels(final String... channels){

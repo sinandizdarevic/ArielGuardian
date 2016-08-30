@@ -6,7 +6,7 @@ import android.util.Log;
 import com.ariel.guardian.library.firebase.model.DeviceActivity;
 import com.ariel.guardian.library.firebase.model.DeviceLocation;
 import com.ariel.guardian.library.firebase.model.DevicePackage;
-import com.ariel.guardian.library.utils.Utilities;
+import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -47,7 +47,7 @@ public class FirebaseHelper {
     public void reportAction(final String action){
         DeviceActivity deviceActivity = new DeviceActivity(action,(new Date()).getTime(),true);
         DatabaseReference myRef = mFBDB.getReference("activity");
-        myRef.child(Utilities.getUniquePsuedoID()).push().setValue(deviceActivity);
+        myRef.child(ArielUtilities.getUniquePseudoID()).push().setValue(deviceActivity);
     }
 
     /**
@@ -57,8 +57,8 @@ public class FirebaseHelper {
      */
     public void reportPackage(final DevicePackage devicePackage, final String packageName){
         DatabaseReference myRef = mFBDB.getReference("application");
-        Log.i(TAG,"Package name: "+Utilities.encodeAsFirebaseKey(packageName));
-        myRef.child(Utilities.getUniquePsuedoID()).child(Utilities.encodeAsFirebaseKey(packageName)).setValue(devicePackage);
+        Log.i(TAG,"Package name: "+ ArielUtilities.encodeAsFirebaseKey(packageName));
+        myRef.child(ArielUtilities.getUniquePseudoID()).child(ArielUtilities.encodeAsFirebaseKey(packageName)).setValue(devicePackage);
     }
 
     /**
@@ -68,8 +68,8 @@ public class FirebaseHelper {
      */
     public DatabaseReference getAppPackageData(final String packageName){
         DatabaseReference myRef = mFBDB.getReference("application");
-        Log.i(TAG,"Package name: "+Utilities.encodeAsFirebaseKey(packageName));
-        return myRef.child(Utilities.getUniquePsuedoID()).child(Utilities.encodeAsFirebaseKey(packageName));
+        Log.i(TAG,"Package name: "+ ArielUtilities.encodeAsFirebaseKey(packageName));
+        return myRef.child(ArielUtilities.getUniquePseudoID()).child(ArielUtilities.encodeAsFirebaseKey(packageName));
     }
 
     /**
@@ -78,12 +78,12 @@ public class FirebaseHelper {
      */
     public void reportLocation(final DeviceLocation deviceLocation){
         DatabaseReference myRef = mFBDB.getReference("location");
-        myRef.child(Utilities.getUniquePsuedoID()).push().setValue(deviceLocation);
+        myRef.child(ArielUtilities.getUniquePseudoID()).push().setValue(deviceLocation);
     }
 
     public void syncDevicePackageInformation(final ValueEventListener listener, String packageName){
-        packageName = Utilities.encodeAsFirebaseKey(packageName);
-        DatabaseReference myRef = mFBDB.getReference("application").child(Utilities.getUniquePsuedoID()).child(packageName);
+        packageName = ArielUtilities.encodeAsFirebaseKey(packageName);
+        DatabaseReference myRef = mFBDB.getReference("application").child(ArielUtilities.getUniquePseudoID()).child(packageName);
         if(listener!=null) {
             myRef.addValueEventListener(listener);
             mPackageListeners.put(packageName, listener);
@@ -92,9 +92,9 @@ public class FirebaseHelper {
     }
 
     public void removeDevicePackageListener(String packageName){
-        packageName = Utilities.encodeAsFirebaseKey(packageName);
+        packageName = ArielUtilities.encodeAsFirebaseKey(packageName);
         if(mPackageListeners.get(packageName)!=null) {
-            DatabaseReference myRef = mFBDB.getReference("application").child(Utilities.getUniquePsuedoID()).child(packageName);
+            DatabaseReference myRef = mFBDB.getReference("application").child(ArielUtilities.getUniquePseudoID()).child(packageName);
             myRef.removeEventListener(mPackageListeners.get(packageName));
             mPackageListeners.remove(packageName);
             myRef.keepSynced(false);

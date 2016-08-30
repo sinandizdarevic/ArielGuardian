@@ -11,7 +11,7 @@ import com.ariel.guardian.library.commands.application.ApplicationCommands;
 import com.ariel.guardian.library.commands.application.ApplicationParams;
 import com.ariel.guardian.library.commands.report.ReportParams;
 import com.ariel.guardian.firebase.listeners.DevicePackageValueEventListener;
-import com.ariel.guardian.library.utils.Utilities;
+import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.firebase.database.DatabaseReference;
 
 /**
@@ -47,8 +47,11 @@ public class DeviceApplicationService extends ArielService implements DataLoadCo
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
         mPackageName = intent.getStringExtra(ApplicationParams.PARAM_PACKAGE_NAME);
-        mDeviceApplication = mFirebaseHelper.getFirebaseDatabase().getReference("application").child(Utilities.getUniquePsuedoID()).child(Utilities.encodeAsFirebaseKey(mPackageName));
+        mDeviceApplication = mFirebaseHelper.getFirebaseDatabase().getReference("application")
+                .child(ArielUtilities.getUniquePseudoID())
+                .child(ArielUtilities.encodeAsFirebaseKey(mPackageName));
         mDeviceApplication.addListenerForSingleValueEvent(mDevicePackageListener);
         return START_STICKY;
     }
@@ -66,27 +69,24 @@ public class DeviceApplicationService extends ArielService implements DataLoadCo
 
     @Override
     public void onDataLoadCompleted() {
-        reportCommandExecution(new ReportParams.ReportParamBuilder()
-                .invokedCommand(ApplicationCommands.APPLICATION_UPDATE_COMMAND)
-                .commandStatus(true)
-                .errorMsg(null)
-                .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
+        reportCommandExecuted(mInvoker,
+                ApplicationCommands.APPLICATION_UPDATE_COMMAND,
+                null);
         stopSelf();
     }
 
     @Override
     public void onDataLoadError(String errorMessage) {
-        reportCommandExecution(new ReportParams.ReportParamBuilder()
-                .invokedCommand(ApplicationCommands.APPLICATION_UPDATE_COMMAND)
-                .commandStatus(false)
-                .errorMsg(errorMessage)
-                .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
+        reportCommandExecuted(mInvoker,
+                ApplicationCommands.APPLICATION_UPDATE_COMMAND,
+                errorMessage);
         stopSelf();
     }
 
     public static Intent getCallingIntent(final ApplicationParams params){
         Intent appService = new Intent(GuardianApplication.getInstance(), DeviceApplicationService.class);
         appService.putExtra(ApplicationParams.PARAM_PACKAGE_NAME, params.getPackageName());
+        appService.putExtra(ApplicationParams.PARAM_INVOKER, params.getInvoker());
         return appService;
     }
 

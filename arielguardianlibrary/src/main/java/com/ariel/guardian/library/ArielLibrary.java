@@ -12,8 +12,6 @@ import android.util.Log;
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.library.pubnub.PubNubService;
-import com.ariel.guardian.library.utils.Constants;
-import com.ariel.guardian.library.utils.Utilities;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
@@ -24,6 +22,8 @@ import com.pubnub.api.models.consumer.PNPublishResult;
 public final class ArielLibrary implements ArielLibraryInterface {
 
     private static final String TAG = "ArielLibrary";
+
+    public static final String BROADCAST_LIBRARY_READY = "ariel_library_ready";
 
     private static boolean mPrepared;
     private static FirebaseHelper mFireBaseHelper;
@@ -78,10 +78,14 @@ public final class ArielLibrary implements ArielLibraryInterface {
         return mInstance;
     }
 
+    public static boolean prepared(){
+        return mPrepared && mPubNubServiceBound;
+    }
+
     @Override
-    public void sendCommand(final CommandMessage command, final String channel,
-                            final PNCallback<PNPublishResult> callback) {
-        mPubNubService.sendCommand(command, channel, callback);
+    public void sendCommand(final CommandMessage command,
+                            final PNCallback<PNPublishResult> callback, final String... channels) {
+        mPubNubService.sendCommand(command, callback, channels);
     }
 
     @Override
@@ -116,7 +120,7 @@ public final class ArielLibrary implements ArielLibraryInterface {
             mPubNubService = binder.getService();
             mPubNubServiceBound = true;
 
-            Intent intent = new Intent(Constants.BROADCAST_LIBRARY_READY);
+            Intent intent = new Intent(BROADCAST_LIBRARY_READY);
             LocalBroadcastManager.getInstance(mApplication).sendBroadcast(intent);
         }
 

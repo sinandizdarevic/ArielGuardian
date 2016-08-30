@@ -197,6 +197,8 @@
 
         <service android:name=".services.DeviceFinderService"></service>
 
+        <service android:name=".services.UpdateDeviceAppsService"></service>
+
         <service
             android:name=".services.FirebaseAuthService"
             android:permission="android.permission.BIND_JOB_SERVICE" />

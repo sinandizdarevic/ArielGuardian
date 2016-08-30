@@ -21,13 +21,14 @@ import java.util.UUID;
  * Created by mikalackis on 23.5.16..
  * Class holding utility methods used throughout the app
  */
-public class Utilities {
+public class ArielUtilities {
 
-    private static final String TAG = Utilities.class.getName();
+    private static final String TAG = ArielUtilities.class.getName();
 
     public static final String UUID_PREFIX = "ariel";
 
     private static final String PUBNUB_ARIEL_CHANNEL = "ariel_%s";
+    private static final String PUBNUB_USER_CHANNEL = "user_%s";
 
     public static String encodeAsFirebaseKey(final String toEncode) {
         return toEncode.replaceAll("\\.", "%2E");
@@ -53,7 +54,13 @@ public class Utilities {
         return String.format(PUBNUB_ARIEL_CHANNEL, deviceId);
     }
 
-    public static String getUniquePsuedoID() {
+    //support multiple devices
+//    public static String getPubNubUserChanel(final String uuid){
+//        Log.i(TAG, "Config topic: "+String.format(PUBNUB_USER_CHANNEL, uuid));
+//        return String.format(PUBNUB_USER_CHANNEL, uuid);
+//    }
+
+    public static String getUniquePseudoID() {
         // If all else fails, if the user does have lower than API 9 (lower
         // than Gingerbread), has reset their device or 'Secure.ANDROID_ID'
         // returns 'null', then simply the ID returned will be solely based

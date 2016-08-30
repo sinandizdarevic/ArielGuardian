@@ -4,10 +4,7 @@ import android.util.Log;
 
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.ArielLibrary;
 import com.ariel.guardian.library.firebase.model.DeviceConfiguration;
-import com.ariel.guardian.library.utils.Utilities;
-import com.ariel.guardian.pubnub.listeners.ArielPubNubCallback;
 import com.ariel.guardian.services.DeviceFinderJobService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

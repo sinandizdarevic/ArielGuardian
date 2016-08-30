@@ -5,6 +5,7 @@ import android.util.Log;
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.GuardianComponent;
 import com.ariel.guardian.library.commands.Params;
+import com.ariel.guardian.library.commands.application.ApplicationCommands;
 import com.ariel.guardian.library.commands.application.ApplicationParams;
 import com.ariel.guardian.services.DeviceApplicationService;
 
@@ -15,7 +16,7 @@ public class ApplicationUpdate extends Command {
 
     @Override
     public void execute(final Params params) {
-        reportCommand("App update");
+        reportCommand(ApplicationCommands.APPLICATION_UPDATE_COMMAND);
         Log.i("Application update", "Executing application update for package name: "+params);
         GuardianApplication.getInstance().startService(DeviceApplicationService.getCallingIntent((ApplicationParams)params));
     }

@@ -5,9 +5,7 @@ import android.util.Log;
 import com.ariel.guardian.command.Command;
 import com.ariel.guardian.command.CommandProducer;
 import com.ariel.guardian.library.commands.CommandMessage;
-import com.ariel.guardian.library.utils.Utilities;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.gson.JsonSyntaxException;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
@@ -46,7 +44,7 @@ public class ArielPubNubCallback extends SubscribeCallback {
         }
 
         try{
-            CommandMessage msg = Utilities.getGson().fromJson(message.getMessage().toString(), CommandMessage.class);
+            CommandMessage msg = ArielUtilities.getGson().fromJson(message.getMessage().toString(), CommandMessage.class);
             Command command = CommandProducer.getInstance().getCommand(msg.getAction());
             Log.i(TAG, "Received command from pubnub: "+msg.getAction()+" with params: "+msg.getParams());
             if(command!=null){

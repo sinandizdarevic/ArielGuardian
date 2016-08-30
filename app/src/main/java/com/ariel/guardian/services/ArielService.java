@@ -2,18 +2,17 @@ package com.ariel.guardian.services;
 
 import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.os.PowerManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.ArielLibrary;
-import com.ariel.guardian.library.commands.CommandMessage;
-import com.ariel.guardian.library.commands.report.ReportParams;
+import com.ariel.guardian.library.commands.Params;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
-import com.pubnub.api.callbacks.PNCallback;
-import com.pubnub.api.models.consumer.PNPublishResult;
-import com.pubnub.api.models.consumer.PNStatus;
+import com.ariel.guardian.library.utils.ArielUtilities;
+import com.ariel.guardian.receivers.ReportActionReceiver;
 
 import javax.inject.Inject;
 
@@ -23,6 +22,8 @@ import javax.inject.Inject;
 abstract public class ArielService extends Service {
 
     private static PowerManager.WakeLock sWakeLock;
+
+    protected String mInvoker;
 
     @Inject
     FirebaseHelper mFirebaseHelper;
@@ -48,6 +49,12 @@ abstract public class ArielService extends Service {
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        mInvoker = intent.getStringExtra(Params.PARAM_INVOKER);
+        return START_STICKY;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         Log.i(getServiceName(), "onDestroy");
@@ -57,14 +64,18 @@ abstract public class ArielService extends Service {
         }
     }
 
-    protected void reportCommandExecution(final ReportParams params, final String channel) {
-//        CommandMessage cm = new CommandMessage(params.getInvokedCommand(), params);
-//        ArielLibrary.action().sendCommand(cm, channel, new PNCallback<PNPublishResult>() {
-//            @Override
-//            public void onResponse(PNPublishResult result, PNStatus status) {
-//
-//            }
-//        });
+    protected void reportCommandExecuted(String masterId, String command, String error){
+        if(masterId!=null && masterId.length()>0) {
+            Intent intent = ReportActionReceiver.getReportActionIntent(
+                    ArielUtilities.getPubNubArielChannel(masterId),
+                    command,
+                    error);
+            LocalBroadcastManager.getInstance(GuardianApplication.getInstance())
+                    .sendBroadcast(intent);
+        }
+        else{
+            Log.i("ArielService", "no master defined for this command");
+        }
     }
 
     abstract String getServiceName();

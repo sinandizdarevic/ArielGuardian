@@ -15,8 +15,9 @@ public interface ArielLibraryInterface {
 
     void destroy();
 
-    void sendCommand(final CommandMessage command, final String channel,
-                     final PNCallback<PNPublishResult> callback);
+    void sendCommand(final CommandMessage command,
+                     final PNCallback<PNPublishResult> callback,
+                     final String... channels);
 
     void addPubNubSubscribeCallback(final SubscribeCallback callback);
 

@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by mikalackis on 2.6.16..
@@ -25,6 +26,11 @@ public class PackageManagerUtilities {
             ai = null;
         }
         return (String) (ai != null ? pm.getApplicationLabel(ai) : "(unknown)");
+    }
+
+    public static List<ApplicationInfo> getInstalledApplications(final Context context){
+        final PackageManager pm = context.getPackageManager();
+        return pm.getInstalledApplications(PackageManager.GET_META_DATA);
     }
 
     public static void setApplicationEnabledState(final Context context, final String packageName, final boolean state) {

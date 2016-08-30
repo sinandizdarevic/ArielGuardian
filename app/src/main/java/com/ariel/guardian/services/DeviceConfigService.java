@@ -1,9 +1,6 @@
 package com.ariel.guardian.services;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -11,9 +8,10 @@ import android.util.Log;
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.firebase.listeners.DataLoadCompletedListener;
 import com.ariel.guardian.firebase.listeners.DeviceConfigurationValueEventListener;
+import com.ariel.guardian.library.commands.application.ApplicationCommands;
 import com.ariel.guardian.library.commands.configuration.DeviceConfigCommands;
 import com.ariel.guardian.library.commands.report.ReportParams;
-import com.ariel.guardian.library.utils.Utilities;
+import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.firebase.database.DatabaseReference;
 
 /**
@@ -33,7 +31,7 @@ public class DeviceConfigService extends ArielService implements DataLoadComplet
         Log.i(TAG, "Created DeviceConfigService");
         ((GuardianApplication)getApplication()).getGuardianComponent().inject(this);
 
-        mDeviceConfiguration = mFirebaseHelper.getFirebaseDatabase().getReference("configuration").child(Utilities.getUniquePsuedoID());
+        mDeviceConfiguration = mFirebaseHelper.getFirebaseDatabase().getReference("configuration").child(ArielUtilities.getUniquePseudoID());
         mDeviceConfigListener = new DeviceConfigurationValueEventListener(mArielJobScheduler, this);
     }
 
@@ -59,21 +57,17 @@ public class DeviceConfigService extends ArielService implements DataLoadComplet
 
     @Override
     public void onDataLoadCompleted() {
-        reportCommandExecution(new ReportParams.ReportParamBuilder()
-                .invokedCommand(DeviceConfigCommands.UPDATE_CONFIG_COMMAND)
-                .commandStatus(true)
-                .errorMsg(null)
-                .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
+        reportCommandExecuted(mInvoker,
+                DeviceConfigCommands.UPDATE_CONFIG_COMMAND,
+                null);
         stopSelf();
     }
 
     @Override
     public void onDataLoadError(String errorMessage) {
-        reportCommandExecution(new ReportParams.ReportParamBuilder()
-                .invokedCommand(DeviceConfigCommands.UPDATE_CONFIG_COMMAND)
-                .commandStatus(false)
-                .errorMsg(errorMessage)
-                .build(), Utilities.getPubNubArielChannel(Utilities.getUniquePsuedoID()));
+        reportCommandExecuted(mInvoker,
+                DeviceConfigCommands.UPDATE_CONFIG_COMMAND,
+                errorMessage);
         stopSelf();
     }
 

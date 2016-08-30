@@ -42,7 +42,7 @@ public class SharedPrefsManager {
         return mSharedPreferences.getString(key, defaultValue);
     }
 
-    public Set<String> getStringSetPreference(final String key, final Set<String> value) {
+    public Set<String> getStringSetPreference(final String key) {
         return mSharedPreferences.getStringSet(key, null);
     }
 
