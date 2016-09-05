@@ -198,7 +198,7 @@ public class GuardianApplication extends Application {
                      * 5. Deactivate camera face detection?
                      */
 
-                    // Lock the screen
+                    // Clear screen lock
                     LockPatternUtilsHelper.clearLock(GuardianApplication.this);
 
                     // Stop location tracking

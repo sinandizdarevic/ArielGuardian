@@ -8,6 +8,7 @@ import android.util.Log;
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.firebase.listeners.DataLoadCompletedListener;
 import com.ariel.guardian.firebase.listeners.DeviceConfigurationValueEventListener;
+import com.ariel.guardian.library.ArielLibrary;
 import com.ariel.guardian.library.commands.application.ApplicationCommands;
 import com.ariel.guardian.library.commands.configuration.DeviceConfigCommands;
 import com.ariel.guardian.library.commands.report.ReportParams;
@@ -31,7 +32,7 @@ public class DeviceConfigService extends ArielService implements DataLoadComplet
         Log.i(TAG, "Created DeviceConfigService");
         ((GuardianApplication)getApplication()).getGuardianComponent().inject(this);
 
-        mDeviceConfiguration = mFirebaseHelper.getFirebaseDatabase().getReference("configuration").child(ArielUtilities.getUniquePseudoID());
+        mDeviceConfiguration = ArielLibrary.action().getConfigurationReference(ArielUtilities.getUniquePseudoID());
         mDeviceConfigListener = new DeviceConfigurationValueEventListener(mArielJobScheduler, this);
     }
 

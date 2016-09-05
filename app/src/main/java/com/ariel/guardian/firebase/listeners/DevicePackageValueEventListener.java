@@ -3,7 +3,7 @@ package com.ariel.guardian.firebase.listeners;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.firebase.model.DevicePackage;
+import com.ariel.guardian.library.firebase.model.DeviceApplication;
 import com.ariel.guardian.services.CreateIFRuleService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,21 +20,21 @@ public class DevicePackageValueEventListener implements ValueEventListener {
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
-        Log.i("DevicePackage", "onDataChange");
-        DevicePackage devicePackage = dataSnapshot.getValue(DevicePackage.class);
-        if (devicePackage != null) {
-            Log.i("DevicePackage", "device package not null");
-//            if (devicePackage.isDisabled()) {
-//                Log.i("DevicePackage", "device package is disabled");
-//                PackageManagerUtilities.killPackageProcess(GuardianApplication.getInstance(), devicePackage.getPackageName());
+        Log.i("DeviceApplication", "onDataChange");
+        DeviceApplication deviceApplication = dataSnapshot.getValue(DeviceApplication.class);
+        if (deviceApplication != null) {
+            Log.i("DeviceApplication", "device package not null");
+//            if (deviceApplication.isDisabled()) {
+//                Log.i("DeviceApplication", "device package is disabled");
+//                PackageManagerUtilities.killPackageProcess(GuardianApplication.getInstance(), deviceApplication.getPackageName());
 //            }
 
             GuardianApplication.getInstance().
                     startService(CreateIFRuleService.getCallingIntent
-                            (devicePackage.getPackageName(), devicePackage.isDisabled()));
+                            (deviceApplication.getPackageName(), deviceApplication.isDisabled()));
 
             if (mListener != null) {
-                Log.i("DevicePackage", "notify listeners");
+                Log.i("DeviceApplication", "notify listeners");
                 mListener.onDataLoadCompleted();
             }
         }

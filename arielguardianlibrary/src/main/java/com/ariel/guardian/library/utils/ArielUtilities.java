@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.ariel.guardian.library.commands.Params;
 import com.ariel.guardian.library.commands.application.ApplicationParams;
+import com.ariel.guardian.library.commands.configuration.DeviceConfigParams;
 import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.library.commands.report.ReportParams;
 import com.google.gson.Gson;
@@ -107,7 +108,8 @@ public class ArielUtilities {
                 = RuntimeTypeAdapterFactory.of(Params.class, "type")
                 .registerSubtype(LocationParams.class)
                 .registerSubtype(ApplicationParams.class)
-                .registerSubtype(ReportParams.class);
+                .registerSubtype(ReportParams.class)
+                .registerSubtype(DeviceConfigParams.class);
         return new GsonBuilder().registerTypeAdapterFactory(paramsAdapterFactory).create();
     }
 

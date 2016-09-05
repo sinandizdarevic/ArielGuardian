@@ -12,9 +12,12 @@ import android.util.Log;
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.ariel.guardian.library.pubnub.PubNubService;
+import com.google.firebase.database.DatabaseReference;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Ariel library main entry point.
@@ -32,43 +35,43 @@ public final class ArielLibrary implements ArielLibraryInterface {
 
     private static boolean mPubNubServiceBound;
 
-    private static Application mApplication;
+    private static WeakReference<Application> mApplication;
 
     private static ArielLibraryInterface mInstance;
 
-    private ArielLibrary() {
+    private ArielLibrary(final Application application) {
         // prevent this class from being instantiable
+        mApplication = new WeakReference<Application>(application);
+
+        // starts pubnub service
+        Intent pubNubService = new Intent(application, PubNubService.class);
+        application.startService(pubNubService);
+
+        // init firebase
+        mFireBaseHelper = new FirebaseHelper();
+
+        // bind to pubnubservice
+        application.bindService(pubNubService, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     /**
+     *
      * Performs library initialization
      *
      * @param Application
      */
     public static void prepare(final Application application) {
         if (!mPrepared) {
-
-            mInstance = new ArielLibrary();
-
-            mApplication = application;
-
-            // starts pubnub service
-            Intent pubNubService = new Intent(application, PubNubService.class);
-            application.startService(pubNubService);
-
-            // init firebase
-            mFireBaseHelper = new FirebaseHelper();
-
-            // bind to pubnubservice
-            application.bindService(pubNubService, mConnection, Context.BIND_AUTO_CREATE);
-
+            mInstance = new ArielLibrary(application);
             mPrepared = true;
         }
     }
 
     @Override
     public void destroy() {
-        mApplication.unbindService(mConnection);
+        if(mApplication.get()!=null) {
+            mApplication.get().unbindService(mConnection);
+        }
     }
 
     public static ArielLibraryInterface action() {
@@ -109,6 +112,34 @@ public final class ArielLibrary implements ArielLibraryInterface {
         mPubNubService.subscribeToChannelsWithCallback(callback, channels);
     }
 
+    @Override
+    public void reconnect() {
+        mPubNubService.reconnect();
+    }
+
+    @Override
+    public Context getApplicationContenxt() {
+        if(mApplication.get()!=null){
+            return mApplication.get().getApplicationContext();
+        }
+        return null;
+    }
+
+    @Override
+    public DatabaseReference getApplicationReference(final String deviceId) {
+        return mFireBaseHelper.getApplicationReference(deviceId);
+    }
+
+    @Override
+    public DatabaseReference getLocationReference(final String deviceId) {
+        return mFireBaseHelper.getLocationReference(deviceId);
+    }
+
+    @Override
+    public DatabaseReference getConfigurationReference(String deviceId) {
+        return mFireBaseHelper.getConfigurationReference(deviceId);
+    }
+
     private static ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -120,8 +151,10 @@ public final class ArielLibrary implements ArielLibraryInterface {
             mPubNubService = binder.getService();
             mPubNubServiceBound = true;
 
-            Intent intent = new Intent(BROADCAST_LIBRARY_READY);
-            LocalBroadcastManager.getInstance(mApplication).sendBroadcast(intent);
+            if(mApplication.get()!=null) {
+                Intent intent = new Intent(BROADCAST_LIBRARY_READY);
+                LocalBroadcastManager.getInstance(mApplication.get()).sendBroadcast(intent);
+            }
         }
 
         @Override

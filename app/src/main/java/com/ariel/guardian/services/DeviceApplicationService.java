@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.firebase.listeners.DataLoadCompletedListener;
+import com.ariel.guardian.library.commands.Params;
 import com.ariel.guardian.library.commands.application.ApplicationCommands;
 import com.ariel.guardian.library.commands.application.ApplicationParams;
 import com.ariel.guardian.library.commands.report.ReportParams;
@@ -49,6 +50,8 @@ public class DeviceApplicationService extends ArielService implements DataLoadCo
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         mPackageName = intent.getStringExtra(ApplicationParams.PARAM_PACKAGE_NAME);
+        mInvoker = intent.getStringExtra(Params.PARAM_INVOKER);
+        Log.i(TAG, "Invoker: "+mInvoker);
         mDeviceApplication = mFirebaseHelper.getFirebaseDatabase().getReference("application")
                 .child(ArielUtilities.getUniquePseudoID())
                 .child(ArielUtilities.encodeAsFirebaseKey(mPackageName));

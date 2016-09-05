@@ -12,6 +12,7 @@ import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNLogVerbosity;
+import com.pubnub.api.enums.PNReconnectionPolicy;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.presence.PNWhereNowResult;
@@ -123,8 +124,12 @@ public class PubNubManager {
 //        pubnub.unsubscribe().channels(mSubscribedChannels);
 //        mSubscribedChannels.clear();
         Log.i(TAG, "Subscribing to channels: " + channels.toString());
-        pubnub.subscribe().channels(Arrays.asList(channels)).execute();
+        pubnub.subscribe().channels(Arrays.asList(channels)).withPresence().execute();
         mSubscribedChannels.addAll(Arrays.asList(channels));
+    }
+
+    public void reconnect(){
+        pubnub.reconnect();
     }
 
     public void restoreChannelSubscription() {

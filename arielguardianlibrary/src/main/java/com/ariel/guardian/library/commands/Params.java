@@ -1,5 +1,8 @@
 package com.ariel.guardian.library.commands;
 
+import com.ariel.guardian.library.ArielLibrary;
+import com.ariel.guardian.library.utils.ArielUtilities;
+
 /**
  * Marker interface for command parameters
  */
@@ -20,13 +23,11 @@ public class Params {
 
     protected Params(final String type){
         this.type = type;
+        this.invoker = ArielUtilities.getUniquePseudoID();
     }
 
     public String getInvoker() {
         return invoker;
     }
 
-    public void setInvoker(String invoker) {
-        this.invoker = invoker;
-    }
 }

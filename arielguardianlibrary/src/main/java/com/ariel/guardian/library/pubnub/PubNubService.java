@@ -48,6 +48,10 @@ public class PubNubService extends Service {
         mPubNubManager.sendCommand(commandMessage,callback,channels);
     }
 
+    public void reconnect(){
+        mPubNubManager.reconnect();
+    }
+
     public void subscribeToChannels(final String... channels){
         Log.i(TAG, "Subscribing to channels: "+channels);
         mPubNubManager.subscribeToChannels(channels);

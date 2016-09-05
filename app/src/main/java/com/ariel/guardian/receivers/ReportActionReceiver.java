@@ -38,7 +38,7 @@ public class ReportActionReceiver extends BroadcastReceiver {
                 ReportCommands.REPORT_EXECUTION_COMMAND,
                 new ReportParams.ReportParamBuilder()
                 .invokedCommand(command)
-                .commandStatus(false)
+                .commandStatus(error == null ? true : false)
                 .errorMsg(error)
                 .build());
 
@@ -47,7 +47,7 @@ public class ReportActionReceiver extends BroadcastReceiver {
             public void onResponse(PNPublishResult result, PNStatus status) {
 
             }
-        }, new String[]{origin_channel});
+        }, origin_channel);
 
     }
 

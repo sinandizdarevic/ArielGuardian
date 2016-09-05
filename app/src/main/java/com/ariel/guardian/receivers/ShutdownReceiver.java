@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.library.ArielLibrary;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
 
 import javax.inject.Inject;

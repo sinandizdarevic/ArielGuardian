@@ -50,7 +50,7 @@ abstract public class ArielService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mInvoker = intent.getStringExtra(Params.PARAM_INVOKER);
+        //mInvoker = intent.getStringExtra(Params.PARAM_INVOKER);
         return START_STICKY;
     }
 

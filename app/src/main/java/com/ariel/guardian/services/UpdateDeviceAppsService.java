@@ -7,10 +7,7 @@ import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.firebase.listeners.DataLoadCompletedListener;
-import com.ariel.guardian.library.commands.application.ApplicationCommands;
-import com.ariel.guardian.library.commands.application.ApplicationParams;
-import com.ariel.guardian.library.commands.report.ReportParams;
-import com.ariel.guardian.library.firebase.model.DevicePackage;
+import com.ariel.guardian.library.firebase.model.DeviceApplication;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -52,21 +49,21 @@ public class UpdateDeviceAppsService extends ArielService implements DataLoadCom
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterator<DataSnapshot> it = dataSnapshot.getChildren().iterator();
                 while(it.hasNext()){
-                    DevicePackage devicePackage = it.next().getValue(DevicePackage.class);
-                    Log.i(TAG, "Checking package: "+devicePackage.getPackageName());
-                    /**
-                     * This needs to be reimplemented: starting a service for every app
-                     * that we get from firebase is quite heavy....
-                     */
+                    DeviceApplication deviceApplication = it.next().getValue(DeviceApplication.class);
+                    Log.i(TAG, "Checking package: "+ deviceApplication.getPackageName());
+
                     GuardianApplication.getInstance().
                             startService(CreateIFRuleService.getCallingIntent
-                                    (devicePackage.getPackageName(), devicePackage.isDisabled()));
+                                    (deviceApplication.getPackageName(), deviceApplication.isDisabled()));
                 }
+
+                onDataLoadCompleted();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // failed, probably should reschedule
+                onDataLoadError(databaseError.getMessage());
             }
         });
         return START_STICKY;

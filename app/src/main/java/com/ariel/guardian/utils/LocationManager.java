@@ -46,6 +46,7 @@ public class LocationManager implements LocationListener,
     private int mUpdateCount = 0;
 
     public void initAndStartLocationUpdates() {
+        Log.i(TAG, "LocationManager initializing...");
         final Context context = mContext.get();
         if(context!=null) {
             final ContentResolver contentResolver = context.getContentResolver();
@@ -57,11 +58,12 @@ public class LocationManager implements LocationListener,
                             Settings.Secure.LOCATION_MODE_HIGH_ACCURACY);
                 }
             } catch (Settings.SettingNotFoundException e) {
-                Log.e("TAG", "Unable find location settings.", e);
+                Log.e(TAG, "Unable find location settings.", e);
             }
 
             buildGoogleApiClient();
         }
+        Log.i(TAG, "LocationManager started!");
     }
 
     /**
@@ -130,7 +132,7 @@ public class LocationManager implements LocationListener,
     public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
-        Log.i("TAG", "Connection suspended");
+        Log.i(TAG, "Connection suspended");
         mGoogleApiClient.connect();
     }
 
@@ -140,10 +142,11 @@ public class LocationManager implements LocationListener,
         if (!constantReporting) {
             if ((mUpdateCount != 0)
                     && (accuracy <= locationAccuracyThreshold || mUpdateCount == maxLocationUpdates)) {
+                Log.i(TAG, "Stopping updates");
                 stopUpdates();
             }
         } else {
-            Log.i("TAG", "Constant reporting in progress");
+            Log.i(TAG, "Constant reporting in progress");
         }
     }
 

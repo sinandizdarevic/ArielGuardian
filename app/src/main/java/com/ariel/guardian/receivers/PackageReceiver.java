@@ -7,8 +7,7 @@ import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.firebase.FirebaseHelper;
-import com.ariel.guardian.firebase.listeners.DevicePackageValueEventListener;
-import com.ariel.guardian.library.firebase.model.DevicePackage;
+import com.ariel.guardian.library.firebase.model.DeviceApplication;
 import com.ariel.guardian.utils.PackageManagerUtilities;
 import com.google.firebase.database.DatabaseReference;
 
@@ -34,17 +33,17 @@ public class PackageReceiver extends BroadcastReceiver {
 
         final String packageName = intent.getData().getSchemeSpecificPart();
 
-        final DevicePackage devicePackage = new DevicePackage();
-        devicePackage.setDate(Calendar.getInstance().getTimeInMillis());
-        devicePackage.setPackageName(packageName);
+        final DeviceApplication deviceApplication = new DeviceApplication();
+        deviceApplication.setDate(Calendar.getInstance().getTimeInMillis());
+        deviceApplication.setPackageName(packageName);
 
         if(intent.getAction().equals("android.intent.action.PACKAGE_ADDED")){
             // INSTALLED PACKAGE
-            devicePackage.setAppName(PackageManagerUtilities.getAppNameFromPackage(context,packageName));
-            devicePackage.setInstalled(true);
-            devicePackage.setDisabled(false);
-            mFirebaseHelper.reportPackage(devicePackage, packageName);
-            mFirebaseHelper.syncDevicePackageInformation(new DevicePackageValueEventListener(), packageName);
+            deviceApplication.setAppName(PackageManagerUtilities.getAppNameFromPackage(context,packageName));
+            deviceApplication.setInstalled(true);
+            deviceApplication.setDisabled(false);
+            mFirebaseHelper.reportApplication(deviceApplication, packageName);
+            //mFirebaseHelper.syncDevicePackageInformation(new DevicePackageValueEventListener(), packageName);
 
             // write into internal db
             // UPDATE LOCAL VARIABLE THAT HOLDS DISABLED PACKAGES
@@ -66,7 +65,7 @@ public class PackageReceiver extends BroadcastReceiver {
         }
         else if(intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")){
             // REMOVED PACKAGE
-            mFirebaseHelper.removeDevicePackageListener(packageName);
+            //mFirebaseHelper.removeDevicePackageListener(packageName);
             DatabaseReference dr = mFirebaseHelper.getAppPackageData(packageName);
             dr.removeValue();
 
@@ -79,10 +78,10 @@ public class PackageReceiver extends BroadcastReceiver {
 //            dr.addListenerForSingleValueEvent(new ValueEventListener() {
 //                @Override
 //                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    //Log.i(TAG, "DevicePackage data: "+dataSnapshot.getValue().toString());
-//                    DevicePackage dp = dataSnapshot.getValue(DevicePackage.class);
+//                    //Log.i(TAG, "DeviceApplication data: "+dataSnapshot.getValue().toString());
+//                    DeviceApplication dp = dataSnapshot.getValue(DeviceApplication.class);
 //                    if(dp.isDisabled()){
-//                        PackageManagerUtilities.setApplicationEnabledState(GuardianApplication.getInstance(), devicePackage.getPackageName(), devicePackage.isDisabled());
+//                        PackageManagerUtilities.setApplicationEnabledState(GuardianApplication.getInstance(), deviceApplication.getPackageName(), deviceApplication.isDisabled());
 //                    }
 //                }
 //

@@ -6,7 +6,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
  * POJO class that represents device application object in firebase database
  */
 @IgnoreExtraProperties
-public class DevicePackage {
+public class DeviceApplication {
 
     /**
      * Application package name
@@ -29,11 +29,11 @@ public class DevicePackage {
      */
     public boolean disabled;
 
-    public DevicePackage(){
+    public DeviceApplication(){
 
     }
 
-    public DevicePackage(String packageName, String appName, long date, boolean installed) {
+    public DeviceApplication(String packageName, String appName, long date, boolean installed) {
         this.appName = appName;
         this.date = date;
         this.installed = installed;
