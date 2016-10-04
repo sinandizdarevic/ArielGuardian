@@ -3,7 +3,7 @@ package com.ariel.guardian;
 
 import android.app.Application;
 
-import com.ariel.guardian.library.firebase.FirebaseHelper;
+import com.ariel.guardian.firebase.FirebaseHelper;
 
 import javax.inject.Singleton;
 
@@ -16,15 +16,15 @@ import dagger.Provides;
 @Module
 public class GuardianModule {
 
-    private Application mApplication;
+    private GuardianApplication mApplication;
 
-    public GuardianModule(final Application application) {
+    public GuardianModule(final GuardianApplication application) {
         mApplication = application;
     }
 
     @Provides
     @Singleton
-    public Application providesApplication() {
+    public GuardianApplication providesApplication() {
         return mApplication;
     }
 

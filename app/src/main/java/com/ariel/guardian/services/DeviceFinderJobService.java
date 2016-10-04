@@ -21,7 +21,7 @@ import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.report.ReportParams;
-import com.ariel.guardian.library.firebase.FirebaseHelper;
+import com.ariel.guardian.firebase.FirebaseHelper;
 import com.ariel.guardian.library.firebase.model.DeviceLocation;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.utils.LocationManager;
@@ -49,6 +49,9 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
 
     @Inject
     FirebaseHelper mFirebaseHelper;
+
+    @Inject
+    GuardianApplication mApplication;
 
     public DeviceFinderJobService(){
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
@@ -112,7 +115,7 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
 
     @Override
     public JobInfo getJobInfo() {
-        ComponentName componentName = new ComponentName(GuardianApplication.getInstance(), DeviceFinderJobService.class);
+        ComponentName componentName = new ComponentName(mApplication, DeviceFinderJobService.class);
         if(locationUpdateInterval!=-1) {
             return new JobInfo.Builder(ArielJobScheduler.ArielJobID.LOCATION.ordinal(), componentName).setPersisted(true).setPeriodic(locationUpdateInterval).build();
         }

@@ -9,8 +9,7 @@ import android.util.Log;
 
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.commands.Params;
-import com.ariel.guardian.library.firebase.FirebaseHelper;
+import com.ariel.guardian.firebase.FirebaseHelper;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.receivers.ReportActionReceiver;
 
@@ -45,7 +44,6 @@ abstract public class ArielService extends Service {
 
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
 
-        //injectComponent(GuardianApplication.getInstance().getGuardianComponent());
     }
 
     @Override

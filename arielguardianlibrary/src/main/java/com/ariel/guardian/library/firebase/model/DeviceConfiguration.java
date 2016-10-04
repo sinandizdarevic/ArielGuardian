@@ -29,11 +29,6 @@ public class DeviceConfiguration {
      * Time interval in which the device will upload its location to firebase
      */
     private long locationTrackingInterval;
-    private String pubNubCipherKey;
-    private String pubNubSubscribeKey;
-    private String pubNubPublishKey;
-    private String pubNubSecretKey;
-    private boolean pubNubUseSSL;
 
     public DeviceConfiguration() {
         // default constructor required by firebase
@@ -59,39 +54,4 @@ public class DeviceConfiguration {
         return locationTrackingInterval;
     }
 
-    public String getPubNubCipherKey() {
-        return pubNubCipherKey;
-    }
-
-    public String getPubNubSubscribeKey() {
-        return pubNubSubscribeKey;
-    }
-
-    public String getPubNubPublishKey() {
-        return pubNubPublishKey;
-    }
-
-    public String getPubNubSecretKey() {
-        return pubNubSecretKey;
-    }
-
-    public boolean isPubNubUseSSL() {
-        return pubNubUseSSL;
-    }
-
-    public void setPubNubCipherKey(String pubNubCipherKey) {
-        this.pubNubCipherKey = pubNubCipherKey;
-    }
-
-    public void setPubNubSubscribeKey(String pubNubSubscribeKey) {
-        this.pubNubSubscribeKey = pubNubSubscribeKey;
-    }
-
-    public void setPubNubPublishKey(String pubNubPublishKey) {
-        this.pubNubPublishKey = pubNubPublishKey;
-    }
-
-    public void setPubNubSecretKey(String pubNubSecretKey) {
-        this.pubNubSecretKey = pubNubSecretKey;
-    }
 }

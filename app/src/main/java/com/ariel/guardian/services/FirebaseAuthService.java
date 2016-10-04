@@ -6,15 +6,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.ariel.guardian.ArielJobScheduler;
-import com.ariel.guardian.GuardianComponent;
-import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-
-import javax.inject.Inject;
 
 /**
  * Created by mikalackis on 7.6.16..

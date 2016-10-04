@@ -3,16 +3,19 @@ package com.ariel.guardian.activity;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ariel.guardian.R;
 import com.ariel.guardian.library.commands.application.ApplicationParams;
 import com.google.gson.Gson;
+import com.google.zxing.WriterException;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,6 +41,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.getInstance());
+                ImageView imgView = (ImageView) findViewById(R.id.imageView);
+//                try {
+//                    //imgView.setImageBitmap(ArielLibrary.action().generateDeviceQRCode("SAVA_MIKALACKI"));
+//                } catch (WriterException e) {
+//                    e.printStackTrace();
+//                }
             }
         });
 
@@ -46,10 +55,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //LockPatternUtilsHelper.clearLock(GuardianApplication.getInstance());
-                ApplicationParams ap = new ApplicationParams.ApplicationParamBuilder("com.example.android").build();
-                Gson gson = new Gson();
-                String json = gson.toJson(ap);
-                Log.i("MainActivity", json);
+//                ApplicationParams ap = new ApplicationParams.ApplicationParamBuilder("com.example.android").build();
+//                Gson gson = new Gson();
+//                String json = gson.toJson(ap);
+//                Log.i("MainActivity", json);
             }
         });
 

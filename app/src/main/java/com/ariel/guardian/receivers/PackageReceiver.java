@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.firebase.FirebaseHelper;
+import com.ariel.guardian.firebase.FirebaseHelper;
 import com.ariel.guardian.library.firebase.model.DeviceApplication;
 import com.ariel.guardian.utils.PackageManagerUtilities;
 import com.google.firebase.database.DatabaseReference;

@@ -5,7 +5,8 @@ import android.util.Log;
 import com.ariel.guardian.command.Command;
 import com.ariel.guardian.command.CommandProducer;
 import com.ariel.guardian.library.commands.CommandMessage;
-import com.ariel.guardian.library.pubnub.ArielPNCallback;
+import com.ariel.guardian.receivers.NetworkChangeReceiver;
+import com.ariel.guardian.pubnub.PubNubUtilities;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.gson.JsonSyntaxException;
 import com.pubnub.api.PubNub;
@@ -18,9 +19,31 @@ import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 /**
  * Created by mikalackis on 4.7.16..
  */
-public class ArielPubNubCallback extends ArielPNCallback {
+public class ArielPubNubCallback extends SubscribeCallback {
 
     private final String TAG = "ArielPubNubCallback";
+
+    private NetworkChangeReceiver mNetworkListener = new NetworkChangeReceiver();
+
+    @Override
+    public void status(PubNub pubnub, PNStatus status) {
+        Log.i(TAG, "Status: " + status.getStatusCode());
+        if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
+            // internet got lost, do some magic and call reconnect when ready
+            Log.i(TAG, "Internet got lost");
+            PubNubUtilities.getInstance().registerNetworkListener();
+        } else if (status.getCategory() == PNStatusCategory.PNTimeoutCategory) {
+            // do some magic and call reconnect when ready
+            Log.i(TAG, "TIMEOUT");
+            //pubnub.reconnect();
+        } else if(status.getCategory() == PNStatusCategory.PNConnectedCategory){
+            Log.i(TAG, "YAY!!!! CONNECTED!!!");
+            //log.error(status)
+        }
+        else{
+            Log.i(TAG, "SOMETHING!!!! HAPPENED0!!!: "+status.getStatusCode());
+        }
+    }
 
     @Override
     public void message(PubNub pubnub, PNMessageResult message){

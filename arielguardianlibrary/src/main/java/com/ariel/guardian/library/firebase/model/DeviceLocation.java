@@ -1,6 +1,5 @@
 package com.ariel.guardian.library.firebase.model;
 
-import com.ariel.guardian.library.firebase.FirebaseHelper;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 /**
@@ -8,6 +7,8 @@ import com.google.firebase.database.IgnoreExtraProperties;
  */
 @IgnoreExtraProperties
 public class DeviceLocation {
+
+    public static final String GOOGLE_MAPS_URL = "http://maps.google.com/?q=%1$f,%2$f";
 
     /**
      * Link to google maps pointing to device location
@@ -29,7 +30,7 @@ public class DeviceLocation {
         this.timestamp=timestamp;
         this.latitude=latitude;
         this.longitude=longitude;
-        googleMapsUrl = String.format(FirebaseHelper.GOOGLE_MAPS_URL, latitude, longitude);
+        googleMapsUrl = String.format(GOOGLE_MAPS_URL, latitude, longitude);
     }
 
 }

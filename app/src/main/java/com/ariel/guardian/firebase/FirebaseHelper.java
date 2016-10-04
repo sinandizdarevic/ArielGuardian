@@ -1,4 +1,4 @@
-package com.ariel.guardian.library.firebase;
+package com.ariel.guardian.firebase;
 
 import android.support.v4.util.ArrayMap;
 import android.util.Log;
@@ -6,6 +6,7 @@ import android.util.Log;
 import com.ariel.guardian.library.firebase.model.DeviceActivity;
 import com.ariel.guardian.library.firebase.model.DeviceLocation;
 import com.ariel.guardian.library.firebase.model.DeviceApplication;
+import com.ariel.guardian.library.firebase.model.QRCode;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -25,8 +26,9 @@ public class FirebaseHelper {
     public static final String FB_CONFIGURATION = "configuration";
     public static final String FB_LOCATION = "location";
     public static final String FB_ACTIVITY = "activity";
+    public static final String FB_SETTINGS = "settings";
+    public static final String FB_QR_CODES = "qrcodes";
 
-    public static final String GOOGLE_MAPS_URL = "http://maps.google.com/?q=%1$f,%2$f";
 
     private FirebaseDatabase mFBDB;
 
@@ -84,6 +86,15 @@ public class FirebaseHelper {
         myRef.child(ArielUtilities.getUniquePseudoID()).push().setValue(deviceLocation);
     }
 
+    /**
+     * Reports device activating qrcode to firebase
+     * @param qrcode QRCode object
+     */
+    public void reportQRCode(final QRCode qrcode){
+        DatabaseReference myRef = mFBDB.getReference(FB_QR_CODES);
+        myRef.child(ArielUtilities.getUniquePseudoID()).push().setValue(qrcode);
+    }
+
     public DatabaseReference getApplicationReference(final String deviceId){
         return mFBDB.getReference(FB_APPLICATION).child(deviceId);
     }
@@ -94,6 +105,10 @@ public class FirebaseHelper {
 
     public DatabaseReference getConfigurationReference(final String deviceId){
         return mFBDB.getReference(FB_CONFIGURATION).child(deviceId);
+    }
+
+    public DatabaseReference getSettingsReference(){
+        return mFBDB.getReference(FB_SETTINGS);
     }
 
     public void syncDevicePackageInformation(final ValueEventListener listener, String packageName){

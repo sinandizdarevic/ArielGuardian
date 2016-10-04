@@ -6,14 +6,16 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.firebase.FirebaseHelper;
 import com.ariel.guardian.firebase.listeners.DataLoadCompletedListener;
 import com.ariel.guardian.firebase.listeners.DeviceConfigurationValueEventListener;
-import com.ariel.guardian.library.ArielLibrary;
 import com.ariel.guardian.library.commands.application.ApplicationCommands;
 import com.ariel.guardian.library.commands.configuration.DeviceConfigCommands;
 import com.ariel.guardian.library.commands.report.ReportParams;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.firebase.database.DatabaseReference;
+
+import javax.inject.Inject;
 
 /**
  * Created by mikalackis on 7.6.16..
@@ -26,13 +28,16 @@ public class DeviceConfigService extends ArielService implements DataLoadComplet
 
     private DeviceConfigurationValueEventListener mDeviceConfigListener;
 
+    @Inject
+    FirebaseHelper mFirebaseHelper;
+
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "Created DeviceConfigService");
-        ((GuardianApplication)getApplication()).getGuardianComponent().inject(this);
+        GuardianApplication.getInstance().getGuardianComponent().inject(this);
 
-        mDeviceConfiguration = ArielLibrary.action().getConfigurationReference(ArielUtilities.getUniquePseudoID());
+        mDeviceConfiguration = mFirebaseHelper.getConfigurationReference(ArielUtilities.getUniquePseudoID());
         mDeviceConfigListener = new DeviceConfigurationValueEventListener(mArielJobScheduler, this);
     }
 

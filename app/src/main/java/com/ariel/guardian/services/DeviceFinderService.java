@@ -22,9 +22,7 @@ package com.ariel.guardian.services;
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
-import com.ariel.guardian.library.commands.report.ReportParams;
 import com.ariel.guardian.library.firebase.model.DeviceLocation;
-import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.utils.LocationManager;
 import com.google.android.gms.common.ConnectionResult;
 
@@ -33,6 +31,8 @@ import android.location.Location;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import javax.inject.Inject;
 
 public class DeviceFinderService extends ArielService implements LocationManager.LocationManagerListener {
 
@@ -46,9 +46,15 @@ public class DeviceFinderService extends ArielService implements LocationManager
 
     private LocationManager mLocationManager;
 
+    @Inject
+    GuardianApplication mApplication;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Service starting");
+
+        GuardianApplication.getInstance().getGuardianComponent().inject(this);
+
         if (!mIsRunning) {
             mLocationManager = new LocationManager.LocationManagerBuilder(this, this)
                     .locationAccuracyThreshold(5)

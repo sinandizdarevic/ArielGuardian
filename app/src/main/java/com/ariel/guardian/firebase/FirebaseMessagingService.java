@@ -1,4 +1,4 @@
-package com.ariel.guardian.library.firebase;
+package com.ariel.guardian.firebase;
 
 import android.util.Log;
 

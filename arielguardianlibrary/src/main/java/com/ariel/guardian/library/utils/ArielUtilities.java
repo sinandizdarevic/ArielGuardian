@@ -11,6 +11,8 @@ import com.ariel.guardian.library.commands.report.ReportParams;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -35,12 +37,12 @@ public class ArielUtilities {
         return toEncode.replaceAll("\\.", "%2E");
     }
 
-    public static Date timestampToDate(final long timestamp){
+    public static Date timestampToDate(final long timestamp) {
         Calendar cal = Calendar.getInstance();
         TimeZone tz = cal.getTimeZone();//get your local time zone.
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
         sdf.setTimeZone(tz);//set time zone.
-        String localTime = sdf.format(new Date(timestamp*1000));
+        String localTime = sdf.format(new Date(timestamp * 1000));
         Date date = new Date();
         try {
             date = sdf.parse(localTime);//get local date
@@ -50,8 +52,8 @@ public class ArielUtilities {
         return date;
     }
 
-    public static String getPubNubArielChannel(final String deviceId){
-        Log.i(TAG, "Config topic: "+String.format(PUBNUB_ARIEL_CHANNEL, deviceId));
+    public static String getPubNubArielChannel(final String deviceId) {
+        Log.i(TAG, "Config topic: " + String.format(PUBNUB_ARIEL_CHANNEL, deviceId));
         return String.format(PUBNUB_ARIEL_CHANNEL, deviceId);
     }
 
@@ -103,7 +105,7 @@ public class ArielUtilities {
                 .toString();
     }
 
-    public static Gson getGson(){
+    public static Gson getGson() {
         RuntimeTypeAdapterFactory<Params> paramsAdapterFactory
                 = RuntimeTypeAdapterFactory.of(Params.class, "type")
                 .registerSubtype(LocationParams.class)
@@ -111,6 +113,43 @@ public class ArielUtilities {
                 .registerSubtype(ReportParams.class)
                 .registerSubtype(DeviceConfigParams.class);
         return new GsonBuilder().registerTypeAdapterFactory(paramsAdapterFactory).create();
+    }
+
+    public static String getEncodedData(final String deviceId, final String cipher, final String secret) {
+        try {
+            AesCbcWithIntegrity.SecretKeys keys = AesCbcWithIntegrity.generateKeyFromPassword(cipher, secret);
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MINUTE, 60);
+            String toEnc = deviceId.concat("_").concat(calendar.getTimeInMillis() + "");
+            AesCbcWithIntegrity.CipherTextIvMac cipherTextIvMac = null;
+            try {
+                cipherTextIvMac = AesCbcWithIntegrity.encrypt(toEnc, keys);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            //store or send to server
+            return cipherTextIvMac.toString();
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String getDecodedData(final String cipherTextString, final String cipher, final String secret) {
+        try {
+            AesCbcWithIntegrity.SecretKeys keys = AesCbcWithIntegrity.generateKeyFromPassword(cipher, secret);
+            AesCbcWithIntegrity.CipherTextIvMac cipherTextIvMac = new AesCbcWithIntegrity.CipherTextIvMac(cipherTextString);
+            String text = null;
+            try {
+                text = AesCbcWithIntegrity.decryptString(cipherTextIvMac, keys);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return text;
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

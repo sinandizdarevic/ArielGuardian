@@ -143,12 +143,23 @@
 
         <activity android:name=".activity.UsageLogActivity"></activity>
 
+        <service android:name=".pubnub.PubNubService"></service>
+
         <receiver
             android:name=".receivers.BootReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
+        </receiver>
+
+        <receiver android:name=".receivers.ArielPNServiceReceiver">
+
+            <intent-filter>
+                <action android:name="ariel_pn_service_running">
+                </action>
+            </intent-filter>
+
         </receiver>
 
         <receiver

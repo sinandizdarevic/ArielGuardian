@@ -7,12 +7,9 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.ArielLibrary;
-import com.ariel.guardian.library.firebase.FirebaseHelper;
+import com.ariel.guardian.firebase.FirebaseHelper;
 
 import javax.inject.Inject;
-
-import ariel.providers.ArielSettings;
 
 public class ShutdownReceiver extends BroadcastReceiver {
 

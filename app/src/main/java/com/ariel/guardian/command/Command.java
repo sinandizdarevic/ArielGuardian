@@ -6,10 +6,8 @@ import android.util.Log;
 
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.GuardianComponent;
-import com.ariel.guardian.library.ArielLibrary;
 import com.ariel.guardian.library.commands.Params;
-import com.ariel.guardian.library.firebase.FirebaseHelper;
+import com.ariel.guardian.firebase.FirebaseHelper;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.receivers.ReportActionReceiver;
 
@@ -36,7 +34,8 @@ public abstract class Command {
     //public abstract void injectComponent(final GuardianComponent component);
 
     protected void reportCommand(String command){
-        ArielLibrary.action().firebase().reportAction(command);
+        //ArielLibrary.action().firebase().reportAction(command);
+        mFirebaseHelper.reportAction(command);
     }
 
     protected void reportCommandExecuted(String masterId, String command, String error){

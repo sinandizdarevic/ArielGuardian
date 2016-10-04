@@ -3,12 +3,7 @@ package com.ariel.guardian.services;
 import android.app.job.JobInfo;
 import android.app.job.JobService;
 
-import com.ariel.guardian.library.ArielLibrary;
-import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.commands.report.ReportParams;
-import com.pubnub.api.callbacks.PNCallback;
-import com.pubnub.api.models.consumer.PNPublishResult;
-import com.pubnub.api.models.consumer.PNStatus;
 
 
 /**

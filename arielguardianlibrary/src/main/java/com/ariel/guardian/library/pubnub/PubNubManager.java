@@ -3,7 +3,6 @@ package com.ariel.guardian.library.pubnub;
 import android.content.Context;
 import android.util.Log;
 
-import com.ariel.guardian.library.R;
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.utils.SharedPrefsManager;
 import com.ariel.guardian.library.utils.ArielUtilities;
@@ -12,7 +11,6 @@ import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNLogVerbosity;
-import com.pubnub.api.enums.PNReconnectionPolicy;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.presence.PNWhereNowResult;
@@ -37,7 +35,8 @@ public class PubNubManager {
 
     private SubscribeCallback mSubscribeListener;
 
-    public PubNubManager(final Context context) {
+    public PubNubManager(final Context context, final String publishKey, final String subscribeKey,
+                         final String cipherKey, final String secretKey) {
         mSubscribedChannels = new ArrayList<>();
         if (pubnub != null) {
             cleanUp();
@@ -46,10 +45,10 @@ public class PubNubManager {
         refContext = new WeakReference<>(context);
 
         PNConfiguration pubNubConfig = new PNConfiguration();
-        pubNubConfig.setPublishKey(context.getString(R.string.pubnub_publish_key));
-        pubNubConfig.setSubscribeKey(context.getString(R.string.pubnub_subscribe_key));
+        pubNubConfig.setPublishKey(publishKey);
+        pubNubConfig.setSubscribeKey(subscribeKey);
         //pubNubConfig.setSecretKey(secretKey);
-        pubNubConfig.setCipherKey(context.getString(R.string.pubnub_cipher_key));
+        pubNubConfig.setCipherKey(cipherKey);
         pubNubConfig.setSecure(true);
         pubNubConfig.setUuid(ArielUtilities.getUniquePseudoID());
         pubNubConfig.setLogVerbosity(PNLogVerbosity.BODY);

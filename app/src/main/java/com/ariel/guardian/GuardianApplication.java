@@ -2,31 +2,44 @@ package com.ariel.guardian;
 
 import android.app.Application;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.database.ContentObserver;
+import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.ariel.guardian.command.Command;
 import com.ariel.guardian.command.CommandProducer;
-import com.ariel.guardian.library.ArielLibrary;
+import com.ariel.guardian.firebase.FirebaseHelper;
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.commands.configuration.DeviceConfigCommands;
 import com.ariel.guardian.library.commands.configuration.DeviceConfigParams;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
+import com.ariel.guardian.library.firebase.model.Settings;
 import com.ariel.guardian.library.utils.ArielUtilities;
+import com.ariel.guardian.pubnub.PubNubService;
+import com.ariel.guardian.pubnub.PubNubServiceInterface;
 import com.ariel.guardian.pubnub.listeners.ArielPubNubCallback;
 import com.ariel.guardian.receivers.ReportActionReceiver;
 import com.ariel.guardian.services.DeviceConfigService;
 import com.ariel.guardian.services.UpdateDeviceAppsService;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import javax.inject.Inject;
 
 import ariel.providers.ArielSettings;
 import ariel.security.LockPatternUtilsHelper;
@@ -41,11 +54,12 @@ public class GuardianApplication extends Application {
 
     private GuardianComponent mGuardianComponent;
 
+    private PubNubServiceInterface mPubNubService;
+
     private static GuardianApplication mInstance;
 
-    public static GuardianApplication getInstance() {
-        return mInstance;
-    }
+    @Inject
+    FirebaseHelper mFirebaseHelper;
 
     @Override
     public void onCreate() {
@@ -64,17 +78,89 @@ public class GuardianApplication extends Application {
 
         prepareDagger();
 
-        ArielLibrary.prepare(this);
-
-        registerArielLibraryReceiver();
-
         registerCommandReportReceiver();
+
+        fetchFirebaseSettings();
 
         Log.i(TAG, "Calling anonym login for: " + ArielUtilities.getUniquePseudoID());
 //        Intent authService = new Intent(this, FirebaseAuthService.class);
 //        startService(authService);
 
     }
+
+    public static GuardianApplication getInstance(){
+        return mInstance;
+    }
+
+    private void fetchFirebaseSettings(){
+        AsyncTask.execute(new Runnable() {
+                              @Override
+                              public void run() {
+                                  DatabaseReference settingsRef = mFirebaseHelper.getSettingsReference();
+                                  settingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                      @Override
+                                      public void onDataChange(DataSnapshot dataSnapshot) {
+                                          Log.i(TAG, "Received firebase settings");
+                                          Settings settings = dataSnapshot.getValue(Settings.class);
+                                          if (settings != null) {
+                                              Log.i(TAG, "Starting pubnub service");
+                                              initiatePubNubService(settings);
+                                          }
+                                      }
+
+                                      @Override
+                                      public void onCancelled(DatabaseError databaseError) {
+                                          Log.i(TAG, "Database error: " + databaseError.getDetails() + ", " + databaseError.getMessage());
+                                      }
+                                  });
+                              }
+                          }
+        );
+    }
+
+    public PubNubServiceInterface getPubNub(){
+        return mPubNubService;
+    }
+
+    private void initiatePubNubService(final Settings settings){
+
+        Intent pubNubServiceIntent = new Intent(GuardianApplication.this, PubNubService.class);
+        pubNubServiceIntent.putExtra(PubNubService.EXTRA_PUBNUB_CIPHER_KEY, settings.getPubNubCipherKey());
+        pubNubServiceIntent.putExtra(PubNubService.EXTRA_PUBNUB_PUBLISH_KEY, settings.getPubNubPublishKey());
+        pubNubServiceIntent.putExtra(PubNubService.EXTRA_PUBNUB_SECRET_KEY, settings.getPubNubSecretKey());
+        pubNubServiceIntent.putExtra(PubNubService.EXTRA_PUBNUB_SUBSCRIBE_KEY, settings.getPubNubSubscribeKey());
+
+        startService(pubNubServiceIntent);
+
+        bindService(pubNubServiceIntent, mConnection, BIND_AUTO_CREATE);
+
+        fireServices();
+    }
+
+    private void fireServices(){
+        startService(DeviceConfigService.getCallingIntent());
+        startService(UpdateDeviceAppsService.getCallingIntent());
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            Log.i(TAG, "Service bound!");
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            PubNubService.PubNubServiceBinder binder = (PubNubService.PubNubServiceBinder) service;
+            mPubNubService = binder.getService();
+
+            mPubNubService.subscribeToChannelsWithCallback(new ArielPubNubCallback(),
+                                                      ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+        }
+    };
+
 
     public String[] getMasterChannels() {
         ArrayList<String> masters = (ArrayList<String>) ArielSettings.Secure.getDelimitedStringAsList(getContentResolver(),
@@ -89,33 +175,33 @@ public class GuardianApplication extends Application {
         return channels;
     }
 
-    private void registerArielLibraryReceiver() {
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(new BroadcastReceiver() {
-                                      @Override
-                                      public void onReceive(Context context, Intent intent) {
-                                          Log.i(TAG, "RECEIVE LOCAL BROADCAST " + intent.getAction());
-                                          String action = intent.getAction();
-                                          if (action.equals(ArielLibrary.BROADCAST_LIBRARY_READY)) {
-                                              // fetch device config
-                                              startService(DeviceConfigService.getCallingIntent());
-
-                                              /**
-                                               * Subscribe to two channels:
-                                               * 1. ariel channel - to distribute messages to all members
-                                               * 2. device specific channel - to receive commands
-                                               */
-                                              ArielLibrary.action().subscribeToChannelsWithCallback(new ArielPubNubCallback(),
-                                                      ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
-
-                                              // sync apps list on firebase side and check status
-                                              startService(UpdateDeviceAppsService.getCallingIntent());
-
-                                          }
-                                      }
-                                  },
-                        new IntentFilter(ArielLibrary.BROADCAST_LIBRARY_READY));
-    }
+//    private void registerArielLibraryReceiver() {
+//        LocalBroadcastManager.getInstance(this)
+//                .registerReceiver(new BroadcastReceiver() {
+//                                      @Override
+//                                      public void onReceive(Context context, Intent intent) {
+//                                          Log.i(TAG, "RECEIVE LOCAL BROADCAST " + intent.getAction());
+//                                          String action = intent.getAction();
+//                                          if (action.equals(ArielLibrary.BROADCAST_LIBRARY_READY)) {
+//                                              // fetch device config
+//                                              startService(DeviceConfigService.getCallingIntent());
+//
+//                                              /**
+//                                               * Subscribe to two channels:
+//                                               * 1. ariel channel - to distribute messages to all members
+//                                               * 2. device specific channel - to receive commands
+//                                               */
+//                                              ArielLibrary.action().subscribeToChannelsWithCallback(new ArielPubNubCallback(),
+//                                                      ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
+//
+//                                              // sync apps list on firebase side and check status
+//                                              startService(UpdateDeviceAppsService.getCallingIntent());
+//
+//                                          }
+//                                      }
+//                                  },
+//                        new IntentFilter(ArielLibrary.BROADCAST_LIBRARY_READY));
+//    }
 
     private void registerCommandReportReceiver() {
         LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -127,6 +213,7 @@ public class GuardianApplication extends Application {
         mGuardianComponent = DaggerGuardianComponent.builder()
                 .guardianModule(new GuardianModule(this))
                 .build();
+        mGuardianComponent.inject(GuardianApplication.this);
     }
 
     public GuardianComponent getGuardianComponent() {
@@ -141,7 +228,7 @@ public class GuardianApplication extends Application {
             ArrayList<String> masters = (ArrayList<String>) ArielSettings.Secure.getDelimitedStringAsList(getContentResolver(),
                     ArielSettings.Secure.ARIEL_MASTERS, ",");
             try {
-                ArielLibrary.action().subscribeToChannels((String[]) masters.toArray());
+                mPubNubService.subscribeToChannels((String[]) masters.toArray());
             } catch (RuntimeException re) {
 
             }

@@ -6,13 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.ariel.guardian.library.ArielLibrary;
+import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.commands.report.ReportCommands;
 import com.ariel.guardian.library.commands.report.ReportParams;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
+
+import javax.inject.Inject;
 
 public class ReportActionReceiver extends BroadcastReceiver {
 
@@ -24,9 +26,14 @@ public class ReportActionReceiver extends BroadcastReceiver {
 
     public static final String REPORT_COMMAND_ACTION = "report_command_execution";
 
+    @Inject
+    GuardianApplication mApplication;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "Report action received");
+
+        GuardianApplication.getInstance().getGuardianComponent().inject(this);
 
         String origin_channel = intent.getStringExtra(PARAM_CHANNEL);
         String command = intent.getStringExtra(PARAM_COMMAND);
@@ -42,7 +49,7 @@ public class ReportActionReceiver extends BroadcastReceiver {
                 .errorMsg(error)
                 .build());
 
-        ArielLibrary.action().sendCommand(cm, new PNCallback<PNPublishResult>() {
+        mApplication.getPubNub().sendCommand(cm, new PNCallback<PNPublishResult>() {
             @Override
             public void onResponse(PNPublishResult result, PNStatus status) {
 

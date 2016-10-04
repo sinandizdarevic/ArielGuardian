@@ -58,38 +58,4 @@ public class SharedPrefsManager {
         editor.commit();
     }
 
-    public void savePubNubData(final DeviceConfiguration deviceConfiguration){
-        final SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(PUBNUB_SUBSCRIBE_KEY, deviceConfiguration.getPubNubSubscribeKey());
-        editor.putString(PUBNUB_PUBLISH_KEY, deviceConfiguration.getPubNubPublishKey());
-        editor.putString(PUBNUB_SECRET_KEY, deviceConfiguration.getPubNubSecretKey());
-        editor.putString(PUBNUB_CIPHER_KEY, deviceConfiguration.getPubNubCipherKey());
-        editor.putBoolean(PUBNUB_DATA_SET, true);
-        editor.commit();
-    }
-
-    public void clearPubNubData(){
-        final SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(PUBNUB_SUBSCRIBE_KEY, "");
-        editor.putString(PUBNUB_PUBLISH_KEY, "");
-        editor.putString(PUBNUB_SECRET_KEY, "");
-        editor.putString(PUBNUB_CIPHER_KEY, "");
-        editor.putBoolean(PUBNUB_DATA_SET, false);
-        editor.commit();
-    }
-
-    public DeviceConfiguration getPubNubData(){
-        boolean dataSet = mSharedPreferences.getBoolean(PUBNUB_DATA_SET, false);
-        DeviceConfiguration deviceConfiguration = null;
-        if(dataSet) {
-            deviceConfiguration = new DeviceConfiguration();
-            deviceConfiguration.setPubNubCipherKey(mSharedPreferences.getString(PUBNUB_CIPHER_KEY, ""));
-            deviceConfiguration.setPubNubPublishKey(mSharedPreferences.getString(PUBNUB_PUBLISH_KEY, ""));
-            deviceConfiguration.setPubNubSecretKey(mSharedPreferences.getString(PUBNUB_SECRET_KEY, ""));
-            deviceConfiguration.setPubNubSubscribeKey(mSharedPreferences.getString(PUBNUB_SUBSCRIBE_KEY, ""));
-            return deviceConfiguration;
-        }
-        return deviceConfiguration;
-    }
-
 }
