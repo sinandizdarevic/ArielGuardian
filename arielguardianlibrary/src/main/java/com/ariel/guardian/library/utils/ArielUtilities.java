@@ -3,11 +3,8 @@ package com.ariel.guardian.library.utils;
 import android.os.Build;
 import android.util.Log;
 
-import com.ariel.guardian.library.commands.Params;
-import com.ariel.guardian.library.commands.application.ApplicationParams;
-import com.ariel.guardian.library.commands.configuration.DeviceConfigParams;
-import com.ariel.guardian.library.commands.location.LocationParams;
-import com.ariel.guardian.library.commands.report.ReportParams;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -19,6 +16,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
+
+import io.realm.RealmObject;
 
 /**
  * Created by mikalackis on 23.5.16..
@@ -106,13 +105,28 @@ public class ArielUtilities {
     }
 
     public static Gson getGson() {
-        RuntimeTypeAdapterFactory<Params> paramsAdapterFactory
-                = RuntimeTypeAdapterFactory.of(Params.class, "type")
-                .registerSubtype(LocationParams.class)
-                .registerSubtype(ApplicationParams.class)
-                .registerSubtype(ReportParams.class)
-                .registerSubtype(DeviceConfigParams.class);
-        return new GsonBuilder().registerTypeAdapterFactory(paramsAdapterFactory).create();
+
+        return new GsonBuilder()
+                .setExclusionStrategies(new ExclusionStrategy() {
+                    @Override
+                    public boolean shouldSkipField(FieldAttributes f) {
+                        return f.getDeclaringClass().equals(RealmObject.class);
+                    }
+
+                    @Override
+                    public boolean shouldSkipClass(Class<?> clazz) {
+                        return false;
+                    }
+                })
+                .create();
+
+//        RuntimeTypeAdapterFactory<Params> paramsAdapterFactory
+//                = RuntimeTypeAdapterFactory.of(Params.class, "type")
+//                .registerSubtype(LocationParams.class)
+//                .registerSubtype(ApplicationParams.class)
+//                .registerSubtype(ReportParams.class)
+//                .registerSubtype(DeviceConfigParams.class);
+//        return new GsonBuilder().registerTypeAdapterFactory(paramsAdapterFactory).create();
     }
 
     public static String getEncodedData(final String deviceId, final String cipher, final String secret) {

@@ -15,6 +15,8 @@ public class CommandMessage {
      */
     private String action;
 
+    private String invoker;
+
     /**
      * List of parameters that go along with the command. Can be null.
      */

@@ -2,7 +2,6 @@
 package com.ariel.guardian.receivers;
 
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.firebase.FirebaseHelper;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,8 +14,6 @@ public class BootReceiver extends BroadcastReceiver {
 
     private static final String TAG = "BootReceiver";
 
-    @Inject
-    FirebaseHelper mFirebaseHelper;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -26,7 +23,6 @@ public class BootReceiver extends BroadcastReceiver {
 
         //((GuardianApplication)context.getApplicationContext()).getGuardianComponent().inject(this);
 
-        mFirebaseHelper.reportAction("Ariel system online");
         //ArielSettings.Secure.putInt(context.getContentResolver(),ArielSettings.Secure.ARIEL_PROCESS_BLOCKER,1);
     }
 

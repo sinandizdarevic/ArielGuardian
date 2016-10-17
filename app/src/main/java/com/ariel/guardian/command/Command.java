@@ -7,7 +7,6 @@ import android.util.Log;
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.commands.Params;
-import com.ariel.guardian.firebase.FirebaseHelper;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.receivers.ReportActionReceiver;
 
@@ -17,9 +16,6 @@ import javax.inject.Inject;
  * Created by mikalackis on 6.7.16..
  */
 public abstract class Command {
-
-    @Inject
-    FirebaseHelper mFirebaseHelper;
 
     @Inject
     ArielJobScheduler mJobScheduler;
@@ -35,7 +31,6 @@ public abstract class Command {
 
     protected void reportCommand(String command){
         //ArielLibrary.action().firebase().reportAction(command);
-        mFirebaseHelper.reportAction(command);
     }
 
     protected void reportCommandExecuted(String masterId, String command, String error){

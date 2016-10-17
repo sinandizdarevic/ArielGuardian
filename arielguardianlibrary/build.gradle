@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 24
@@ -10,13 +11,30 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
+
+        def STRING = "String"
+        def PN_PUBLISH_KEY = "PN_PUBLISH_KEY"
+        def PN_SUBSCRIBE_KEY = "PN_SUBSCRIBE_KEY"
+        def PN_SECRET_KEY = "PN_SECRET_KEY"
+
         release {
+
+            buildConfigField(STRING, PN_PUBLISH_KEY, "\"pub-c-4c2f969c-fde1-44e1-9598-48434e4f687a\"")
+            buildConfigField(STRING, PN_SUBSCRIBE_KEY, "\"sub-c-d6997764-4063-11e6-ba28-02ee2ddab7fe\"")
+            buildConfigField(STRING, PN_SECRET_KEY, "\"sec-c-ZTZjNGZjYjAtY2YxNi00MmJjLWJkNmItYzkyOGZhOGUyZDc4\"")
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            minifyEnabled true
+
+            buildConfigField(STRING, PN_PUBLISH_KEY, "\"pub-c-4c2f969c-fde1-44e1-9598-48434e4f687a\"")
+            buildConfigField(STRING, PN_SUBSCRIBE_KEY, "\"sub-c-d6997764-4063-11e6-ba28-02ee2ddab7fe\"")
+            buildConfigField(STRING, PN_SECRET_KEY, "\"sec-c-ZTZjNGZjYjAtY2YxNi00MmJjLWJkNmItYzkyOGZhOGUyZDc4\"")
+
+            minifyEnabled false
             proguardFiles 'proguard-rules.pro'
         }
     }
@@ -28,12 +46,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support:support-v4:24.2.0'
     compile 'com.pubnub:pubnub:4.0.8'
-    compile 'com.google.firebase:firebase-core:9.4.0'
-    compile 'com.google.firebase:firebase-database:9.4.0'
-    compile 'com.google.firebase:firebase-messaging:9.4.0'
     compile 'com.google.android.gms:play-services-location:9.4.0'
-    compile 'com.google.firebase:firebase-auth:9.4.0'
-    compile 'com.google.firebase:firebase-config:9.4.0'
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.google.zxing:core:3.2.1'
+    compile 'io.reactivex:rxjava:1.1.6'
 }

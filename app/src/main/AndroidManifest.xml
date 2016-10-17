@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     coreApp="true"
     package="com.ariel.guardian"
-    android:sharedUserId="android.uid.system">
+    android:sharedUserId="android.uid.system"
+    >
 
     <!-- android:sharedUserId="android.uid.system" -->
 
@@ -143,23 +144,12 @@
 
         <activity android:name=".activity.UsageLogActivity"></activity>
 
-        <service android:name=".pubnub.PubNubService"></service>
-
         <receiver
             android:name=".receivers.BootReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
-        </receiver>
-
-        <receiver android:name=".receivers.ArielPNServiceReceiver">
-
-            <intent-filter>
-                <action android:name="ariel_pn_service_running">
-                </action>
-            </intent-filter>
-
         </receiver>
 
         <receiver
@@ -212,9 +202,8 @@
 
         <service android:name=".services.UpdateDeviceAppsService"></service>
 
-        <service
-            android:name=".services.FirebaseAuthService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service android:name=".services.IntentFirewallService"
+            android:exported="true"></service>
 
     </application>
 

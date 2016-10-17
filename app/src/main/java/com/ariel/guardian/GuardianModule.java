@@ -2,8 +2,7 @@ package com.ariel.guardian;
 
 
 import android.app.Application;
-
-import com.ariel.guardian.firebase.FirebaseHelper;
+import android.support.v4.content.LocalBroadcastManager;
 
 import javax.inject.Singleton;
 
@@ -30,16 +29,15 @@ public class GuardianModule {
 
     @Provides
     @Singleton
-    public FirebaseHelper providesFirebaseHelper() {
-        FirebaseHelper fHelper = new FirebaseHelper();
-        return fHelper;
+    public ArielJobScheduler providesArielJobScheduler() {
+        ArielJobScheduler pnManager = new ArielJobScheduler(mApplication);
+        return pnManager;
     }
 
     @Provides
     @Singleton
-    public ArielJobScheduler providesArielJobScheduler() {
-        ArielJobScheduler pnManager = new ArielJobScheduler(mApplication);
-        return pnManager;
+    public LocalBroadcastManager provideLocalBroadcastManager() {
+        return LocalBroadcastManager.getInstance(mApplication);
     }
 
 }

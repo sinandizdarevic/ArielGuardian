@@ -13,7 +13,7 @@ public class IntentFirewallReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG, "Application blocked intent received: "+intent.getAction());
+        Log.i(TAG, "DeviceApplication blocked intent received: "+intent.getAction());
         String action = intent.getAction();
         if(action.equals("ariel.intent.action.BROADCAST_BLOCKED")){
             Log.i(TAG, "Brodacast blocked: "+action);

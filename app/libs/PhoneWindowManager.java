@@ -229,7 +229,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private boolean mKeyguardHidden;
     private boolean mKeyguardDrawnOnce;
 
-    /* Table of Application Launch keys.  Maps from key codes to intent categories.
+    /* Table of DeviceApplication Launch keys.  Maps from key codes to intent categories.
      *
      * These are special keys that are used to launch particular kinds of applications,
      * such as a web browser.  HID defines nearly a hundred of them in the Consumer (0x0C)
@@ -5870,7 +5870,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 // Note that the dock orientation and HDMI rotation lock override this.
                 preferredRotation = mDemoRotation;
             } else if (orientation == ActivityInfo.SCREEN_ORIENTATION_LOCKED) {
-                // Application just wants to remain locked in the last rotation.
+                // DeviceApplication just wants to remain locked in the last rotation.
                 preferredRotation = lastRotation;
             } else if (!mSupportAutoRotation) {
                 // If we don't support auto-rotation then bail out here and ignore

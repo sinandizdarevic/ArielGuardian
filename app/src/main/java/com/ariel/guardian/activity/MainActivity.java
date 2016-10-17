@@ -3,20 +3,17 @@ package com.ariel.guardian.activity;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ariel.guardian.R;
-import com.ariel.guardian.library.commands.application.ApplicationParams;
-import com.google.gson.Gson;
-import com.google.zxing.WriterException;
+import com.ariel.guardian.library.db.realm.model.DeviceApplication;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -40,8 +37,16 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                DeviceApplication app = new DeviceApplication();
+                app.setPackageName("com.google.sava");
+                app.setAppName("Sava");
+                app.setDisabled(false);
+                app.setId(Calendar.getInstance().getTimeInMillis());
+
+
                 //LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.getInstance());
-                ImageView imgView = (ImageView) findViewById(R.id.imageView);
+                //ImageView imgView = (ImageView) findViewById(R.id.imageView);
 //                try {
 //                    //imgView.setImageBitmap(ArielLibrary.action().generateDeviceQRCode("SAVA_MIKALACKI"));
 //                } catch (WriterException e) {
@@ -54,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 //LockPatternUtilsHelper.clearLock(GuardianApplication.getInstance());
 //                ApplicationParams ap = new ApplicationParams.ApplicationParamBuilder("com.example.android").build();
 //                Gson gson = new Gson();
@@ -71,30 +77,28 @@ public class MainActivity extends AppCompatActivity {
 //                ArielSettings.Secure.putInt(getContentResolver(),
 //                        ArielSettings.Secure.ARIEL_SYSTEM_STATUS,
 //                        ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
-               // LockPatternUtilsHelper.performAdminLock("123qwe", MainActivity.this);
+                // LockPatternUtilsHelper.performAdminLock("123qwe", MainActivity.this);
                 byte[] unlockPwd = LockPatternUtilsHelper.getUnlockPassword();
-                if(unlockPwd!=null && unlockPwd.length>0){
+                if (unlockPwd != null && unlockPwd.length > 0) {
                     Log.i("MainActivity", "Lock password exists");
-                }
-                else{
+                } else {
                     Log.i("MainActivity", "No lock password exists");
                 }
 
                 byte[] unlockPattern = LockPatternUtilsHelper.getUnlockPattern();
-                if(unlockPattern!=null && unlockPattern.length>0){
+                if (unlockPattern != null && unlockPattern.length > 0) {
                     Log.i("MainActivity", "Lock pattern exists");
-                }
-                else{
+                } else {
                     Log.i("MainActivity", "No lock pattern exists");
                 }
             }
         });
     }
 
-    private String getTopPackage(){
+    private String getTopPackage() {
         long ts = System.currentTimeMillis();
-        UsageStatsManager mUsageStatsManager = (UsageStatsManager)getSystemService(Context.USAGE_STATS_SERVICE);
-        List<UsageStats> usageStats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts-1000, ts);
+        UsageStatsManager mUsageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+        List<UsageStats> usageStats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, ts - 1000, ts);
         if (usageStats == null || usageStats.size() == 0) {
             return "unknown";
         }

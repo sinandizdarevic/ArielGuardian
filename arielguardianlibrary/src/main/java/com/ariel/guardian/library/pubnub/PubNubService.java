@@ -1,4 +1,4 @@
-package com.ariel.guardian.pubnub;
+package com.ariel.guardian.library.pubnub;
 
 import android.app.Service;
 import android.content.Intent;
@@ -8,8 +8,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.ariel.guardian.library.commands.CommandMessage;
-import com.ariel.guardian.library.pubnub.PubNubManager;
-import com.ariel.guardian.pubnub.listeners.ArielPubNubCallback;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
@@ -41,14 +39,8 @@ public class PubNubService extends Service implements PubNubServiceInterface{
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Initating PubNubManager");
 
-        mPubNubCipherKey = intent.getStringExtra(EXTRA_PUBNUB_CIPHER_KEY);
-        mPubNubSecretKey = intent.getStringExtra(EXTRA_PUBNUB_SECRET_KEY);
-
         if(!mIsRunning) {
-            mPubNubManager = new PubNubManager(getApplicationContext(), intent.getStringExtra(EXTRA_PUBNUB_PUBLISH_KEY),
-                    intent.getStringExtra(EXTRA_PUBNUB_SUBSCRIBE_KEY), intent.getStringExtra(EXTRA_PUBNUB_CIPHER_KEY),
-                    intent.getStringExtra(EXTRA_PUBNUB_SECRET_KEY));
-            mPubNubManager.addSubscribeCallback(new ArielPubNubCallback());
+            mPubNubManager = PubNubManager.getInstance(getApplicationContext());
             mIsRunning = true;
         }
 
@@ -65,6 +57,12 @@ public class PubNubService extends Service implements PubNubServiceInterface{
     public void sendCommand(final CommandMessage commandMessage, final PNCallback<PNPublishResult> callback, final String... channels){
         Log.i(TAG, "Sending command");
         mPubNubManager.sendCommand(commandMessage,callback,channels);
+    }
+
+    @Override
+    public void sendMessage(Object commandMessage, PNCallback<PNPublishResult> callback, String... channels) {
+        Log.i(TAG, "Sending command");
+        mPubNubManager.sendMessage(commandMessage, callback, channels);
     }
 
     @Override

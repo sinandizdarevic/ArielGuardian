@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.firebase.FirebaseHelper;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.receivers.ReportActionReceiver;
 
@@ -23,9 +22,6 @@ abstract public class ArielService extends Service {
     private static PowerManager.WakeLock sWakeLock;
 
     protected String mInvoker;
-
-    @Inject
-    FirebaseHelper mFirebaseHelper;
 
     @Inject
     ArielJobScheduler mArielJobScheduler;

@@ -1,9 +1,10 @@
-package com.ariel.guardian.pubnub;
+package com.ariel.guardian.library.pubnub;
 
 import android.content.IntentFilter;
 
-import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.receivers.NetworkChangeReceiver;
+import com.ariel.guardian.library.Ariel;
+import com.ariel.guardian.library.receiver.NetworkChangeReceiver;
+
 
 /**
  * Created by mikalackis on 5.9.16..
@@ -28,10 +29,10 @@ public class PubNubUtilities {
     public void registerNetworkListener(){
         IntentFilter filter = new IntentFilter();
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-        GuardianApplication.getInstance().registerReceiver(mReceiver, filter);
+        Ariel.getMyApplicationContext().registerReceiver(mReceiver, filter);
     }
 
     public void unregisterReceiver(){
-        GuardianApplication.getInstance().unregisterReceiver(mReceiver);
+        Ariel.getMyApplicationContext().unregisterReceiver(mReceiver);
     }
 }

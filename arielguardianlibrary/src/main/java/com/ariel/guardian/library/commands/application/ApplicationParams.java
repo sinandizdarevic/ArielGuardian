@@ -3,7 +3,7 @@ package com.ariel.guardian.library.commands.application;
 import com.ariel.guardian.library.commands.Params;
 
 /**
- * Application command available parameters
+ * DeviceApplication command available parameters
  */
 public class ApplicationParams extends Params {
 
@@ -25,7 +25,7 @@ public class ApplicationParams extends Params {
     }
 
     /**
-     * Application commands parameter builder class
+     * DeviceApplication commands parameter builder class
      */
     public static class ApplicationParamBuilder{
 

@@ -1,4 +1,4 @@
-package com.ariel.guardian.receivers;
+package com.ariel.guardian.library.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -6,23 +6,16 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.pubnub.PubNubUtilities;
-
-import javax.inject.Inject;
+import com.ariel.guardian.library.Ariel;
+import com.ariel.guardian.library.pubnub.PubNubUtilities;
 
 /**
  * Created by mikalackis on 5.9.16..
  */
 public class NetworkChangeReceiver extends BroadcastReceiver{
 
-    @Inject
-    GuardianApplication mApplication;
-
     @Override
     public void onReceive(Context context, Intent intent) {
-
-        GuardianApplication.getInstance().getGuardianComponent().inject(this);
 
         ConnectivityManager cm =
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -31,7 +24,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver{
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
         if(isConnected){
-            mApplication.getPubNub().reconnect();
+            Ariel.action().pubnub().reconnect();
             PubNubUtilities.getInstance().unregisterReceiver();
         }
     }

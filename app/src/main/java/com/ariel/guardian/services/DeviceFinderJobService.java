@@ -21,8 +21,6 @@ import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.report.ReportParams;
-import com.ariel.guardian.firebase.FirebaseHelper;
-import com.ariel.guardian.library.firebase.model.DeviceLocation;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.utils.LocationManager;
 import com.google.android.gms.common.ConnectionResult;
@@ -46,9 +44,6 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
     private long locationUpdateInterval;
 
     private LocationManager mLocationManager;
-
-    @Inject
-    FirebaseHelper mFirebaseHelper;
 
     @Inject
     GuardianApplication mApplication;
@@ -94,8 +89,6 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
     @Override
     public void onLocationChanged(Location location) {
         Log.i(TAG, "Got location: "+location.toString());
-        DeviceLocation deviceLocation = new DeviceLocation(location.getTime(),location.getLatitude(),location.getLongitude());
-        mFirebaseHelper.reportLocation(deviceLocation);
     }
 
     @Override

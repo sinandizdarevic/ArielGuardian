@@ -3,8 +3,6 @@ package com.ariel.guardian.library.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.ariel.guardian.library.firebase.model.DeviceConfiguration;
-
 import java.util.Set;
 
 /**

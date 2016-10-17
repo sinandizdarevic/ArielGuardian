@@ -1,4 +1,4 @@
-package com.ariel.guardian.pubnub;
+package com.ariel.guardian.library.pubnub;
 
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.pubnub.api.callbacks.PNCallback;
@@ -13,6 +13,8 @@ public interface PubNubServiceInterface {
     void addSubscribeCallback(SubscribeCallback callback);
 
     void sendCommand(final CommandMessage commandMessage, final PNCallback<PNPublishResult> callback, final String... channels);
+
+    void sendMessage(final Object commandMessage, final PNCallback<PNPublishResult> callback, final String... channels);
 
      void reconnect();
 

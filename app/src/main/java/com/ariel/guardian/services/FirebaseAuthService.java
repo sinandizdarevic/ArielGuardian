@@ -9,7 +9,6 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * Created by mikalackis on 7.6.16..
@@ -18,42 +17,42 @@ public class FirebaseAuthService extends ArielService {
 
     private static final String TAG = "FirebaseAuthService";
 
-    private FirebaseAuth mAuth;
+    //private FirebaseAuth mAuth;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mAuth = FirebaseAuth.getInstance();
+        //mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "FirebaseAuthService attempt login");
-        mAuth.signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-            @Override
-            public void onSuccess(AuthResult authResult) {
-                if(authResult.getUser().isAnonymous()){
-                    Log.i(TAG, "Logged in: "+authResult.getUser().getUid());
-                    //FirebaseHelper.getInstance().syncDeviceConfiguration(new DeviceConfigurationValueEventListener());
-                    /*
-                      Start device config service
-                     */
-                    startService(DeviceConfigService.getCallingIntent());
-                }
-                else{
-                    Log.i(TAG, "User not anonymous!!!");
-                }
-                stopSelf();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.i(TAG, "EXCEPTION: "+e.getMessage());
-                e.printStackTrace();
-                mArielJobScheduler.registerNewJob(new RetryLoginJobService());
-                stopSelf();
-            }
-        });
+//        mAuth.signInAnonymously().addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+//            @Override
+//            public void onSuccess(AuthResult authResult) {
+//                if(authResult.getUser().isAnonymous()){
+//                    Log.i(TAG, "Logged in: "+authResult.getUser().getUid());
+//                    //FirebaseHelper.getInstance().syncDeviceConfiguration(new DeviceConfigurationValueEventListener());
+//                    /*
+//                      Start device config service
+//                     */
+//                    startService(DeviceConfigService.getCallingIntent());
+//                }
+//                else{
+//                    Log.i(TAG, "User not anonymous!!!");
+//                }
+//                stopSelf();
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.i(TAG, "EXCEPTION: "+e.getMessage());
+//                e.printStackTrace();
+//                mArielJobScheduler.registerNewJob(new RetryLoginJobService());
+//                stopSelf();
+//            }
+//        });
         return START_STICKY;
     }
 
@@ -67,7 +66,7 @@ public class FirebaseAuthService extends ArielService {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "FirebaseAuthService destroyed");
-        mAuth = null;
+        //mAuth = null;
     }
 
     @Override

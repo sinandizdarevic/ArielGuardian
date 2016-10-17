@@ -17,7 +17,7 @@ public class ApplicationUpdate extends Command {
     @Override
     public void execute(final Params params) {
         reportCommand(ApplicationCommands.APPLICATION_UPDATE_COMMAND);
-        Log.i("Application update", "Executing application update for package name: "+params);
+        Log.i("DeviceApplication update", "Executing application update for package name: "+params);
         GuardianApplication.getInstance().startService(DeviceApplicationService.getCallingIntent((ApplicationParams)params));
     }
 

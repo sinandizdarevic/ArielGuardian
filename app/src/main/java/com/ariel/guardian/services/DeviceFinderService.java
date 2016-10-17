@@ -22,7 +22,6 @@ package com.ariel.guardian.services;
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
-import com.ariel.guardian.library.firebase.model.DeviceLocation;
 import com.ariel.guardian.utils.LocationManager;
 import com.google.android.gms.common.ConnectionResult;
 
@@ -105,8 +104,7 @@ public class DeviceFinderService extends ArielService implements LocationManager
     @Override
     public void onLocationChanged(Location location) {
         Log.i(TAG, "Got location: " + location.toString());
-        DeviceLocation deviceLocation = new DeviceLocation(location.getTime(), location.getLatitude(), location.getLongitude());
-        mFirebaseHelper.reportLocation(deviceLocation);
+        //DeviceLocation deviceLocation = new DeviceLocation(location.getTime(), location.getLatitude(), location.getLongitude());
         if (mReportBySms) {
             // // TODO: 29.7.16. send SMS location with google maps URL
         }

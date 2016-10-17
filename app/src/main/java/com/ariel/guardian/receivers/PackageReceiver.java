@@ -6,14 +6,12 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.firebase.FirebaseHelper;
-import com.ariel.guardian.library.firebase.model.DeviceApplication;
+import com.ariel.guardian.library.Ariel;
+import com.ariel.guardian.library.db.realm.model.DeviceApplication;
+import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.utils.PackageManagerUtilities;
-import com.google.firebase.database.DatabaseReference;
 
 import java.util.Calendar;
-
-import javax.inject.Inject;
 
 /**
  * Created by mikalackis on 1.6.16..
@@ -21,9 +19,6 @@ import javax.inject.Inject;
 public class PackageReceiver extends BroadcastReceiver {
 
     private static final String TAG = PackageReceiver.class.getSimpleName();
-
-    @Inject
-    FirebaseHelper mFirebaseHelper;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -34,15 +29,18 @@ public class PackageReceiver extends BroadcastReceiver {
         final String packageName = intent.getData().getSchemeSpecificPart();
 
         final DeviceApplication deviceApplication = new DeviceApplication();
-        deviceApplication.setDate(Calendar.getInstance().getTimeInMillis());
+
         deviceApplication.setPackageName(packageName);
 
         if(intent.getAction().equals("android.intent.action.PACKAGE_ADDED")){
             // INSTALLED PACKAGE
             deviceApplication.setAppName(PackageManagerUtilities.getAppNameFromPackage(context,packageName));
-            deviceApplication.setInstalled(true);
+            deviceApplication.setId(Calendar.getInstance().getTimeInMillis());
             deviceApplication.setDisabled(false);
-            mFirebaseHelper.reportApplication(deviceApplication, packageName);
+
+            long applicationId = Ariel.action().database().createOrUpdateApplication(deviceApplication);
+            Ariel.action().pubnub().sendApplicationMessage(applicationId, ArielConstants.TYPE_APPLICATION_ADDED);
+
             //mFirebaseHelper.syncDevicePackageInformation(new DevicePackageValueEventListener(), packageName);
 
             // write into internal db
@@ -66,8 +64,6 @@ public class PackageReceiver extends BroadcastReceiver {
         else if(intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")){
             // REMOVED PACKAGE
             //mFirebaseHelper.removeDevicePackageListener(packageName);
-            DatabaseReference dr = mFirebaseHelper.getAppPackageData(packageName);
-            dr.removeValue();
 
             //db.delete(DatabaseContract.ApplicationEntry.TABLE_NAME, DatabaseContract.ApplicationEntry.COLUMN_NAME_APP_PACKAGE + " = ?", new String[] { packageName });
         }

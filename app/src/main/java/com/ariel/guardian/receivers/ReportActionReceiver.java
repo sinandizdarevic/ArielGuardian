@@ -49,12 +49,12 @@ public class ReportActionReceiver extends BroadcastReceiver {
                 .errorMsg(error)
                 .build());
 
-        mApplication.getPubNub().sendCommand(cm, new PNCallback<PNPublishResult>() {
-            @Override
-            public void onResponse(PNPublishResult result, PNStatus status) {
-
-            }
-        }, origin_channel);
+//        mApplication.getPubNub().sendCommand(cm, new PNCallback<PNPublishResult>() {
+//            @Override
+//            public void onResponse(PNPublishResult result, PNStatus status) {
+//
+//            }
+//        }, origin_channel);
 
     }
 
