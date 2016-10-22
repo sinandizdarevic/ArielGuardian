@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.ariel.guardian.R;
-import com.ariel.guardian.library.db.realm.model.DeviceApplication;
+import com.ariel.guardian.library.db.model.DeviceApplication;
 
 import java.util.Calendar;
 import java.util.Collections;

@@ -1,12 +1,12 @@
-package com.ariel.guardian.library.db.realm.model;
+package com.ariel.guardian.library.db.model;
 
-import io.realm.RealmObject;
+import com.orm.SugarRecord;
 
 /**
  * Created by mikalackis on 5.10.16..
  */
 
-public class Configuration extends RealmObject {
+public class Configuration extends SugarRecord {
 
     /**
      * Ariel systems status field
@@ -18,6 +18,10 @@ public class Configuration extends RealmObject {
     private long locationTrackingInterval;
 
     private boolean constantTracking;
+
+    private boolean active;
+
+    public Configuration(){}
 
     public int getArielSystemStatus() {
         return arielSystemStatus;
@@ -41,5 +45,13 @@ public class Configuration extends RealmObject {
 
     public void setConstantTracking(boolean constantTracking) {
         this.constantTracking = constantTracking;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

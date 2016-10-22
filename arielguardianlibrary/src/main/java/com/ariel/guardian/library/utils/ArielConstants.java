@@ -9,8 +9,24 @@ public class ArielConstants {
     /**
      * PubNub message types
      */
-    public static String TYPE_APPLICATION_ADDED = "realm_application_added";
-    public static String TYPE_APPLICATION_REMOVED = "realm_application_removed";
+
+    /**
+     * Application messages and intents
+     */
+    public static String TYPE_APPLICATION_ADDED = "ariel.intent.action.application.ADD";
+    public static String TYPE_APPLICATION_REMOVED = "ariel.intent.action.application.REMOVE";
+    public static String TYPE_APPLICATION_UPDATED = "ariel.intent.action.application.UPDATE";
+
+    /**
+     * Configuration messages and intents
+     */
+    public static String TYPE_DEVICE_CONFIG_UPDATE = "ariel.intent.action.device.CONFIG_UPDATE";
+
+    /**
+     * DeviceLocation messages and intents
+     */
+    public static String TYPE_LOCATION_UPDATE = "ariel.intent.action.location.UPDATE";
+
 
     /**
      * Local broadcast extras

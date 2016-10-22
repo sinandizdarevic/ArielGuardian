@@ -1,7 +1,7 @@
 package com.ariel.guardian.library.commands.report;
 
 /**
- * Class that contains commands related to Location services and a param builder
+ * Class that contains commands related to DeviceLocation services and a param builder
  * class.
  */
 public interface ReportCommands {

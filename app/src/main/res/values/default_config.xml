@@ -1,0 +1,6 @@
+<resources>
+    <integer name="ariel_system_status">0</integer>
+    <integer name="location_tracking_interval">60000</integer>
+    <bool name="constant_location_tracking">false</bool>
+    <bool name="configuration_active">true</bool>
+</resources>

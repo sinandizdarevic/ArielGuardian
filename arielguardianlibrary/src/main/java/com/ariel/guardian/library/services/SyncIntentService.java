@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ariel.guardian.library.Ariel;
-import com.ariel.guardian.library.db.realm.model.WrapperMessage;
+import com.ariel.guardian.library.db.model.WrapperMessage;
 import com.google.gson.Gson;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
@@ -34,7 +34,7 @@ public class SyncIntentService extends IntentService {
         final long messageId = intent.getLongExtra(EXTRA_MESSAGE_ID, -1);
         if (messageId != -1) {
             Gson gson = new Gson();
-            final WrapperMessage message = Ariel.action().database().getUnmanagedWrapperMessageById(messageId);
+            final WrapperMessage message = (WrapperMessage)Ariel.action().database().getObjectById(WrapperMessage.class, messageId);
             Log.i("Ariel", "DATA TO SEND: " + gson.toJson(message));
             Ariel.action().pubnub().sendMessage(message, new PNCallback<PNPublishResult>() {
                 @Override
@@ -42,7 +42,7 @@ public class SyncIntentService extends IntentService {
                     if (!status.isError()) {
                         // everything is ok, remove wrapper message from realm
                         Log.i("SyncIntentService", "Message sent, remove wrapper");
-                        Ariel.action().database().removeWrapperMessage(message.getId());
+                        Ariel.action().database().removeObject(message);
                     } else {
                         // keep trying until you send the message
                         // this should probably be replaced with some alarm mechanism

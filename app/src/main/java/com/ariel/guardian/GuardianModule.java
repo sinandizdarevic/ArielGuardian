@@ -34,10 +34,4 @@ public class GuardianModule {
         return pnManager;
     }
 
-    @Provides
-    @Singleton
-    public LocalBroadcastManager provideLocalBroadcastManager() {
-        return LocalBroadcastManager.getInstance(mApplication);
-    }
-
 }

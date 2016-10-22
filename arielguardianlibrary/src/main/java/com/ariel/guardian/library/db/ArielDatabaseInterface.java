@@ -1,7 +1,8 @@
 package com.ariel.guardian.library.db;
 
-import com.ariel.guardian.library.db.realm.model.WrapperMessage;
-import com.ariel.guardian.library.db.realm.model.DeviceApplication;
+import com.ariel.guardian.library.db.model.DeviceApplication;
+import com.ariel.guardian.library.db.model.WrapperMessage;
+import com.orm.SugarRecord;
 
 import java.util.List;
 
@@ -11,17 +12,14 @@ import java.util.List;
 
 public interface ArielDatabaseInterface {
 
-    // realm methods
-    long createOrUpdateApplication(final DeviceApplication object);
+    long createOrUpdateObject(final SugarRecord record);
 
-    long saveWrapperMessage(final WrapperMessage message);
+    void removeObject(final SugarRecord record);
 
-    void removeWrapperMessage(final long id);
+    SugarRecord getObjectById(Class<? extends SugarRecord> type, final long id);
 
-    List<DeviceApplication> getDeviceApplications(final boolean managed);
+    SugarRecord getObjectByField(Class<? extends SugarRecord> type, final String field, String value);
 
-    WrapperMessage getUnmanagedWrapperMessageById(final long id);
-
-    DeviceApplication getDeviceApplicationById(final long id, final boolean managed);
+    List<? extends SugarRecord> getListOfObjects(Class<? extends SugarRecord> type);
 
 }

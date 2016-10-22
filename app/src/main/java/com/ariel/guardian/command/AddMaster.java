@@ -4,8 +4,6 @@ import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.commands.Params;
 import com.ariel.guardian.library.commands.configuration.DeviceConfigCommands;
 import com.ariel.guardian.library.commands.configuration.DeviceConfigParams;
-import com.ariel.guardian.library.utils.ArielUtilities;
-import com.ariel.guardian.services.DeviceConfigService;
 
 import java.util.ArrayList;
 
@@ -36,9 +34,6 @@ public class AddMaster extends Command {
                     masters);
         }
 
-        reportCommandExecuted(masterId,
-                DeviceConfigCommands.ADD_MASTER_COMMAND,
-                "");
     }
 
 //    @Override

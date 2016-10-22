@@ -33,9 +33,9 @@ import android.util.Log;
 
 import javax.inject.Inject;
 
-public class DeviceFinderService extends ArielService implements LocationManager.LocationManagerListener {
+public class DeviceTrackerService extends ArielService implements LocationManager.LocationManagerListener {
 
-    private static final String TAG = DeviceFinderService.class.getSimpleName();
+    private static final String TAG = DeviceTrackerService.class.getSimpleName();
 
     public static final String EXTRA_PARAM = "param";
 
@@ -62,10 +62,6 @@ public class DeviceFinderService extends ArielService implements LocationManager
                     .build();
             mLocationManager.initAndStartLocationUpdates();
 
-            reportCommandExecuted(mInvoker,
-                    LocationCommands.TRACKING_START_COMMAND,
-                    null);
-
         }
 
         mReportBySms = intent.getBooleanExtra(LocationParams.PARAM_SMS_LOCATION_REPORT, false);
@@ -80,9 +76,6 @@ public class DeviceFinderService extends ArielService implements LocationManager
         mIsRunning = false;
         mLocationManager.stopUpdates();
         mLocationManager = null;
-        reportCommandExecuted(mInvoker,
-                LocationCommands.TRACKING_STOP_COMMAND,
-                null);
     }
 
     @Nullable
@@ -93,7 +86,7 @@ public class DeviceFinderService extends ArielService implements LocationManager
 
     @Override
     String getServiceName() {
-        return "DeviceFinderService";
+        return "DeviceTrackerService";
     }
 
 //    @Override
@@ -116,7 +109,7 @@ public class DeviceFinderService extends ArielService implements LocationManager
     }
 
     public static Intent getCallingIntent(final LocationParams params) {
-        Intent finderService = new Intent(GuardianApplication.getInstance(), DeviceFinderService.class);
+        Intent finderService = new Intent(GuardianApplication.getInstance(), DeviceTrackerService.class);
         if(params!=null) {
             finderService.putExtra(LocationParams.PARAM_SMS_LOCATION_REPORT, params.getSmsLocationReport());
         }
@@ -125,9 +118,6 @@ public class DeviceFinderService extends ArielService implements LocationManager
 
     @Override
     public void onGoogleClientError(ConnectionResult connectionResult) {
-        reportCommandExecuted(mInvoker,
-                LocationCommands.TRACKING_START_COMMAND +" or "+LocationCommands.TRACKING_STOP_COMMAND,
-                "Google client error: "+connectionResult.getErrorMessage());
         stopSelf();
     }
 }

@@ -4,7 +4,6 @@
     package="com.ariel.guardian"
     android:sharedUserId="android.uid.system"
     >
-
     <!-- android:sharedUserId="android.uid.system" -->
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -184,26 +183,21 @@
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".services.DeviceFinderJobService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <receiver android:name=".receivers.ariel.DeviceApplicationReceiver" >
+            <intent-filter>
+                <action android:name="ariel.intent.action.application.ADD" />
+                <action android:name="ariel.intent.action.application.REMOVE" />
+                <action android:name="ariel.intent.action.application.UPDATE" />
+            </intent-filter>
+        </receiver>
 
         <service
-            android:name=".services.RetryLoginJobService"
+            android:name=".services.DeviceLocationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <service android:name=".services.DeviceConfigService"></service>
 
         <service android:name=".services.CreateIFRuleService"></service>
 
-        <service android:name=".services.DeviceApplicationService"></service>
-
-        <service android:name=".services.DeviceFinderService"></service>
-
-        <service android:name=".services.UpdateDeviceAppsService"></service>
-
-        <service android:name=".services.IntentFirewallService"
-            android:exported="true"></service>
+        <service android:name=".services.DeviceTrackerService"></service>
 
     </application>
 

@@ -20,14 +20,7 @@ public class PubNubService extends Service implements PubNubServiceInterface{
 
     private static final String TAG = "PubNubService";
 
-    public static final String EXTRA_PUBNUB_CIPHER_KEY = "cipher_key";
-    public static final String EXTRA_PUBNUB_SECRET_KEY = "secret_key";
-    public static final String EXTRA_PUBNUB_PUBLISH_KEY = "publish_key";
-    public static final String EXTRA_PUBNUB_SUBSCRIBE_KEY = "subscribe_key";
-
-    private String mPubNubCipherKey;
-
-    private String mPubNubSecretKey;
+    public static final String EXTRA_PUBNUB_CHANNEL = "pubnub_channel";
 
     private PubNubManager mPubNubManager;
 
@@ -41,6 +34,7 @@ public class PubNubService extends Service implements PubNubServiceInterface{
 
         if(!mIsRunning) {
             mPubNubManager = PubNubManager.getInstance(getApplicationContext());
+            subscribeToChannelsWithCallback(new ArielPubNubCallback(getApplicationContext()), intent.getStringExtra(EXTRA_PUBNUB_CHANNEL));
             mIsRunning = true;
         }
 
@@ -54,12 +48,6 @@ public class PubNubService extends Service implements PubNubServiceInterface{
     }
 
     @Override
-    public void sendCommand(final CommandMessage commandMessage, final PNCallback<PNPublishResult> callback, final String... channels){
-        Log.i(TAG, "Sending command");
-        mPubNubManager.sendCommand(commandMessage,callback,channels);
-    }
-
-    @Override
     public void sendMessage(Object commandMessage, PNCallback<PNPublishResult> callback, String... channels) {
         Log.i(TAG, "Sending command");
         mPubNubManager.sendMessage(commandMessage, callback, channels);
@@ -68,16 +56,6 @@ public class PubNubService extends Service implements PubNubServiceInterface{
     @Override
     public void reconnect(){
         mPubNubManager.reconnect();
-    }
-
-    @Override
-    public String getPubNubCipherKey(){
-        return mPubNubCipherKey;
-    }
-
-    @Override
-    public String getPubNubSecretKey(){
-        return mPubNubSecretKey;
     }
 
     @Override

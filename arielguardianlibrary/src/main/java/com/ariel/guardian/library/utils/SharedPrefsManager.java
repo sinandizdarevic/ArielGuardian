@@ -12,14 +12,7 @@ public class SharedPrefsManager {
 
     public static final String SHARED_PREFS = "ariel_library_preferences";
 
-    public static final String PUBNUB_SUBSCRIBE_KEY = "pubnub_subscribe_key";
-    public static final String PUBNUB_PUBLISH_KEY = "pubnub_publish_key";
-    public static final String PUBNUB_SECRET_KEY = "pubnub_publish_key";
-    public static final String PUBNUB_CIPHER_KEY = "pubnub_publish_key";
-    public static final String PUBNUB_DATA_SET = "pubnub_data_set";
-
-    public static final String PUBNUB_CHANNELS = "pubnub_channels";
-
+    public static final String KEY_FIRST_RUN="key_first_run";
 
     private static SharedPrefsManager sInstance;
 
@@ -38,6 +31,16 @@ public class SharedPrefsManager {
 
     public String getStringPreference(final String key, final String defaultValue) {
         return mSharedPreferences.getString(key, defaultValue);
+    }
+
+    public boolean getBoolPreference(final String key, final boolean defaultValue) {
+        return mSharedPreferences.getBoolean(key, defaultValue);
+    }
+
+    public void setBooleanPrefernece(final String key, final boolean value) {
+        final SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putBoolean(key, value);
+        editor.commit();
     }
 
     public Set<String> getStringSetPreference(final String key) {

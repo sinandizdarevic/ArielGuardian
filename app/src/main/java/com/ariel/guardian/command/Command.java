@@ -8,7 +8,6 @@ import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.commands.Params;
 import com.ariel.guardian.library.utils.ArielUtilities;
-import com.ariel.guardian.receivers.ReportActionReceiver;
 
 import javax.inject.Inject;
 
@@ -31,19 +30,6 @@ public abstract class Command {
 
     protected void reportCommand(String command){
         //ArielLibrary.action().firebase().reportAction(command);
-    }
-
-    protected void reportCommandExecuted(String masterId, String command, String error){
-        if(masterId!=null && masterId.length()>0) {
-            Intent intent = ReportActionReceiver.getReportActionIntent(
-                    ArielUtilities.getPubNubArielChannel(masterId),
-                    command,
-                    error);
-            LocalBroadcastManager.getInstance(GuardianApplication.getInstance()).sendBroadcast(intent);
-        }
-        else{
-            Log.i("COMMAND", "no master defined for this command");
-        }
     }
 
 }

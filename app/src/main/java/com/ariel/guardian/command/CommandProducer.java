@@ -36,10 +36,8 @@ public class CommandProducer {
         mChannelCommandMap.put(LocationCommands.TRACKING_START_COMMAND, new TrackerStart());
         mChannelCommandMap.put(LocationCommands.TRACKING_STOP_COMMAND, new TrackerStop());
 
-        mChannelCommandMap.put(DeviceConfigCommands.UPDATE_CONFIG_COMMAND, new UpdateConfig());
         mChannelCommandMap.put(DeviceConfigCommands.ADD_MASTER_COMMAND, new AddMaster());
 
-        mChannelCommandMap.put(ApplicationCommands.APPLICATION_UPDATE_COMMAND, new ApplicationUpdate());
     }
 
 

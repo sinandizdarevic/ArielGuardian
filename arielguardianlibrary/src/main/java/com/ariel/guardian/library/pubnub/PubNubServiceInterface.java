@@ -12,15 +12,9 @@ public interface PubNubServiceInterface {
 
     void addSubscribeCallback(SubscribeCallback callback);
 
-    void sendCommand(final CommandMessage commandMessage, final PNCallback<PNPublishResult> callback, final String... channels);
-
     void sendMessage(final Object commandMessage, final PNCallback<PNPublishResult> callback, final String... channels);
 
      void reconnect();
-
-     String getPubNubCipherKey();
-
-     String getPubNubSecretKey();
 
      void subscribeToChannels(final String... channels);
 

@@ -10,7 +10,6 @@ import android.util.Log;
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.utils.ArielUtilities;
-import com.ariel.guardian.receivers.ReportActionReceiver;
 
 import javax.inject.Inject;
 
@@ -55,20 +54,6 @@ abstract public class ArielService extends Service {
         if (sWakeLock != null && sWakeLock.isHeld()) {
             Log.i(getServiceName(), "sWakeLock existing");
             sWakeLock.release();
-        }
-    }
-
-    protected void reportCommandExecuted(String masterId, String command, String error){
-        if(masterId!=null && masterId.length()>0) {
-            Intent intent = ReportActionReceiver.getReportActionIntent(
-                    ArielUtilities.getPubNubArielChannel(masterId),
-                    command,
-                    error);
-            LocalBroadcastManager.getInstance(GuardianApplication.getInstance())
-                    .sendBroadcast(intent);
-        }
-        else{
-            Log.i("ArielService", "no master defined for this command");
         }
     }
 

@@ -17,8 +17,6 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import io.realm.RealmObject;
-
 /**
  * Created by mikalackis on 23.5.16..
  * Class holding utility methods used throughout the app
@@ -106,19 +104,7 @@ public class ArielUtilities {
 
     public static Gson getGson() {
 
-        return new GsonBuilder()
-                .setExclusionStrategies(new ExclusionStrategy() {
-                    @Override
-                    public boolean shouldSkipField(FieldAttributes f) {
-                        return f.getDeclaringClass().equals(RealmObject.class);
-                    }
-
-                    @Override
-                    public boolean shouldSkipClass(Class<?> clazz) {
-                        return false;
-                    }
-                })
-                .create();
+        return new Gson();
 
 //        RuntimeTypeAdapterFactory<Params> paramsAdapterFactory
 //                = RuntimeTypeAdapterFactory.of(Params.class, "type")

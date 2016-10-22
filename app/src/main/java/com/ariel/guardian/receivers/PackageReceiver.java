@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.Ariel;
-import com.ariel.guardian.library.db.realm.model.DeviceApplication;
+import com.ariel.guardian.library.db.model.DeviceApplication;
 import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.utils.PackageManagerUtilities;
 
@@ -38,54 +38,22 @@ public class PackageReceiver extends BroadcastReceiver {
             deviceApplication.setId(Calendar.getInstance().getTimeInMillis());
             deviceApplication.setDisabled(false);
 
-            long applicationId = Ariel.action().database().createOrUpdateApplication(deviceApplication);
-            Ariel.action().pubnub().sendApplicationMessage(applicationId, ArielConstants.TYPE_APPLICATION_ADDED);
+            long applicationId = Ariel.action().database().createOrUpdateObject(deviceApplication);
+            Ariel.action().pubnub().sendApplicationMessage(packageName, ArielConstants.TYPE_APPLICATION_ADDED);
 
-            //mFirebaseHelper.syncDevicePackageInformation(new DevicePackageValueEventListener(), packageName);
-
-            // write into internal db
-            // UPDATE LOCAL VARIABLE THAT HOLDS DISABLED PACKAGES
-//            ContentValues values = new ContentValues();
-//            values.put(DatabaseContract.ApplicationEntry.COLUMN_NAME_APP_PACKAGE, packageName);
-//            values.put(DatabaseContract.ApplicationEntry.COLUMN_NAME_APP_DISABLED, 989);
-//
-//            try {
-//                ArielGuardian.ApplicationEntry.insertPackage(context.getContentResolver(), values);
-//            } catch (ArielGuardian.ArielPackageNotFoundException e) {
-//                e.printStackTrace();
-//            }
-
-//            long newRowId;
-//            newRowId = db.insert(
-//                    DatabaseContract.ApplicationEntry.TABLE_NAME,
-//                    null,
-//                    values);
         }
         else if(intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")){
             // REMOVED PACKAGE
             //mFirebaseHelper.removeDevicePackageListener(packageName);
 
+            DeviceApplication deviceApp = (DeviceApplication)Ariel.action().database()
+                    .getObjectByField(DeviceApplication.class, "package_name", packageName);
+
+            Ariel.action().database().removeObject(deviceApp);
+
+            Ariel.action().pubnub().sendApplicationMessage(packageName, ArielConstants.TYPE_APPLICATION_REMOVED);
+
             //db.delete(DatabaseContract.ApplicationEntry.TABLE_NAME, DatabaseContract.ApplicationEntry.COLUMN_NAME_APP_PACKAGE + " = ?", new String[] { packageName });
         }
-//        else if(intent.getAction().equals("android.intent.action.PACKAGE_CHANGED")){
-//            // REMOVED PACKAGE
-//            FirebaseHelper.getInstance().removeDevicePackageListener(packageName);
-//            DatabaseReference dr = FirebaseHelper.getInstance().getAppPackageData(packageName);
-//            dr.addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    //Log.i(TAG, "DeviceApplication data: "+dataSnapshot.getValue().toString());
-//                    DeviceApplication dp = dataSnapshot.getValue(DeviceApplication.class);
-//                    if(dp.isDisabled()){
-//                        PackageManagerUtilities.setApplicationEnabledState(GuardianApplication.getInstance(), deviceApplication.getPackageName(), deviceApplication.isDisabled());
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-//        }
     }
 }

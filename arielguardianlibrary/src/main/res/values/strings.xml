@@ -2,9 +2,4 @@
     <string name="app_name">ArielGuardian Library</string>
 
     <!-- MOVE THIS TO GRADLE BUILD!!! -->
-    <string name="pubnub_cipher_key">123qwe</string>
-    <string name="pubnub_publish_key">pub-c-4c2f969c-fde1-44e1-9598-48434e4f687a</string>
-    <string name="pubnub_subscribe_key">sub-c-d6997764-4063-11e6-ba28-02ee2ddab7fe</string>
-    <string name="pubnub_secret_key">sec-c-ZTZjNGZjYjAtY2YxNi00MmJjLWJkNmItYzkyOGZhOGUyZDc4</string>
-
 </resources>

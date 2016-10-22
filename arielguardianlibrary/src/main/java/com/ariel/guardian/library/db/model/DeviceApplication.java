@@ -1,16 +1,14 @@
-package com.ariel.guardian.library.db.realm.model;
+package com.ariel.guardian.library.db.model;
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
+import android.bluetooth.BluetoothClass;
+
+import com.orm.SugarRecord;
 
 /**
  * Created by mikalackis on 5.10.16..
  */
 
-public class DeviceApplication extends RealmObject {
-
-    @PrimaryKey
-    private long id;
+public class DeviceApplication extends SugarRecord {
 
     /**
      * DeviceApplication package name
@@ -26,6 +24,8 @@ public class DeviceApplication extends RealmObject {
     private boolean disabled;
 
     private long disabledUntil;
+
+    public DeviceApplication(){}
 
     public String getPackageName() {
         return packageName;
@@ -51,11 +51,4 @@ public class DeviceApplication extends RealmObject {
         this.disabled = disabled;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 }

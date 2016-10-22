@@ -19,8 +19,11 @@ package com.ariel.guardian.services;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
+import com.ariel.guardian.library.Ariel;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.report.ReportParams;
+import com.ariel.guardian.library.db.model.DeviceLocation;
+import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.utils.LocationManager;
 import com.google.android.gms.common.ConnectionResult;
@@ -31,11 +34,13 @@ import android.content.ComponentName;
 import android.location.Location;
 import android.util.Log;
 
+import java.util.Calendar;
+
 import javax.inject.Inject;
 
-public class DeviceFinderJobService extends ArielJobService implements LocationManager.LocationManagerListener {
+public class DeviceLocationJobService extends ArielJobService implements LocationManager.LocationManagerListener {
 
-    private static final String TAG = DeviceFinderJobService.class.getSimpleName();
+    private static final String TAG = DeviceLocationJobService.class.getSimpleName();
 
     private boolean mIsRunning = false;
 
@@ -48,12 +53,13 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
     @Inject
     GuardianApplication mApplication;
 
-    public DeviceFinderJobService(){
+    public DeviceLocationJobService(){
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
     }
 
-    public DeviceFinderJobService(final long locationUpdateInterval){
+    public DeviceLocationJobService(final long locationUpdateInterval){
         super();
+        Log.i(TAG, "Define location job with interval: "+locationUpdateInterval);
         this.locationUpdateInterval=locationUpdateInterval;
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
     }
@@ -61,6 +67,7 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         this.mJobParams = jobParameters;
+        Log.i(TAG, "Location job starting");
         if (!mIsRunning) {
             mLocationManager = new LocationManager.LocationManagerBuilder(this, this)
                                    .locationAccuracyThreshold(5)
@@ -89,11 +96,19 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
     @Override
     public void onLocationChanged(Location location) {
         Log.i(TAG, "Got location: "+location.toString());
+        DeviceLocation loc = new DeviceLocation();
+        loc.setLatitude(location.getLatitude());
+        loc.setLongitude(location.getLongitude());
+        loc.setTimestamp(Calendar.getInstance().getTimeInMillis());
+        loc.setGoogleMapsUrl(String.format(DeviceLocation.GOOGLE_MAPS_URL,
+                location.getLatitude(), location.getLongitude()));
+        long locationID = Ariel.action().database().createOrUpdateObject(loc);
+        Ariel.action().pubnub().sendLocationMessage(locationID, ArielConstants.TYPE_LOCATION_UPDATE);
     }
 
     @Override
     public void doneWithUpdates() {
-        jobFinished(mJobParams, false);
+        jobFinished(mJobParams, true);
     }
 
     @Override
@@ -108,7 +123,7 @@ public class DeviceFinderJobService extends ArielJobService implements LocationM
 
     @Override
     public JobInfo getJobInfo() {
-        ComponentName componentName = new ComponentName(mApplication, DeviceFinderJobService.class);
+        ComponentName componentName = new ComponentName(mApplication, DeviceLocationJobService.class);
         if(locationUpdateInterval!=-1) {
             return new JobInfo.Builder(ArielJobScheduler.ArielJobID.LOCATION.ordinal(), componentName).setPersisted(true).setPeriodic(locationUpdateInterval).build();
         }

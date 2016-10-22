@@ -1,5 +1,0 @@
-<resources>
-    <integer name="ariel_system_status">0</integer>
-    <long name="location_tracking_interval">3600000</long>
-    <string name="phone_number"></string>
-</resources>

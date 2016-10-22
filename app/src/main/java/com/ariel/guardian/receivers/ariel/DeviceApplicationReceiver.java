@@ -1,4 +1,4 @@
-package com.ariel.guardian.receivers;
+package com.ariel.guardian.receivers.ariel;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.Ariel;
-import com.ariel.guardian.library.db.realm.model.DeviceApplication;
+import com.ariel.guardian.library.db.model.DeviceApplication;
 import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.services.CreateIFRuleService;
 
@@ -24,7 +24,7 @@ public class DeviceApplicationReceiver extends BroadcastReceiver {
 
         long appId = intent.getLongExtra(ArielConstants.EXTRA_DATABASE_ID, -1);
         if (appId != -1) {
-            DeviceApplication da = Ariel.action().database().getDeviceApplicationById(appId, false);
+            DeviceApplication da = (DeviceApplication)Ariel.action().database().getObjectById(DeviceApplication.class, appId);
 
             Log.i(TAG, "Received an appID: "+appId+" with status: "+da.isDisabled());
 

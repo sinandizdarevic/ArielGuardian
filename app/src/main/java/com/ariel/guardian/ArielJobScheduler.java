@@ -29,6 +29,7 @@ public class ArielJobScheduler {
     }
 
     public void registerNewJob(final ArielJobService service){
+        Log.i("ArielJobScheduler", "JOB SCHEDULED");
         mJobScheduler.schedule(service.getJobInfo());
     }
 

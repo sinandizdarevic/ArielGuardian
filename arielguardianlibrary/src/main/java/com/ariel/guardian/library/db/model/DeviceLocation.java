@@ -1,12 +1,12 @@
-package com.ariel.guardian.library.db.realm.model;
+package com.ariel.guardian.library.db.model;
 
-import io.realm.RealmObject;
+import com.orm.SugarRecord;
 
 /**
  * Created by mikalackis on 5.10.16..
  */
 
-public class Location extends RealmObject {
+public class DeviceLocation extends SugarRecord {
 
     public static final String GOOGLE_MAPS_URL = "http://maps.google.com/?q=%1$f,%2$f";
 
@@ -15,11 +15,13 @@ public class Location extends RealmObject {
      */
     public String googleMapsUrl;
     /**
-     * Location timestamp
+     * DeviceLocation timestamp
      */
     public long timestamp;
     public double latitude;
     public double longitude;
+
+    public DeviceLocation(){}
 
     public String getGoogleMapsUrl() {
         return googleMapsUrl;

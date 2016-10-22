@@ -1,10 +1,9 @@
 package com.ariel.guardian;
 
 import android.app.Application;
-import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.os.Handler;
-import android.support.v4.content.LocalBroadcastManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,15 +12,13 @@ import com.ariel.guardian.command.CommandProducer;
 import com.ariel.guardian.library.Ariel;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
+import com.ariel.guardian.library.db.model.Configuration;
 import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.library.utils.ArielUtilities;
-import com.ariel.guardian.receivers.DeviceApplicationReceiver;
-import com.ariel.guardian.services.DeviceConfigService;
-import com.ariel.guardian.services.IntentFirewallService;
-import com.ariel.guardian.services.UpdateDeviceAppsService;
+import com.ariel.guardian.library.utils.SharedPrefsManager;
+import com.ariel.guardian.services.DeviceLocationJobService;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import javax.inject.Inject;
 
 import ariel.providers.ArielSettings;
 import ariel.security.LockPatternUtilsHelper;
@@ -38,14 +35,27 @@ public class GuardianApplication extends Application {
 
     private static GuardianApplication mInstance;
 
+    @Inject
+    ArielJobScheduler mJobScheduler;
+
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "GuardianApplication app created");
 
-
         Ariel.init(getApplicationContext(),
                 ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
+
+        //if(!SharedPrefsManager.getInstance(this).getBoolPreference(SharedPrefsManager.KEY_FIRST_RUN, false)){
+            // this is the first run, setup config
+            Configuration configuration = new Configuration();
+            configuration.setArielSystemStatus(getResources().getInteger(R.integer.ariel_system_status));
+            configuration.setConstantTracking(getResources().getBoolean(R.bool.constant_location_tracking));
+            configuration.setLocationTrackingInterval(getResources().getInteger(R.integer.location_tracking_interval));
+            configuration.setActive(getResources().getBoolean(R.bool.configuration_active));
+            long id = Ariel.action().database().createOrUpdateObject(configuration);
+            //Ariel.action().pubnub().sendConfigurationMessage(id, ArielConstants.TYPE_DEVICE_CONFIG_UPDATE);
+        //}
 
         mInstance = this;
 
@@ -53,21 +63,9 @@ public class GuardianApplication extends Application {
                 ArielSettings.Secure.getUriFor(ArielSettings.Secure.ARIEL_SYSTEM_STATUS),
                 false, mSettingObserver);
 
-        getContentResolver().registerContentObserver(
-                ArielSettings.Secure.getUriFor(ArielSettings.Secure.ARIEL_MASTERS),
-                false, mMastersObserver);
-
         prepareDagger();
 
-        registerReceivers();
-
-        fetchFirebaseSettings();
-
         fireServices();
-
-        Log.i(TAG, "Calling anonym login for: " + ArielUtilities.getUniquePseudoID());
-//        Intent authService = new Intent(this, FirebaseAuthService.class);
-//        startService(authService);
 
     }
 
@@ -75,89 +73,10 @@ public class GuardianApplication extends Application {
         return mInstance;
     }
 
-    private void fetchFirebaseSettings(){
-//        AsyncTask.execute(new Runnable() {
-//                              @Override
-//                              public void run() {
-//                                  DatabaseReference settingsRef = mFirebaseHelper.getSettingsReference();
-//                                  settingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                                      @Override
-//                                      public void onDataChange(DataSnapshot dataSnapshot) {
-//                                          Log.i(TAG, "Received firebase settings");
-//                                          Settings settings = dataSnapshot.getValue(Settings.class);
-//                                          if (settings != null) {
-//                                              Log.i(TAG, "Starting pubnub service");
-//                                              initiatePubNubService(settings);
-//                                          }
-//                                      }
-//
-//                                      @Override
-//                                      public void onCancelled(DatabaseError databaseError) {
-//                                          Log.i(TAG, "Database error: " + databaseError.getDetails() + ", " + databaseError.getMessage());
-//                                      }
-//                                  });
-//                              }
-//                          }
-//        );
-    }
-
     private void fireServices(){
-        //startService(DeviceConfigService.getCallingIntent());
-        //startService(UpdateDeviceAppsService.getCallingIntent());
-        startService(IntentFirewallService.getCallingIntent());
-    }
-
-    public String[] getMasterChannels() {
-        ArrayList<String> masters = (ArrayList<String>) ArielSettings.Secure.getDelimitedStringAsList(getContentResolver(),
-                ArielSettings.Secure.ARIEL_MASTERS, ",");
-        String[] channels = new String[masters.size()];
-        Iterator<String> it = masters.iterator();
-        int i = 0;
-        while (it.hasNext()) {
-            channels[i] = ArielUtilities.getPubNubArielChannel(it.next());
-            i++;
-        }
-        return channels;
-    }
-
-//    private void registerArielLibraryReceiver() {
-//        LocalBroadcastManager.getInstance(this)
-//                .registerReceiver(new BroadcastReceiver() {
-//                                      @Override
-//                                      public void onReceive(Context context, Intent intent) {
-//                                          Log.i(TAG, "RECEIVE LOCAL BROADCAST " + intent.getAction());
-//                                          String action = intent.getAction();
-//                                          if (action.equals(ArielLibrary.BROADCAST_LIBRARY_READY)) {
-//                                              // fetch device config
-//                                              startService(DeviceConfigService.getCallingIntent());
-//
-//                                              /**
-//                                               * Subscribe to two channels:
-//                                               * 1. ariel channel - to distribute messages to all members
-//                                               * 2. device specific channel - to receive commands
-//                                               */
-//                                              ArielLibrary.action().subscribeToChannelsWithCallback(new GuardianPubNubCallback(),
-//                                                      ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
-//
-//                                              // sync apps list on firebase side and check status
-//                                              startService(UpdateDeviceAppsService.getCallingIntent());
-//
-//                                          }
-//                                      }
-//                                  },
-//                        new IntentFilter(ArielLibrary.BROADCAST_LIBRARY_READY));
-//    }
-
-    private void registerReceivers() {
-//        LocalBroadcastManager.getInstance(this).registerReceiver(
-//                new ReportActionReceiver(),
-//                new IntentFilter(ReportActionReceiver.REPORT_COMMAND_ACTION));
-        IntentFilter appIntentFilter = new IntentFilter();
-        appIntentFilter.addAction(ArielConstants.TYPE_APPLICATION_ADDED);
-        appIntentFilter.addAction(ArielConstants.TYPE_APPLICATION_REMOVED);
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                new DeviceApplicationReceiver(),
-                appIntentFilter);
+        Configuration configuration = (Configuration)Ariel.action().database().getObjectByField(Configuration.class,
+                "active","1");
+        mJobScheduler.registerNewJob(new DeviceLocationJobService(configuration.getLocationTrackingInterval()));
     }
 
     private void prepareDagger() {
@@ -170,21 +89,6 @@ public class GuardianApplication extends Application {
     public GuardianComponent getGuardianComponent() {
         return mGuardianComponent;
     }
-
-    /**
-     * Listen to changes on ariel system masters
-     */
-    private final ContentObserver mMastersObserver = new ContentObserver(new Handler()) {
-        public void onChange(boolean selfChange, android.net.Uri uri, int userId) {
-            ArrayList<String> masters = (ArrayList<String>) ArielSettings.Secure.getDelimitedStringAsList(getContentResolver(),
-                    ArielSettings.Secure.ARIEL_MASTERS, ",");
-            try {
-                //mPubNubService.subscribeToChannels((String[]) masters.toArray());
-            } catch (RuntimeException re) {
-
-            }
-        }
-    };
 
     /**
      * Listen to changes on ariel system status and perform actions on change

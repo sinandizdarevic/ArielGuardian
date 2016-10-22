@@ -7,11 +7,12 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.ariel.guardian.library.db.RealmDatabaseManager;
-import com.ariel.guardian.library.db.realm.model.DeviceApplication;
-import com.ariel.guardian.library.db.realm.model.WrapperMessage;
+import com.ariel.guardian.library.db.model.Configuration;
+import com.ariel.guardian.library.db.model.DeviceApplication;
+import com.ariel.guardian.library.db.SugarDatabaseManager;
+import com.ariel.guardian.library.db.model.DeviceLocation;
+import com.ariel.guardian.library.db.model.WrapperMessage;
 import com.ariel.guardian.library.services.SyncIntentService;
-import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.gson.Gson;
 import com.pubnub.api.callbacks.PNCallback;
@@ -41,20 +42,50 @@ public class ArielPubNub implements ArielPubNubInterface {
         mPubNubChannel = pubNubChannel;
         mContext = context;
         Intent pubNubServiceIntent = new Intent(context, PubNubService.class);
+        pubNubServiceIntent.putExtra(PubNubService.EXTRA_PUBNUB_CHANNEL, mPubNubChannel);
         context.startService(pubNubServiceIntent);
         context.bindService(pubNubServiceIntent, mConnection, BIND_AUTO_CREATE);
     }
 
     @Override
-    public void sendApplicationMessage(long appId, String action) {
-        DeviceApplication deviceApp = RealmDatabaseManager.getInstance(mContext).getDeviceApplicationById(appId, false);
+    public void sendApplicationMessage(String packageName, String action) {
+        DeviceApplication deviceApp = (DeviceApplication)SugarDatabaseManager.getInstance(mContext)
+                .getObjectByField(DeviceApplication.class, "package_name", packageName);
         Gson gson = new Gson();
         final WrapperMessage message = new WrapperMessage();
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
-        message.setType(ArielConstants.TYPE_APPLICATION_ADDED);
-        message.setRealmObject(gson.toJson(deviceApp));
-        final long messageId = RealmDatabaseManager.getInstance(mContext).saveWrapperMessage(message);
+        message.setType(action);
+        message.setDataObject(gson.toJson(deviceApp));
+        final long messageId = SugarDatabaseManager.getInstance(mContext).createOrUpdateObject(message);
+        mContext.startService(SyncIntentService.getSyncIntent(messageId));
+    }
+
+    @Override
+    public void sendLocationMessage(long locationId, String action) {
+        DeviceLocation deviceLocation = (DeviceLocation)SugarDatabaseManager.getInstance(mContext)
+                .getObjectById(DeviceLocation.class, locationId);
+        Gson gson = new Gson();
+        final WrapperMessage message = new WrapperMessage();
+        message.setId(Calendar.getInstance().getTimeInMillis());
+        message.setSender(ArielUtilities.getUniquePseudoID());
+        message.setType(action);
+        message.setDataObject(gson.toJson(deviceLocation));
+        final long messageId = SugarDatabaseManager.getInstance(mContext).createOrUpdateObject(message);
+        mContext.startService(SyncIntentService.getSyncIntent(messageId));
+    }
+
+    @Override
+    public void sendConfigurationMessage(long configID, String action) {
+        Configuration deviceConfiguration = (Configuration)SugarDatabaseManager.getInstance(mContext)
+                .getObjectById(Configuration.class, configID);
+        Gson gson = new Gson();
+        final WrapperMessage message = new WrapperMessage();
+        message.setId(Calendar.getInstance().getTimeInMillis());
+        message.setSender(ArielUtilities.getUniquePseudoID());
+        message.setType(action);
+        message.setDataObject(gson.toJson(deviceConfiguration));
+        final long messageId = SugarDatabaseManager.getInstance(mContext).createOrUpdateObject(message);
         mContext.startService(SyncIntentService.getSyncIntent(messageId));
     }
 
@@ -78,7 +109,7 @@ public class ArielPubNub implements ArielPubNubInterface {
             PubNubService.PubNubServiceBinder binder = (PubNubService.PubNubServiceBinder) service;
             mPubNubService = binder.getService();
 
-            mPubNubService.subscribeToChannelsWithCallback(new ArielPubNubCallback(), mPubNubChannel);
+            //mPubNubService.subscribeToChannelsWithCallback(new ArielPubNubCallback(), mPubNubChannel);
         }
 
         @Override
