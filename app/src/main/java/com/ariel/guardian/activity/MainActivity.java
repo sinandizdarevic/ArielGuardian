@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
                 app.setPackageName("com.google.sava");
                 app.setAppName("Sava");
                 app.setDisabled(false);
-                app.setId(Calendar.getInstance().getTimeInMillis());
 
 
                 //LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.getInstance());

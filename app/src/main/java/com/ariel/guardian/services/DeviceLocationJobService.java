@@ -100,10 +100,11 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
         loc.setLatitude(location.getLatitude());
         loc.setLongitude(location.getLongitude());
         loc.setTimestamp(Calendar.getInstance().getTimeInMillis());
+        loc.setId(Calendar.getInstance().getTimeInMillis());
         loc.setGoogleMapsUrl(String.format(DeviceLocation.GOOGLE_MAPS_URL,
                 location.getLatitude(), location.getLongitude()));
-        long locationID = Ariel.action().database().createOrUpdateObject(loc);
-        Ariel.action().pubnub().sendLocationMessage(locationID, ArielConstants.TYPE_LOCATION_UPDATE);
+        Ariel.action().database().createLocation(loc);
+        Ariel.action().pubnub().sendLocationMessage(loc.getId(), ArielConstants.TYPE_LOCATION_UPDATE);
     }
 
     @Override

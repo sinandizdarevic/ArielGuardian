@@ -128,18 +128,6 @@
 # platform version.  We know about them, and they are safe.
 -dontwarn android.support.**
 
-#Start FIREBASE proguard
--keep class com.firebase.** { *; }
--keep class org.apache.** { *; }
--keepnames class com.fasterxml.jackson.** { *; }
--keepnames class javax.servlet.** { *; }
--keepnames class org.ietf.jgss.** { *; }
--dontwarn org.apache.**
--dontwarn org.w3c.dom.**
--keep class com.ariel.guardian.library.firebase.model.** { *; }
--keep public class com.ariel.guardian.firebase.FirebaseHelper {*;}
-#End FIREBASE proguard
-
 ##---------------Begin: proguard configuration for Gson  ----------
 # Gson uses generic type information stored in a class file when working with fields. Proguard
 # removes such information by default, so configure it to keep all of it.
@@ -164,3 +152,5 @@
 -keep public class com.ariel.guardian.library.ArielLibraryInterface { public static *;}
 -keep public class com.ariel.guardian.pubnub.listeners.pubnub.ArielPNCallback     { public protected *; }
 -keep public class com.ariel.guardian.library.utils.ArielUtilities     { public protected *; }
+
+-keep class * extends com.raizlabs.android.dbflow.config.DatabaseHolder { *; }

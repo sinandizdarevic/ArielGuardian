@@ -9,6 +9,7 @@ import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.Ariel;
 import com.ariel.guardian.library.db.model.DeviceApplication;
 import com.ariel.guardian.library.utils.ArielConstants;
+import com.ariel.guardian.services.CreateIFRuleService;
 import com.ariel.guardian.utils.PackageManagerUtilities;
 
 import java.util.Calendar;
@@ -22,38 +23,47 @@ public class PackageReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG, "Package receiver activated: "+intent.getAction()+" packageName: "+intent.getData().getSchemeSpecificPart());
+        Log.i(TAG, "Package receiver activated: " + intent.getAction() + " packageName: " + intent.getData().getSchemeSpecificPart());
 
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
 
         final String packageName = intent.getData().getSchemeSpecificPart();
 
-        final DeviceApplication deviceApplication = new DeviceApplication();
+        if (intent.getAction().equals("android.intent.action.PACKAGE_ADDED")) {
+            // check if app already exists in database
+            DeviceApplication deviceApp = Ariel.action().
+                    database().getApplicationByPackageName(packageName);
+            if (deviceApp != null) {
+                // good, we had this app before
+                // perform block check and set it to installed
+                GuardianApplication.getInstance().
+                        startService(CreateIFRuleService.getCallingIntent
+                                (deviceApp.getPackageName(), deviceApp.isDisabled()));
+                deviceApp.setUninstalled(false);
+                Ariel.action().database().createOrUpdateApplication(deviceApp);
+                Ariel.action().pubnub().sendApplicationMessage(packageName, ArielConstants.TYPE_APPLICATION_ADDED);
+            }
+            else{
+                // this is new app, create it in the db
+                final DeviceApplication deviceApplication = new DeviceApplication();
 
-        deviceApplication.setPackageName(packageName);
+                deviceApplication.setPackageName(packageName);
+                deviceApplication.setAppName(PackageManagerUtilities.getAppNameFromPackage(context, packageName));
+                deviceApplication.setDisabled(false);
+                deviceApplication.setUninstalled(false);
 
-        if(intent.getAction().equals("android.intent.action.PACKAGE_ADDED")){
-            // INSTALLED PACKAGE
-            deviceApplication.setAppName(PackageManagerUtilities.getAppNameFromPackage(context,packageName));
-            deviceApplication.setId(Calendar.getInstance().getTimeInMillis());
-            deviceApplication.setDisabled(false);
+                Ariel.action().database().createOrUpdateApplication(deviceApplication);
+                Ariel.action().pubnub().sendApplicationMessage(packageName, ArielConstants.TYPE_APPLICATION_ADDED);
+            }
+        } else if (intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")) {
+            // find the app in the database and update its uninstall status
+            DeviceApplication deviceApp = Ariel.action().database()
+                    .getApplicationByPackageName(packageName);
+            deviceApp.setUninstalled(true);
 
-            long applicationId = Ariel.action().database().createOrUpdateObject(deviceApplication);
-            Ariel.action().pubnub().sendApplicationMessage(packageName, ArielConstants.TYPE_APPLICATION_ADDED);
-
-        }
-        else if(intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")){
-            // REMOVED PACKAGE
-            //mFirebaseHelper.removeDevicePackageListener(packageName);
-
-            DeviceApplication deviceApp = (DeviceApplication)Ariel.action().database()
-                    .getObjectByField(DeviceApplication.class, "package_name", packageName);
-
-            Ariel.action().database().removeObject(deviceApp);
-
+            Ariel.action().database().createOrUpdateApplication(deviceApp);
             Ariel.action().pubnub().sendApplicationMessage(packageName, ArielConstants.TYPE_APPLICATION_REMOVED);
 
-            //db.delete(DatabaseContract.ApplicationEntry.TABLE_NAME, DatabaseContract.ApplicationEntry.COLUMN_NAME_APP_PACKAGE + " = ?", new String[] { packageName });
         }
     }
 }

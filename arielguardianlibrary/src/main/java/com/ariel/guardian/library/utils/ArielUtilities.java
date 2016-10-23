@@ -103,16 +103,10 @@ public class ArielUtilities {
     }
 
     public static Gson getGson() {
-
-        return new Gson();
-
-//        RuntimeTypeAdapterFactory<Params> paramsAdapterFactory
-//                = RuntimeTypeAdapterFactory.of(Params.class, "type")
-//                .registerSubtype(LocationParams.class)
-//                .registerSubtype(ApplicationParams.class)
-//                .registerSubtype(ReportParams.class)
-//                .registerSubtype(DeviceConfigParams.class);
-//        return new GsonBuilder().registerTypeAdapterFactory(paramsAdapterFactory).create();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setExclusionStrategies(new ExclusionStrategy[]{new DBFlowExclusionStrategy()});
+        Gson gson = gsonBuilder.create();
+        return gson;
     }
 
     public static String getEncodedData(final String deviceId, final String cipher, final String secret) {

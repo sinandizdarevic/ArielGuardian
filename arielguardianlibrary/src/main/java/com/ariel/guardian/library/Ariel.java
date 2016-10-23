@@ -3,7 +3,7 @@ package com.ariel.guardian.library;
 import android.content.Context;
 
 import com.ariel.guardian.library.db.ArielDatabaseInterface;
-import com.ariel.guardian.library.db.SugarDatabaseManager;
+import com.ariel.guardian.library.db.DBFlowDatabaseManager;
 import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.library.pubnub.ArielPubNubInterface;
 
@@ -36,7 +36,7 @@ public final class Ariel implements ArielInterface {
     }
 
     private void initDb(){
-        SugarDatabaseManager.getInstance(mApplicationContext);
+        DBFlowDatabaseManager.getInstance(mApplicationContext);
     }
 
     private void initPubNub(){
@@ -55,7 +55,7 @@ public final class Ariel implements ArielInterface {
 
     @Override
     public ArielDatabaseInterface database() {
-        return SugarDatabaseManager.getInstance(mApplicationContext);
+        return DBFlowDatabaseManager.getInstance(mApplicationContext);
     }
 
     @Override

@@ -7,9 +7,9 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.ariel.guardian.library.db.DBFlowDatabaseManager;
 import com.ariel.guardian.library.db.model.Configuration;
 import com.ariel.guardian.library.db.model.DeviceApplication;
-import com.ariel.guardian.library.db.SugarDatabaseManager;
 import com.ariel.guardian.library.db.model.DeviceLocation;
 import com.ariel.guardian.library.db.model.WrapperMessage;
 import com.ariel.guardian.library.services.SyncIntentService;
@@ -38,9 +38,12 @@ public class ArielPubNub implements ArielPubNubInterface {
 
     private Context mContext;
 
+    private Gson mGson;
+
     public ArielPubNub(final Context context, final String pubNubChannel){
         mPubNubChannel = pubNubChannel;
         mContext = context;
+        mGson = ArielUtilities.getGson();
         Intent pubNubServiceIntent = new Intent(context, PubNubService.class);
         pubNubServiceIntent.putExtra(PubNubService.EXTRA_PUBNUB_CHANNEL, mPubNubChannel);
         context.startService(pubNubServiceIntent);
@@ -49,44 +52,41 @@ public class ArielPubNub implements ArielPubNubInterface {
 
     @Override
     public void sendApplicationMessage(String packageName, String action) {
-        DeviceApplication deviceApp = (DeviceApplication)SugarDatabaseManager.getInstance(mContext)
-                .getObjectByField(DeviceApplication.class, "package_name", packageName);
-        Gson gson = new Gson();
+        DeviceApplication deviceApp = DBFlowDatabaseManager.getInstance(mContext)
+                .getApplicationByPackageName(packageName);
         final WrapperMessage message = new WrapperMessage();
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
         message.setType(action);
-        message.setDataObject(gson.toJson(deviceApp));
-        final long messageId = SugarDatabaseManager.getInstance(mContext).createOrUpdateObject(message);
-        mContext.startService(SyncIntentService.getSyncIntent(messageId));
+        message.setDataObject(mGson.toJson(deviceApp));
+        DBFlowDatabaseManager.getInstance(mContext).createWrapperMessage(message);
+        mContext.startService(SyncIntentService.getSyncIntent(message.getId()));
     }
 
     @Override
     public void sendLocationMessage(long locationId, String action) {
-        DeviceLocation deviceLocation = (DeviceLocation)SugarDatabaseManager.getInstance(mContext)
-                .getObjectById(DeviceLocation.class, locationId);
-        Gson gson = new Gson();
+        DeviceLocation deviceLocation = DBFlowDatabaseManager.getInstance(mContext)
+                .getLocationByID(locationId);
         final WrapperMessage message = new WrapperMessage();
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
         message.setType(action);
-        message.setDataObject(gson.toJson(deviceLocation));
-        final long messageId = SugarDatabaseManager.getInstance(mContext).createOrUpdateObject(message);
-        mContext.startService(SyncIntentService.getSyncIntent(messageId));
+        message.setDataObject(mGson.toJson(deviceLocation));
+        DBFlowDatabaseManager.getInstance(mContext).createWrapperMessage(message);
+        mContext.startService(SyncIntentService.getSyncIntent(message.getId()));
     }
 
     @Override
     public void sendConfigurationMessage(long configID, String action) {
-        Configuration deviceConfiguration = (Configuration)SugarDatabaseManager.getInstance(mContext)
-                .getObjectById(Configuration.class, configID);
-        Gson gson = new Gson();
+        Configuration deviceConfiguration = DBFlowDatabaseManager.getInstance(mContext)
+                .getConfigurationByID(configID);
         final WrapperMessage message = new WrapperMessage();
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
         message.setType(action);
-        message.setDataObject(gson.toJson(deviceConfiguration));
-        final long messageId = SugarDatabaseManager.getInstance(mContext).createOrUpdateObject(message);
-        mContext.startService(SyncIntentService.getSyncIntent(messageId));
+        message.setDataObject(mGson.toJson(deviceConfiguration));
+        DBFlowDatabaseManager.getInstance(mContext).createWrapperMessage(message);
+        mContext.startService(SyncIntentService.getSyncIntent(message.getId()));
     }
 
     @Override

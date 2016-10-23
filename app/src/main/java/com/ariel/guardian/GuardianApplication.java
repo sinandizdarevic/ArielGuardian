@@ -18,6 +18,8 @@ import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.library.utils.SharedPrefsManager;
 import com.ariel.guardian.services.DeviceLocationJobService;
 
+import java.util.Calendar;
+
 import javax.inject.Inject;
 
 import ariel.providers.ArielSettings;
@@ -53,7 +55,8 @@ public class GuardianApplication extends Application {
             configuration.setConstantTracking(getResources().getBoolean(R.bool.constant_location_tracking));
             configuration.setLocationTrackingInterval(getResources().getInteger(R.integer.location_tracking_interval));
             configuration.setActive(getResources().getBoolean(R.bool.configuration_active));
-            long id = Ariel.action().database().createOrUpdateObject(configuration);
+            configuration.setId(Calendar.getInstance().getTimeInMillis());
+            Ariel.action().database().createConfiguration(configuration);
             //Ariel.action().pubnub().sendConfigurationMessage(id, ArielConstants.TYPE_DEVICE_CONFIG_UPDATE);
         //}
 
@@ -74,8 +77,7 @@ public class GuardianApplication extends Application {
     }
 
     private void fireServices(){
-        Configuration configuration = (Configuration)Ariel.action().database().getObjectByField(Configuration.class,
-                "active","1");
+        Configuration configuration = Ariel.action().database().getActiveConfiguration();
         mJobScheduler.registerNewJob(new DeviceLocationJobService(configuration.getLocationTrackingInterval()));
     }
 

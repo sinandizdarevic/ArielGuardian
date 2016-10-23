@@ -22,9 +22,9 @@ public class DeviceApplicationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        long appId = intent.getLongExtra(ArielConstants.EXTRA_DATABASE_ID, -1);
-        if (appId != -1) {
-            DeviceApplication da = (DeviceApplication)Ariel.action().database().getObjectById(DeviceApplication.class, appId);
+        String appId = intent.getStringExtra(ArielConstants.EXTRA_DATABASE_ID);
+        if (appId != null) {
+            DeviceApplication da = Ariel.action().database().getApplicationByID(appId);
 
             Log.i(TAG, "Received an appID: "+appId+" with status: "+da.isDisabled());
 

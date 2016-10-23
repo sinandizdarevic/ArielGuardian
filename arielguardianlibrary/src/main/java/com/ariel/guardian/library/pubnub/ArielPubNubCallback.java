@@ -29,6 +29,8 @@ public class ArielPubNubCallback extends SubscribeCallback {
 
     private NetworkChangeReceiver mNetworkListener = new NetworkChangeReceiver();
 
+    private Gson mGson = ArielUtilities.getGson();
+
     private Context mContext;
 
     public ArielPubNubCallback(final Context context){
@@ -59,8 +61,7 @@ public class ArielPubNubCallback extends SubscribeCallback {
     }
 
     protected WrapperMessage parseIncomingMessage(String message){
-        Gson gson = new Gson();
-        WrapperMessage msg = gson.fromJson(message, WrapperMessage.class);
+        WrapperMessage msg = mGson.fromJson(message, WrapperMessage.class);
         if(msg!=null){
             if(msg.getSender().equals(ArielUtilities.getUniquePseudoID())){
                 //this is my message
@@ -81,50 +82,49 @@ public class ArielPubNubCallback extends SubscribeCallback {
         WrapperMessage currentMessage = parseIncomingMessage(message.getMessage().toString());
 
         if(currentMessage!=null){
-            Gson gson = new Gson();
             // its not a message from me, deal with it
             if(currentMessage.getType().equals(ArielConstants.TYPE_APPLICATION_ADDED)){
                 // add an app to the realm database
-                DeviceApplication deviceApp = gson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
-                long appId = Ariel.action().database().createOrUpdateObject(deviceApp);
+                DeviceApplication deviceApp = mGson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
+                Ariel.action().database().createOrUpdateApplication(deviceApp);
                 Intent appIntent = new Intent();
                 appIntent.setAction(ArielConstants.TYPE_APPLICATION_ADDED);
-                appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, appId);
+                appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, deviceApp.getPackageName());
                 mContext.sendBroadcast(appIntent);
             }
             if(currentMessage.getType().equals(ArielConstants.TYPE_APPLICATION_UPDATED)){
                 // add an app to the realm database
-                DeviceApplication deviceApp = gson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
-                long appId = Ariel.action().database().createOrUpdateObject(deviceApp);
+                DeviceApplication deviceApp = mGson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
+                Ariel.action().database().createOrUpdateApplication(deviceApp);
                 Intent appIntent = new Intent();
                 appIntent.setAction(ArielConstants.TYPE_APPLICATION_UPDATED);
-                appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, appId);
+                appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, deviceApp.getPackageName());
                 mContext.sendBroadcast(appIntent);
             }
             else if(currentMessage.getType().equals(ArielConstants.TYPE_APPLICATION_REMOVED)){
                 // remove an app from the realm database
-                DeviceApplication deviceApp = gson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
-                Ariel.action().database().removeObject(deviceApp);
+                DeviceApplication deviceApp = mGson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
+                Ariel.action().database().deleteApplication(deviceApp);
                 Intent appIntent = new Intent();
                 appIntent.setAction(ArielConstants.TYPE_APPLICATION_REMOVED);
                 mContext.sendBroadcast(appIntent);
             }
             else if(currentMessage.getType().equals(ArielConstants.TYPE_DEVICE_CONFIG_UPDATE)){
                 // update device configuration and broadcast change
-                Configuration deviceConfig = gson.fromJson(currentMessage.getDataObject(), Configuration.class);
-                long configId = Ariel.action().database().createOrUpdateObject(deviceConfig);
+                Configuration deviceConfig = mGson.fromJson(currentMessage.getDataObject(), Configuration.class);
+                Ariel.action().database().createConfiguration(deviceConfig);
                 Intent appIntent = new Intent();
                 appIntent.setAction(ArielConstants.TYPE_DEVICE_CONFIG_UPDATE);
-                appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, configId);
+                appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, deviceConfig.getId());
                 mContext.sendBroadcast(appIntent);
             }
             else if(currentMessage.getType().equals(ArielConstants.TYPE_LOCATION_UPDATE)){
                 // update device location and broadcast change
-                DeviceLocation deviceLocation = gson.fromJson(currentMessage.getDataObject(), DeviceLocation.class);
-                long locationId = Ariel.action().database().createOrUpdateObject(deviceLocation);
+                DeviceLocation deviceLocation = mGson.fromJson(currentMessage.getDataObject(), DeviceLocation.class);
+                Ariel.action().database().createLocation(deviceLocation);
                 Intent appIntent = new Intent();
                 appIntent.setAction(ArielConstants.TYPE_LOCATION_UPDATE);
-                appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, locationId);
+                appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, deviceLocation.getId());
                 mContext.sendBroadcast(appIntent);
             }
         }
