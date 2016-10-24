@@ -17,7 +17,6 @@ public interface ArielDatabaseInterface {
     void createOrUpdateApplication(final DeviceApplication deviceApplication);
     void deleteApplication(final DeviceApplication deviceApplication);
     DeviceApplication getApplicationByID(final String packageName);
-    DeviceApplication getApplicationByPackageName(final String packageName);
     List<DeviceApplication> getAllApplications();
 
     // Configuration methods

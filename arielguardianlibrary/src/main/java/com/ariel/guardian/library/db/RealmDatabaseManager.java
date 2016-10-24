@@ -4,17 +4,9 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ariel.guardian.library.db.model.Configuration;
-import com.ariel.guardian.library.db.model.Configuration_Table;
 import com.ariel.guardian.library.db.model.DeviceApplication;
-import com.ariel.guardian.library.db.model.DeviceApplication_Table;
 import com.ariel.guardian.library.db.model.DeviceLocation;
-import com.ariel.guardian.library.db.model.DeviceLocation_Table;
 import com.ariel.guardian.library.db.model.WrapperMessage;
-import com.ariel.guardian.library.db.model.WrapperMessage_Table;
-import com.raizlabs.android.dbflow.config.FlowConfig;
-import com.raizlabs.android.dbflow.config.FlowLog;
-import com.raizlabs.android.dbflow.config.FlowManager;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.io.File;
 import java.security.SecureRandom;
@@ -22,6 +14,8 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 /**
  * Created by mikalackis on 14.10.16..
@@ -59,45 +53,46 @@ public class RealmDatabaseManager implements ArielDatabaseInterface {
     @Override
     public void createOrUpdateApplication(DeviceApplication deviceApplication) {
         Log.i(TAG, "Creating application: " + deviceApplication.getPackageName());
-        deviceApplication.save();
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        realm.beginTransaction();
+        DeviceApplication newApp = realm.copyToRealmOrUpdate(deviceApplication);
+        realm.commitTransaction();
+        realm.close();
     }
 
     @Override
     public void deleteApplication(DeviceApplication deviceApplication) {
-        Log.i(TAG, "Removing application: " + deviceApplication.getPackageName());
-        deviceApplication.delete();
+        Log.i(TAG, "TODO: Removing application: " + deviceApplication.getPackageName());
     }
 
     @Override
     public DeviceApplication getApplicationByID(String packageName) {
         Log.i(TAG, "Get application by id: " + packageName);
-        DeviceApplication deviceApp = SQLite.select().
-                from(DeviceApplication.class).
-                where(DeviceApplication_Table.packageName.eq(packageName)).querySingle();
-        return deviceApp;
-    }
-
-    @Override
-    public DeviceApplication getApplicationByPackageName(String packageName) {
-        Log.i(TAG, "Get application by packageName: " + packageName);
-        DeviceApplication deviceApp = SQLite.select().
-                from(DeviceApplication.class).
-                where(DeviceApplication_Table.packageName.eq(packageName)).querySingle();
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        RealmQuery<DeviceApplication> query = realm.where(DeviceApplication.class);
+        query.equalTo("packageName", packageName);
+        RealmResults<DeviceApplication> result1 = query.findAll();
+        DeviceApplication deviceApp = realm.copyFromRealm(result1.first());
         return deviceApp;
     }
 
     @Override
     public List<DeviceApplication> getAllApplications() {
         Log.i(TAG, "Get all applications");
-        List<DeviceApplication> deviceApps = SQLite.select().
-                from(DeviceApplication.class).queryList();
-        return deviceApps;
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        RealmQuery<DeviceApplication> query = realm.where(DeviceApplication.class);
+        RealmResults<DeviceApplication> result1 = query.findAll();
+        return realm.copyFromRealm(result1);
     }
 
     @Override
     public void createConfiguration(Configuration deviceConfiguration) {
         Log.i(TAG, "Creating device configuration with id: " + deviceConfiguration.getId());
-        deviceConfiguration.save();
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        realm.beginTransaction();
+        Configuration newApp = realm.copyToRealmOrUpdate(deviceConfiguration);
+        realm.commitTransaction();
+        realm.close();
     }
 
     @Override
@@ -107,25 +102,34 @@ public class RealmDatabaseManager implements ArielDatabaseInterface {
 
     @Override
     public Configuration getConfigurationByID(long id) {
-        Configuration deviceConfiguration = SQLite.select().
-                from(Configuration.class).
-                where(Configuration_Table.id.eq(id)).querySingle();
+        Log.i(TAG, "Get configuration by id: " + id);
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        RealmQuery<Configuration> query = realm.where(Configuration.class);
+        query.equalTo("id", id);
+        RealmResults<Configuration> result1 = query.findAll();
+        Configuration deviceConfiguration = realm.copyFromRealm(result1.first());
         return deviceConfiguration;
     }
 
     @Override
     public Configuration getActiveConfiguration() {
         Log.i(TAG, "Get active configuration");
-        Configuration deviceConfiguration = SQLite.select().
-                from(Configuration.class).
-                where(Configuration_Table.active.eq(true)).querySingle();
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        RealmQuery<Configuration> query = realm.where(Configuration.class);
+        query.equalTo("active", true);
+        RealmResults<Configuration> result1 = query.findAll();
+        Configuration deviceConfiguration = realm.copyFromRealm(result1.first());
         return deviceConfiguration;
     }
 
     @Override
     public void createLocation(DeviceLocation deviceLocation) {
         Log.i(TAG, "Create location with id: " + deviceLocation);
-        deviceLocation.save();
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        realm.beginTransaction();
+        DeviceLocation newApp = realm.copyToRealmOrUpdate(deviceLocation);
+        realm.commitTransaction();
+        realm.close();
     }
 
     @Override
@@ -135,47 +139,59 @@ public class RealmDatabaseManager implements ArielDatabaseInterface {
 
     @Override
     public DeviceLocation getLocationByID(long id) {
-        DeviceLocation deviceLocation = SQLite.select().
-                from(DeviceLocation.class).
-                where(DeviceLocation_Table.id.eq(id)).querySingle();
+        Log.i(TAG, "Get location by id: "+id);
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        RealmQuery<DeviceLocation> query = realm.where(DeviceLocation.class);
+        query.equalTo("id", id);
+        RealmResults<DeviceLocation> result1 = query.findAll();
+        DeviceLocation deviceLocation = realm.copyFromRealm(result1.first());
         return deviceLocation;
     }
 
     @Override
     public DeviceLocation getLastLocation() {
-        DeviceLocation deviceLocation = SQLite.select().
-                from(DeviceLocation.class)
-                .where().orderBy(DeviceLocation_Table.timestamp, true).querySingle();
-        return deviceLocation;
+        Log.i(TAG, "TODO: getLastLocation()");
+        return new DeviceLocation();
     }
 
     @Override
     public void createWrapperMessage(WrapperMessage wrapperMessage) {
         Log.i(TAG, "Create wrapper message with id: " + wrapperMessage.getId());
-        wrapperMessage.save();
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        realm.beginTransaction();
+        WrapperMessage newApp = realm.copyToRealmOrUpdate(wrapperMessage);
+        realm.commitTransaction();
+        realm.close();
     }
 
     @Override
     public void deleteWrapperMessageByID(long id) {
-        Log.i(TAG, "Detelet wrapper message with id: " + id);
-        WrapperMessage wrapperMessage = getWrapperMessageByID(id);
-        if (wrapperMessage != null) {
-            Log.i(TAG, "Removing wrapper message with id: " + wrapperMessage.getId());
-            wrapperMessage.delete();
-        }
+        Log.i(TAG, "Delete wrapper message with id: " + id);
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        realm.beginTransaction();
+        RealmQuery<WrapperMessage> query = realm.where(WrapperMessage.class);
+        query.equalTo("id", id);
+        RealmResults<WrapperMessage> result1 = query.findAll();
+        WrapperMessage wrapperMessage = result1.first();
+        wrapperMessage.deleteFromRealm();
+        realm.commitTransaction();
+        realm.close();
     }
 
     @Override
     public void deleteWrapperMessage(WrapperMessage wrapperMessage) {
         Log.i(TAG, "Detelet wrapper message with id: " + wrapperMessage.getId());
-        wrapperMessage.delete();
+        deleteWrapperMessageByID(wrapperMessage.getId());
     }
 
     @Override
     public WrapperMessage getWrapperMessageByID(long id) {
-        WrapperMessage wrapperMessage = SQLite.select().
-                from(WrapperMessage.class).
-                where(WrapperMessage_Table.id.eq(id)).querySingle();
+        Log.i(TAG, "Get wrapper message by id: "+id);
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        RealmQuery<WrapperMessage> query = realm.where(WrapperMessage.class);
+        query.equalTo("id", id);
+        RealmResults<WrapperMessage> result1 = query.findAll();
+        WrapperMessage wrapperMessage = realm.copyFromRealm(result1.first());
         return wrapperMessage;
     }
 
