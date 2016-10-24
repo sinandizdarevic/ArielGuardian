@@ -1,37 +1,28 @@
 package com.ariel.guardian.library.db.model;
 
-import com.ariel.guardian.library.db.ArielDatabase;
-import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.annotation.Table;
-import com.raizlabs.android.dbflow.structure.BaseModel;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by mikalackis on 5.10.16..
  */
 
-@Table(database = ArielDatabase.class)
-public class Configuration extends ArielModel {
+public class Configuration extends RealmObject {
 
-    @Column
     @PrimaryKey
     long id;
 
     /**
      * Ariel systems status field
      */
-    @Column
     private int arielSystemStatus;
     /**
      * Time interval in which the device will automatically upload its location
      */
-    @Column
     private long locationTrackingInterval;
 
-    @Column
     private boolean constantTracking;
 
-    @Column
     private boolean active;
 
     public int getArielSystemStatus() {

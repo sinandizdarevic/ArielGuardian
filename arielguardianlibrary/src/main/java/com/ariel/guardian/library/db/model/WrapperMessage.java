@@ -1,10 +1,7 @@
 package com.ariel.guardian.library.db.model;
 
-import com.ariel.guardian.library.db.ArielDatabase;
-import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.annotation.Table;
-import com.raizlabs.android.dbflow.structure.BaseModel;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by mikalackis on 7.10.16..
@@ -13,20 +10,15 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
  * and transfer data between devices via pubnub
  */
 
-@Table(database = ArielDatabase.class)
-public class WrapperMessage extends ArielModel {
+public class WrapperMessage extends RealmObject {
 
-    @Column
     @PrimaryKey
     long id;
 
-    @Column
     private String sender;
 
-    @Column
     private String type;
 
-    @Column
     private String dataObject;
 
     public void setSender(String sender) {

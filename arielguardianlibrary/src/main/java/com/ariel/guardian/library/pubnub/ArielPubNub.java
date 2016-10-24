@@ -7,7 +7,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.ariel.guardian.library.db.DBFlowDatabaseManager;
+import com.ariel.guardian.library.db.RealmDatabaseManager;
 import com.ariel.guardian.library.db.model.Configuration;
 import com.ariel.guardian.library.db.model.DeviceApplication;
 import com.ariel.guardian.library.db.model.DeviceLocation;
@@ -52,40 +52,40 @@ public class ArielPubNub implements ArielPubNubInterface {
 
     @Override
     public void sendApplicationMessage(String packageName, String action) {
-        DeviceApplication deviceApp = DBFlowDatabaseManager.getInstance(mContext)
+        DeviceApplication deviceApp = RealmDatabaseManager.getInstance(mContext)
                 .getApplicationByPackageName(packageName);
         final WrapperMessage message = new WrapperMessage();
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
         message.setType(action);
         message.setDataObject(mGson.toJson(deviceApp));
-        DBFlowDatabaseManager.getInstance(mContext).createWrapperMessage(message);
+        RealmDatabaseManager.getInstance(mContext).createWrapperMessage(message);
         mContext.startService(SyncIntentService.getSyncIntent(message.getId()));
     }
 
     @Override
     public void sendLocationMessage(long locationId, String action) {
-        DeviceLocation deviceLocation = DBFlowDatabaseManager.getInstance(mContext)
+        DeviceLocation deviceLocation = RealmDatabaseManager.getInstance(mContext)
                 .getLocationByID(locationId);
         final WrapperMessage message = new WrapperMessage();
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
         message.setType(action);
         message.setDataObject(mGson.toJson(deviceLocation));
-        DBFlowDatabaseManager.getInstance(mContext).createWrapperMessage(message);
+        RealmDatabaseManager.getInstance(mContext).createWrapperMessage(message);
         mContext.startService(SyncIntentService.getSyncIntent(message.getId()));
     }
 
     @Override
     public void sendConfigurationMessage(long configID, String action) {
-        Configuration deviceConfiguration = DBFlowDatabaseManager.getInstance(mContext)
+        Configuration deviceConfiguration = RealmDatabaseManager.getInstance(mContext)
                 .getConfigurationByID(configID);
         final WrapperMessage message = new WrapperMessage();
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
         message.setType(action);
         message.setDataObject(mGson.toJson(deviceConfiguration));
-        DBFlowDatabaseManager.getInstance(mContext).createWrapperMessage(message);
+        RealmDatabaseManager.getInstance(mContext).createWrapperMessage(message);
         mContext.startService(SyncIntentService.getSyncIntent(message.getId()));
     }
 

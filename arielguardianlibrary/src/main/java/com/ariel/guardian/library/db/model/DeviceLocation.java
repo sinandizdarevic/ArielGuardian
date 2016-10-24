@@ -1,39 +1,30 @@
 package com.ariel.guardian.library.db.model;
 
-import com.ariel.guardian.library.db.ArielDatabase;
-import com.raizlabs.android.dbflow.annotation.Column;
-import com.raizlabs.android.dbflow.annotation.PrimaryKey;
-import com.raizlabs.android.dbflow.annotation.Table;
-import com.raizlabs.android.dbflow.structure.BaseModel;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by mikalackis on 5.10.16..
  */
 
-@Table(database = ArielDatabase.class)
-public class DeviceLocation extends ArielModel {
+public class DeviceLocation extends RealmObject {
 
     public static final String GOOGLE_MAPS_URL = "http://maps.google.com/?q=%1$f,%2$f";
 
-    @Column
     @PrimaryKey
     long id;
 
     /**
      * Link to google maps pointing to device location
      */
-    @Column
     public String googleMapsUrl;
     /**
      * DeviceLocation timestamp
      */
-    @Column
     public long timestamp;
 
-    @Column
     public double latitude;
 
-    @Column
     public double longitude;
 
     public String getGoogleMapsUrl() {

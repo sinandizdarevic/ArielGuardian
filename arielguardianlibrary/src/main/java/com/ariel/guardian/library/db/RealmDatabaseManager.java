@@ -11,35 +11,49 @@ import com.ariel.guardian.library.db.model.DeviceLocation;
 import com.ariel.guardian.library.db.model.DeviceLocation_Table;
 import com.ariel.guardian.library.db.model.WrapperMessage;
 import com.ariel.guardian.library.db.model.WrapperMessage_Table;
-import com.raizlabs.android.dbflow.config.DatabaseConfig;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowLog;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
+import java.io.File;
+import java.security.SecureRandom;
 import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 /**
  * Created by mikalackis on 14.10.16..
  */
 
-public class DBFlowDatabaseManager implements ArielDatabaseInterface {
+public class RealmDatabaseManager implements ArielDatabaseInterface {
 
-    public static final String TAG = "DBFlowDatabaseManager";
+    public static final String TAG = "RealmDatabaseManager";
 
-    private static DBFlowDatabaseManager mInstance;
+    private static RealmDatabaseManager mInstance;
 
-    public static DBFlowDatabaseManager getInstance(final Context context) {
+    private RealmConfiguration mRealmConfiguration;
+
+    public static RealmDatabaseManager getInstance(final Context context) {
         if (mInstance == null) {
-            mInstance = new DBFlowDatabaseManager(context);
+            mInstance = new RealmDatabaseManager(context);
         }
         return mInstance;
     }
 
-    private DBFlowDatabaseManager(final Context context) {
-        Log.i(TAG, "Initializing FlowManager");
-        FlowManager.init(new FlowConfig.Builder(context).build());
-        FlowLog.setMinimumLoggingLevel(FlowLog.Level.V);
+    private RealmDatabaseManager(final Context context) {
+        Realm.init(context);
+        byte[] key = new byte[64];
+        new SecureRandom().nextBytes(key);
+        final File externalFilesDir = context.getExternalFilesDir(null);
+        Log.i("ABRAKADABRA", "File path: "+externalFilesDir.getAbsolutePath());
+        Log.i("ABRAKADABRA", "Context files dir path: "+context.getFilesDir().getAbsolutePath());
+        mRealmConfiguration = new RealmConfiguration.Builder()
+                //.encryptionKey(key)
+                .name("ariel.realm")
+                .modules(new ArielLibraryModule())
+                .build();
     }
 
     @Override
