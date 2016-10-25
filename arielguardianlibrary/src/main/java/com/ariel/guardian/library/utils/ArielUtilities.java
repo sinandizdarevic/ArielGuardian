@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
 
+import io.realm.RealmObject;
+
 /**
  * Created by mikalackis on 23.5.16..
  * Class holding utility methods used throughout the app
@@ -103,10 +105,19 @@ public class ArielUtilities {
     }
 
     public static Gson getGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setExclusionStrategies(new ExclusionStrategy[]{new DBFlowExclusionStrategy()});
-        Gson gson = gsonBuilder.create();
-        return gson;
+        return new GsonBuilder()
+                .setExclusionStrategies(new ExclusionStrategy() {
+                    @Override
+                    public boolean shouldSkipField(FieldAttributes f) {
+                        return f.getDeclaringClass().equals(RealmObject.class);
+                    }
+
+                    @Override
+                    public boolean shouldSkipClass(Class<?> clazz) {
+                        return false;
+                    }
+                })
+                .create();
     }
 
     public static String getEncodedData(final String deviceId, final String cipher, final String secret) {

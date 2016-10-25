@@ -53,7 +53,7 @@ public class ArielPubNub implements ArielPubNubInterface {
     @Override
     public void sendApplicationMessage(String packageName, String action) {
         DeviceApplication deviceApp = RealmDatabaseManager.getInstance(mContext)
-                .getApplicationByPackageName(packageName);
+                .getApplicationByID(packageName);
         final WrapperMessage message = new WrapperMessage();
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());

@@ -12,8 +12,6 @@ import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.services.CreateIFRuleService;
 import com.ariel.guardian.utils.PackageManagerUtilities;
 
-import java.util.Calendar;
-
 /**
  * Created by mikalackis on 1.6.16..
  */
@@ -32,7 +30,7 @@ public class PackageReceiver extends BroadcastReceiver {
         if (intent.getAction().equals("android.intent.action.PACKAGE_ADDED")) {
             // check if app already exists in database
             DeviceApplication deviceApp = Ariel.action().
-                    database().getApplicationByPackageName(packageName);
+                    database().getApplicationByID(packageName);
             if (deviceApp != null) {
                 // good, we had this app before
                 // perform block check and set it to installed
@@ -58,11 +56,13 @@ public class PackageReceiver extends BroadcastReceiver {
         } else if (intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")) {
             // find the app in the database and update its uninstall status
             DeviceApplication deviceApp = Ariel.action().database()
-                    .getApplicationByPackageName(packageName);
-            deviceApp.setUninstalled(true);
+                    .getApplicationByID(packageName);
+            if(deviceApp!=null) {
+                deviceApp.setUninstalled(true);
 
-            Ariel.action().database().createOrUpdateApplication(deviceApp);
-            Ariel.action().pubnub().sendApplicationMessage(packageName, ArielConstants.TYPE_APPLICATION_REMOVED);
+                Ariel.action().database().createOrUpdateApplication(deviceApp);
+                Ariel.action().pubnub().sendApplicationMessage(packageName, ArielConstants.TYPE_APPLICATION_REMOVED);
+            }
 
         }
     }

@@ -3,6 +3,7 @@ package com.ariel.guardian.library.db;
 import android.content.Context;
 import android.util.Log;
 
+import com.ariel.guardian.library.Ariel;
 import com.ariel.guardian.library.db.model.Configuration;
 import com.ariel.guardian.library.db.model.DeviceApplication;
 import com.ariel.guardian.library.db.model.DeviceLocation;
@@ -41,8 +42,8 @@ public class RealmDatabaseManager implements ArielDatabaseInterface {
         byte[] key = new byte[64];
         new SecureRandom().nextBytes(key);
         final File externalFilesDir = context.getExternalFilesDir(null);
-        Log.i("ABRAKADABRA", "File path: "+externalFilesDir.getAbsolutePath());
-        Log.i("ABRAKADABRA", "Context files dir path: "+context.getFilesDir().getAbsolutePath());
+        Log.i("ABRAKADABRA", "File path: " + externalFilesDir.getAbsolutePath());
+        Log.i("ABRAKADABRA", "Context files dir path: " + context.getFilesDir().getAbsolutePath());
         mRealmConfiguration = new RealmConfiguration.Builder()
                 //.encryptionKey(key)
                 .name("ariel.realm")
@@ -72,8 +73,14 @@ public class RealmDatabaseManager implements ArielDatabaseInterface {
         RealmQuery<DeviceApplication> query = realm.where(DeviceApplication.class);
         query.equalTo("packageName", packageName);
         RealmResults<DeviceApplication> result1 = query.findAll();
-        DeviceApplication deviceApp = realm.copyFromRealm(result1.first());
-        return deviceApp;
+        if (result1 != null && result1.size() == 1) {
+            DeviceApplication deviceApp = realm.copyFromRealm(result1.first());
+            realm.close();
+            return deviceApp;
+        } else {
+            realm.close();
+            return null;
+        }
     }
 
     @Override
@@ -82,7 +89,9 @@ public class RealmDatabaseManager implements ArielDatabaseInterface {
         Realm realm = Realm.getInstance(mRealmConfiguration);
         RealmQuery<DeviceApplication> query = realm.where(DeviceApplication.class);
         RealmResults<DeviceApplication> result1 = query.findAll();
-        return realm.copyFromRealm(result1);
+        List<DeviceApplication> apps = realm.copyFromRealm(result1);
+        realm.close();
+        return apps;
     }
 
     @Override
@@ -108,6 +117,7 @@ public class RealmDatabaseManager implements ArielDatabaseInterface {
         query.equalTo("id", id);
         RealmResults<Configuration> result1 = query.findAll();
         Configuration deviceConfiguration = realm.copyFromRealm(result1.first());
+        realm.close();
         return deviceConfiguration;
     }
 
@@ -119,6 +129,7 @@ public class RealmDatabaseManager implements ArielDatabaseInterface {
         query.equalTo("active", true);
         RealmResults<Configuration> result1 = query.findAll();
         Configuration deviceConfiguration = realm.copyFromRealm(result1.first());
+        realm.close();
         return deviceConfiguration;
     }
 
@@ -139,12 +150,13 @@ public class RealmDatabaseManager implements ArielDatabaseInterface {
 
     @Override
     public DeviceLocation getLocationByID(long id) {
-        Log.i(TAG, "Get location by id: "+id);
+        Log.i(TAG, "Get location by id: " + id);
         Realm realm = Realm.getInstance(mRealmConfiguration);
         RealmQuery<DeviceLocation> query = realm.where(DeviceLocation.class);
         query.equalTo("id", id);
         RealmResults<DeviceLocation> result1 = query.findAll();
         DeviceLocation deviceLocation = realm.copyFromRealm(result1.first());
+        realm.close();
         return deviceLocation;
     }
 
@@ -186,12 +198,13 @@ public class RealmDatabaseManager implements ArielDatabaseInterface {
 
     @Override
     public WrapperMessage getWrapperMessageByID(long id) {
-        Log.i(TAG, "Get wrapper message by id: "+id);
+        Log.i(TAG, "Get wrapper message by id: " + id);
         Realm realm = Realm.getInstance(mRealmConfiguration);
         RealmQuery<WrapperMessage> query = realm.where(WrapperMessage.class);
         query.equalTo("id", id);
         RealmResults<WrapperMessage> result1 = query.findAll();
         WrapperMessage wrapperMessage = realm.copyFromRealm(result1.first());
+        realm.close();
         return wrapperMessage;
     }
 
