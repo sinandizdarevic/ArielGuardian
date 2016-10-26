@@ -20,8 +20,6 @@ public class PubNubService extends Service implements PubNubServiceInterface{
 
     private static final String TAG = "PubNubService";
 
-    public static final String EXTRA_PUBNUB_CHANNEL = "pubnub_channel";
-
     private PubNubManager mPubNubManager;
 
     private boolean mIsRunning;
@@ -34,7 +32,7 @@ public class PubNubService extends Service implements PubNubServiceInterface{
 
         if(!mIsRunning) {
             mPubNubManager = PubNubManager.getInstance(getApplicationContext());
-            subscribeToChannelsWithCallback(new ArielPubNubCallback(getApplicationContext()), intent.getStringExtra(EXTRA_PUBNUB_CHANNEL));
+            addSubscribeCallback(new ArielPubNubCallback(getApplicationContext()));
             mIsRunning = true;
         }
 

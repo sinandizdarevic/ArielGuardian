@@ -7,7 +7,9 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.ariel.guardian.library.Ariel;
 import com.ariel.guardian.library.db.RealmDatabaseManager;
+import com.ariel.guardian.library.db.model.ArielDevice;
 import com.ariel.guardian.library.db.model.Configuration;
 import com.ariel.guardian.library.db.model.DeviceApplication;
 import com.ariel.guardian.library.db.model.DeviceLocation;
@@ -19,6 +21,8 @@ import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
 
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
 
 import static android.content.Context.BIND_AUTO_CREATE;
 
@@ -34,18 +38,29 @@ public class ArielPubNub implements ArielPubNubInterface {
 
     private PubNubServiceInterface mPubNubService;
 
-    private String mPubNubChannel;
+    private String[] mPubNubChannels;
 
     private Context mContext;
 
     private Gson mGson;
 
-    public ArielPubNub(final Context context, final String pubNubChannel){
-        mPubNubChannel = pubNubChannel;
+    public ArielPubNub(final Context context){
         mContext = context;
         mGson = ArielUtilities.getGson();
+
+        List<ArielDevice> devices = RealmDatabaseManager.getInstance(context).getAllDevices();
+        if(devices!=null && devices.size()>0) {
+            mPubNubChannels = new String[devices.size()];
+            Iterator<ArielDevice> devicesIt = devices.iterator();
+            int i = 0;
+            while(devicesIt.hasNext()){
+                ArielDevice device = devicesIt.next();
+                mPubNubChannels[i] = device.getArielChannel();
+                i++;
+            }
+        }
+
         Intent pubNubServiceIntent = new Intent(context, PubNubService.class);
-        pubNubServiceIntent.putExtra(PubNubService.EXTRA_PUBNUB_CHANNEL, mPubNubChannel);
         context.startService(pubNubServiceIntent);
         context.bindService(pubNubServiceIntent, mConnection, BIND_AUTO_CREATE);
     }
@@ -91,12 +106,17 @@ public class ArielPubNub implements ArielPubNubInterface {
 
     @Override
     public void sendMessage(Object commandMessage, PNCallback<PNPublishResult> callback) {
-        mPubNubService.sendMessage(commandMessage, callback, mPubNubChannel);
+        mPubNubService.sendMessage(commandMessage, callback, mPubNubChannels);
     }
 
     @Override
     public void reconnect() {
         mPubNubService.reconnect();
+    }
+
+    @Override
+    public void subscribeToChannels(String... channels) {
+        mPubNubService.subscribeToChannels(channels);
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -108,6 +128,10 @@ public class ArielPubNub implements ArielPubNubInterface {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             PubNubService.PubNubServiceBinder binder = (PubNubService.PubNubServiceBinder) service;
             mPubNubService = binder.getService();
+
+            if(mPubNubChannels!=null && mPubNubChannels.length>0){
+                mPubNubService.subscribeToChannels(mPubNubChannels);
+            }
 
             //mPubNubService.subscribeToChannelsWithCallback(new ArielPubNubCallback(), mPubNubChannel);
         }

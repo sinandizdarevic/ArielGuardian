@@ -27,11 +27,18 @@ public class ArielConstants {
      */
     public static String TYPE_LOCATION_UPDATE = "ariel.intent.action.location.UPDATE";
 
+    /**
+     * WrapperMessage messages and intents
+     */
+    public static String TYPE_WRAPPER_MESSAGE_REPORT = "ariel.intent.action.wrapper.REPORT";
+
 
     /**
      * Local broadcast extras
      */
     public static String EXTRA_DATABASE_ID = "database_id";
+
+
 
 
 }

@@ -17,15 +17,12 @@ public final class Ariel implements ArielInterface {
 
     private static Ariel mInstance;
 
-    private static String mPubNubChannel;
-
     private static Context mApplicationContext;
 
     private static ArielPubNub mPubNub;
 
-    private Ariel(final Context context, final String pubNubChannel){
+    private Ariel(final Context context){
         mApplicationContext = context;
-        mPubNubChannel = pubNubChannel;
         // initialize realm database here
         initDb();
         initReceivers();
@@ -40,12 +37,12 @@ public final class Ariel implements ArielInterface {
     }
 
     private void initPubNub(){
-        mPubNub = new ArielPubNub(mApplicationContext,mPubNubChannel);
+        mPubNub = new ArielPubNub(mApplicationContext);
     }
 
-    public static synchronized void init(final Context context, final String pubNubChannel){
+    public static synchronized void init(final Context context){
         if(mInstance==null) {
-            mInstance = new Ariel(context, pubNubChannel);
+            mInstance = new Ariel(context);
         }
     }
 

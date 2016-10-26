@@ -20,4 +20,6 @@ public interface ArielPubNubInterface {
 
     void reconnect();
 
+    void subscribeToChannels(final String... channels);
+
 }

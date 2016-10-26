@@ -1,5 +1,6 @@
 package com.ariel.guardian.library.db;
 
+import com.ariel.guardian.library.db.model.ArielDevice;
 import com.ariel.guardian.library.db.model.Configuration;
 import com.ariel.guardian.library.db.model.DeviceApplication;
 import com.ariel.guardian.library.db.model.DeviceLocation;
@@ -36,5 +37,9 @@ public interface ArielDatabaseInterface {
     void deleteWrapperMessageByID(final long id);
     void deleteWrapperMessage(final WrapperMessage wrapperMessage);
     WrapperMessage getWrapperMessageByID(final long id);
+
+    // ArielDevice methods
+    void createDevice(final ArielDevice device);
+    List<ArielDevice> getAllDevices();
 
 }

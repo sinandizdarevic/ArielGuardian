@@ -12,6 +12,7 @@ import com.ariel.guardian.command.CommandProducer;
 import com.ariel.guardian.library.Ariel;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
+import com.ariel.guardian.library.db.model.ArielDevice;
 import com.ariel.guardian.library.db.model.Configuration;
 import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.library.utils.ArielUtilities;
@@ -45,11 +46,17 @@ public class GuardianApplication extends Application {
         super.onCreate();
         Log.i(TAG, "GuardianApplication app created");
 
-        Ariel.init(getApplicationContext(),
-                ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
+        Ariel.init(getApplicationContext());
 
-        //if(!SharedPrefsManager.getInstance(this).getBoolPreference(SharedPrefsManager.KEY_FIRST_RUN, false)){
+        if(SharedPrefsManager.getInstance(this).getBoolPreference(SharedPrefsManager.KEY_FIRST_RUN, true)){
             // this is the first run, setup config
+
+            ArielDevice device = new ArielDevice();
+            device.setId(Calendar.getInstance().getTimeInMillis());
+            device.setDeviceUID(ArielUtilities.getUniquePseudoID());
+            device.setArielChannel(ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
+            Ariel.action().database().createDevice(device);
+
             Configuration configuration = new Configuration();
             configuration.setArielSystemStatus(getResources().getInteger(R.integer.ariel_system_status));
             configuration.setConstantTracking(getResources().getBoolean(R.bool.constant_location_tracking));
@@ -57,8 +64,11 @@ public class GuardianApplication extends Application {
             configuration.setActive(getResources().getBoolean(R.bool.configuration_active));
             configuration.setId(Calendar.getInstance().getTimeInMillis());
             Ariel.action().database().createConfiguration(configuration);
+
+            SharedPrefsManager.getInstance(this).setBooleanPrefernece(SharedPrefsManager.KEY_FIRST_RUN, false);
+
             //Ariel.action().pubnub().sendConfigurationMessage(id, ArielConstants.TYPE_DEVICE_CONFIG_UPDATE);
-        //}
+        }
 
         mInstance = this;
 

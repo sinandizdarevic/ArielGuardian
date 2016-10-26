@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ariel.guardian.library.Ariel;
+import com.ariel.guardian.library.db.model.ArielDevice;
 import com.ariel.guardian.library.db.model.Configuration;
 import com.ariel.guardian.library.db.model.DeviceApplication;
 import com.ariel.guardian.library.db.model.DeviceLocation;
@@ -206,6 +207,27 @@ public class RealmDatabaseManager implements ArielDatabaseInterface {
         WrapperMessage wrapperMessage = realm.copyFromRealm(result1.first());
         realm.close();
         return wrapperMessage;
+    }
+
+    @Override
+    public void createDevice(ArielDevice device) {
+        Log.i(TAG, "Create device message with id: " + device.getId());
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        realm.beginTransaction();
+        ArielDevice newDevice = realm.copyToRealmOrUpdate(device);
+        realm.commitTransaction();
+        realm.close();
+    }
+
+    @Override
+    public List<ArielDevice> getAllDevices() {
+        Log.i(TAG, "Get all devices");
+        Realm realm = Realm.getInstance(mRealmConfiguration);
+        RealmQuery<ArielDevice> query = realm.where(ArielDevice.class);
+        RealmResults<ArielDevice> result1 = query.findAll();
+        List<ArielDevice> devices = realm.copyFromRealm(result1);
+        realm.close();
+        return devices;
     }
 
 }

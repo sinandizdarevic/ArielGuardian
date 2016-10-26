@@ -14,8 +14,10 @@ import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.gson.Gson;
 import com.pubnub.api.PubNub;
+import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNStatusCategory;
+import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
@@ -82,7 +84,15 @@ public class ArielPubNubCallback extends SubscribeCallback {
         WrapperMessage currentMessage = parseIncomingMessage(message.getMessage().toString());
 
         if(currentMessage!=null){
-            // its not a message from me, deal with it
+            // its not a message from me, send it back to confirm reception
+            PubNubManager.getInstance(mContext).sendMessage(currentMessage, new PNCallback<PNPublishResult>() {
+                @Override
+                public void onResponse(PNPublishResult result, PNStatus status) {
+
+                }
+            });
+
+            // now deal with it
             if(currentMessage.getType().equals(ArielConstants.TYPE_APPLICATION_ADDED)){
                 // add an app to the realm database
                 DeviceApplication deviceApp = mGson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
