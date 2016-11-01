@@ -33,6 +33,8 @@ import android.util.Log;
 
 import javax.inject.Inject;
 
+
+
 public class DeviceTrackerService extends ArielService implements LocationManager.LocationManagerListener {
 
     private static final String TAG = DeviceTrackerService.class.getSimpleName();
@@ -50,7 +52,7 @@ public class DeviceTrackerService extends ArielService implements LocationManage
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "Service starting");
+        Log.i(TAG,"Service starting");
 
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
 
@@ -72,7 +74,7 @@ public class DeviceTrackerService extends ArielService implements LocationManage
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "Service stopped");
+        Log.i(TAG,"Service stopped");
         mIsRunning = false;
         mLocationManager.stopUpdates();
         mLocationManager = null;
@@ -96,7 +98,7 @@ public class DeviceTrackerService extends ArielService implements LocationManage
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i(TAG, "Got location: " + location.toString());
+        Log.i(TAG,"Got location: " + location.toString());
         //DeviceLocation deviceLocation = new DeviceLocation(location.getTime(), location.getLatitude(), location.getLongitude());
         if (mReportBySms) {
             // // TODO: 29.7.16. send SMS location with google maps URL

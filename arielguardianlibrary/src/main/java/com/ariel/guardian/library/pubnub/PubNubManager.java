@@ -24,9 +24,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 /**
- * Main PubNub manager class. Managed by PubNubService
+ * Main PubNub manager class. Managed by InstanceKeeperService
  */
-public class PubNubManager {
+public final class PubNubManager {
 
     private final String TAG = "PubNubManager";
 
@@ -37,11 +37,15 @@ public class PubNubManager {
 
     private SubscribeCallback mSubscribeListener;
 
-    private static PubNubManager mInstance;
+    private static volatile PubNubManager mInstance;
 
-    public static PubNubManager getInstance(final Context context){
-        if(mInstance == null){
-            mInstance = new PubNubManager(context);
+    public static PubNubManager getInstance(final Context context) {
+        if (mInstance == null) {
+            synchronized (PubNubManager.class) {
+                if (mInstance == null) {
+                    mInstance = new PubNubManager(context);
+                }
+            }
         }
         return mInstance;
     }
@@ -66,7 +70,7 @@ public class PubNubManager {
         pubNubConfig.setSecure(true);
         pubNubConfig.setUuid(ArielUtilities.getUniquePseudoID());
         pubNubConfig.setLogVerbosity(PNLogVerbosity.BODY);
-
+        //pubNubConfig.setConnectTimeout()
         //pubNubConfig.setPresenceTimeout()
 
         pubnub = new PubNub(pubNubConfig);
@@ -119,7 +123,7 @@ public class PubNubManager {
                         // returns a pojo with channels // channel groups which I am part of.
                         Iterator<String> it = result.getChannels().iterator();
                         while (it.hasNext()) {
-                            Log.i("CHANNELS: ", it.next());
+                            Log.i(TAG,"CHANNELS: "+ it.next());
                         }
                     }
                 });
@@ -128,12 +132,12 @@ public class PubNubManager {
     public void subscribeToChannels(String... channels) {
 //        pubnub.unsubscribe().channels(mSubscribedChannels);
 //        mSubscribedChannels.clear();
-        Log.i(TAG, "Subscribing to channels: " + channels.toString());
+        Log.i(TAG,"Subscribing to channels: " + channels.toString());
         pubnub.subscribe().channels(Arrays.asList(channels)).withPresence().execute();
         mSubscribedChannels.addAll(Arrays.asList(channels));
     }
 
-    public void reconnect(){
+    public void reconnect() {
         pubnub.reconnect();
     }
 
@@ -167,7 +171,8 @@ public class PubNubManager {
      * @param channel
      */
     public void sendMessage(final Object message, final PNCallback<PNPublishResult> callback, final String... channels) {
-        if (channels.length > 0) {
+        Log.i("PubNubManager", "ABout to send a message: "+message+" to channel "+channels[0]);
+        if (channels != null && channels.length > 0) {
             for (String channel : channels
                     ) {
                 if (callback != null) {

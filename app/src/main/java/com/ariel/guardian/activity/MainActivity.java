@@ -20,7 +20,10 @@ import java.util.List;
 
 import ariel.security.LockPatternUtilsHelper;
 
+
 public class MainActivity extends AppCompatActivity {
+
+    public static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 //                ApplicationParams ap = new ApplicationParams.ApplicationParamBuilder("com.example.android").build();
 //                Gson gson = new Gson();
 //                String json = gson.toJson(ap);
-//                Log.i("MainActivity", json);
+//                Log.i(TAG,"MainActivity", json);
             }
         });
 
@@ -79,16 +82,16 @@ public class MainActivity extends AppCompatActivity {
                 // LockPatternUtilsHelper.performAdminLock("123qwe", MainActivity.this);
                 byte[] unlockPwd = LockPatternUtilsHelper.getUnlockPassword();
                 if (unlockPwd != null && unlockPwd.length > 0) {
-                    Log.i("MainActivity", "Lock password exists");
+                    Log.i(TAG,"Lock password exists");
                 } else {
-                    Log.i("MainActivity", "No lock password exists");
+                    Log.i(TAG,"No lock password exists");
                 }
 
                 byte[] unlockPattern = LockPatternUtilsHelper.getUnlockPattern();
                 if (unlockPattern != null && unlockPattern.length > 0) {
-                    Log.i("MainActivity", "Lock pattern exists");
+                    Log.i(TAG,"Lock pattern exists");
                 } else {
-                    Log.i("MainActivity", "No lock pattern exists");
+                    Log.i(TAG,"No lock pattern exists");
                 }
             }
         });

@@ -10,13 +10,15 @@ import com.ariel.guardian.GuardianApplication;
 
 import javax.inject.Inject;
 
+
+
 public class ShutdownReceiver extends BroadcastReceiver {
 
     private static final String TAG = "ShutdownReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG, "Shutdown received, should send data ");
+        Log.i(TAG,"Shutdown received, should send data ");
 
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
 

@@ -9,10 +9,14 @@ import com.ariel.guardian.services.ArielJobService;
 
 import java.util.Iterator;
 
+
+
 /**
  * Created by mikalackis on 23.5.16..
  */
 public class ArielJobScheduler {
+
+    public static final String TAG = "ArielJobScheduler";
 
     public static enum ArielJobID{
         LOCATION,
@@ -29,7 +33,7 @@ public class ArielJobScheduler {
     }
 
     public void registerNewJob(final ArielJobService service){
-        Log.i("ArielJobScheduler", "JOB SCHEDULED");
+        Log.i(TAG,"JOB SCHEDULED");
         mJobScheduler.schedule(service.getJobInfo());
     }
 
@@ -37,7 +41,7 @@ public class ArielJobScheduler {
         Iterator<JobInfo> it = mJobScheduler.getAllPendingJobs().iterator();
         while(it.hasNext()){
             JobInfo ji = it.next();
-            Log.i("ArielJobScheduler", "JOB INFO: "+ji.toString());
+            Log.i(TAG,"JOB INFO: "+ji.toString());
         }
     }
 

@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import com.ariel.guardian.command.Command;
 import com.ariel.guardian.command.CommandProducer;
-import com.ariel.guardian.library.Ariel;
+import com.ariel.guardian.library.*;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.library.db.model.ArielDevice;
@@ -25,6 +25,7 @@ import javax.inject.Inject;
 
 import ariel.providers.ArielSettings;
 import ariel.security.LockPatternUtilsHelper;
+
 
 /**
  * @author mikalackis
@@ -44,7 +45,8 @@ public class GuardianApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "GuardianApplication app created");
+
+        Log.i(TAG,"GuardianApplication app created");
 
         Ariel.init(getApplicationContext());
 
@@ -89,6 +91,7 @@ public class GuardianApplication extends Application {
     private void fireServices(){
         Configuration configuration = Ariel.action().database().getActiveConfiguration();
         mJobScheduler.registerNewJob(new DeviceLocationJobService(configuration.getLocationTrackingInterval()));
+        Ariel.action().pubnub().subscribeToChannelsFromDB();
     }
 
     private void prepareDagger() {
@@ -109,7 +112,7 @@ public class GuardianApplication extends Application {
         public void onChange(boolean selfChange, android.net.Uri uri, int userId) {
             int arielSystemStatus = ArielSettings.Secure.getInt(getContentResolver(),
                     ArielSettings.Secure.ARIEL_SYSTEM_STATUS, ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
-            Log.i(TAG, "Ariel system status changed: " + arielSystemStatus);
+            Log.i(TAG,"Ariel system status changed: " + arielSystemStatus);
             switch (arielSystemStatus) {
                 case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_LOCKDOWN: {
                     // // TODO: 29.7.16.

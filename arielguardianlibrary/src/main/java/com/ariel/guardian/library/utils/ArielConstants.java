@@ -9,6 +9,9 @@ public class ArielConstants {
     /**
      * PubNub message types
      */
+    public static String MESSAGE_TYPE_APPLICATION = "ariel.message.application";
+    public static String MESSAGE_TYPE_LOCATION = "ariel.message.location";
+    public static String MESSAGE_TYPE_CONFIGURATION = "ariel.message.configuration";
 
     /**
      * Application messages and intents

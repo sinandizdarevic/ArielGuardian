@@ -8,6 +8,9 @@ import com.ariel.guardian.library.db.model.WrapperMessage;
 
 import java.util.List;
 
+import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
+
 /**
  * Created by mikalackis on 6.10.16..
  */
@@ -37,9 +40,15 @@ public interface ArielDatabaseInterface {
     void deleteWrapperMessageByID(final long id);
     void deleteWrapperMessage(final WrapperMessage wrapperMessage);
     WrapperMessage getWrapperMessageByID(final long id);
+    List<WrapperMessage> getUnsentWrapperMessages();
+    RealmResults<WrapperMessage> getWaitingForExecutionMessages(final String type);
 
     // ArielDevice methods
     void createDevice(final ArielDevice device);
     List<ArielDevice> getAllDevices();
+    ArielDevice getDeviceByID(final String deviceID);
+
+    // Realm methods
+    RealmConfiguration getRealmConfiguration();
 
 }

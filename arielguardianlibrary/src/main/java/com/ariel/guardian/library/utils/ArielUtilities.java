@@ -18,7 +18,6 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import io.realm.RealmObject;
-
 /**
  * Created by mikalackis on 23.5.16..
  * Class holding utility methods used throughout the app
@@ -52,13 +51,13 @@ public class ArielUtilities {
     }
 
     public static String getPubNubArielChannel(final String deviceId) {
-        Log.i(TAG, "Config topic: " + String.format(PUBNUB_ARIEL_CHANNEL, deviceId));
+        Log.i(TAG,"Config topic: " + String.format(PUBNUB_ARIEL_CHANNEL, deviceId));
         return String.format(PUBNUB_ARIEL_CHANNEL, deviceId);
     }
 
     //support multiple devices
 //    public static String getPubNubUserChanel(final String uuid){
-//        Log.i(TAG, "Config topic: "+String.format(PUBNUB_USER_CHANNEL, uuid));
+//        Log.i(TAG,"Config topic: "+String.format(PUBNUB_USER_CHANNEL, uuid));
 //        return String.format(PUBNUB_USER_CHANNEL, uuid);
 //    }
 

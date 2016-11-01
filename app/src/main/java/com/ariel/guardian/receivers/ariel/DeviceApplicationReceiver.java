@@ -11,6 +11,8 @@ import com.ariel.guardian.library.db.model.DeviceApplication;
 import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.services.CreateIFRuleService;
 
+
+
 /**
  * Created by mikalackis on 8.10.16..
  */
@@ -26,7 +28,7 @@ public class DeviceApplicationReceiver extends BroadcastReceiver {
         if (appId != null) {
             DeviceApplication da = Ariel.action().database().getApplicationByID(appId);
 
-            Log.i(TAG, "Received an appID: "+appId+" with status: "+da.isDisabled());
+            Log.i(TAG,"Received an appID: "+appId+" with status: "+da.isDisabled());
 
             GuardianApplication.getInstance().
                     startService(CreateIFRuleService.getCallingIntent

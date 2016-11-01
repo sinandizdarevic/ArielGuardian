@@ -17,16 +17,22 @@ public class WrapperMessage extends RealmObject {
 
     private String sender;
 
-    private String type;
+    private String messageType;
+
+    private String actionType;
 
     private String dataObject;
+
+    private boolean reportReception;
+
+    private boolean sent;
 
     public void setSender(String sender) {
         this.sender = sender;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
     }
 
     public void setDataObject(String dataObject) {
@@ -37,8 +43,8 @@ public class WrapperMessage extends RealmObject {
         return sender;
     }
 
-    public String getType() {
-        return type;
+    public String getActionType() {
+        return actionType;
     }
 
     public String getDataObject() {
@@ -51,5 +57,33 @@ public class WrapperMessage extends RealmObject {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public boolean getReportReception() {
+        return reportReception;
+    }
+
+    public void setReportReception(boolean reportReception) {
+        this.reportReception = reportReception;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
+    }
+
+    public boolean isSent() {
+        return sent;
+    }
+
+    public void setSent(boolean sent) {
+        this.sent = sent;
+    }
+
+    public boolean isReportReception() {
+        return reportReception;
     }
 }

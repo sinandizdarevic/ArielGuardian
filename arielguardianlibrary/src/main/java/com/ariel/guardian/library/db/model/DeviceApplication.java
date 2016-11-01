@@ -1,6 +1,7 @@
 package com.ariel.guardian.library.db.model;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 
 /**
@@ -24,6 +25,12 @@ public class DeviceApplication extends RealmObject {
     private boolean disabled;
 
     private long disabledUntil;
+
+    /**
+     * Used as a helper field to display progress when updating
+     */
+    @Ignore
+    private transient boolean pending;
 
     /**
      * Human readable application name
@@ -68,5 +75,13 @@ public class DeviceApplication extends RealmObject {
 
     public void setUninstalled(boolean uninstalled) {
         this.uninstalled = uninstalled;
+    }
+
+    public boolean isPending() {
+        return pending;
+    }
+
+    public void setPending(boolean pending) {
+        this.pending = pending;
     }
 }

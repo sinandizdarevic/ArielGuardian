@@ -10,6 +10,8 @@ import android.util.Log;
 
 import javax.inject.Inject;
 
+
+
 public class BootReceiver extends BroadcastReceiver {
 
     private static final String TAG = "BootReceiver";
@@ -17,7 +19,7 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG, "Boot received, should send data ");
+        Log.i(TAG,"Boot received, should send data ");
 
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
 

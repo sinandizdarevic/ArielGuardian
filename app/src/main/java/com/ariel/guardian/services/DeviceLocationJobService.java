@@ -38,6 +38,8 @@ import java.util.Calendar;
 
 import javax.inject.Inject;
 
+
+
 public class DeviceLocationJobService extends ArielJobService implements LocationManager.LocationManagerListener {
 
     private static final String TAG = DeviceLocationJobService.class.getSimpleName();
@@ -59,7 +61,7 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
 
     public DeviceLocationJobService(final long locationUpdateInterval){
         super();
-        Log.i(TAG, "Define location job with interval: "+locationUpdateInterval);
+        Log.i(TAG,"Define location job with interval: "+locationUpdateInterval);
         this.locationUpdateInterval=locationUpdateInterval;
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
     }
@@ -67,7 +69,7 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         this.mJobParams = jobParameters;
-        Log.i(TAG, "Location job starting");
+        Log.i(TAG,"Location job starting");
         if (!mIsRunning) {
             mLocationManager = new LocationManager.LocationManagerBuilder(this, this)
                                    .locationAccuracyThreshold(5)
@@ -95,7 +97,7 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i(TAG, "Got location: "+location.toString());
+        Log.i(TAG,"Got location: "+location.toString());
         DeviceLocation loc = new DeviceLocation();
         loc.setLatitude(location.getLatitude());
         loc.setLongitude(location.getLongitude());
@@ -104,7 +106,7 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
         loc.setGoogleMapsUrl(String.format(DeviceLocation.GOOGLE_MAPS_URL,
                 location.getLatitude(), location.getLongitude()));
         Ariel.action().database().createLocation(loc);
-        Ariel.action().pubnub().sendLocationMessage(loc.getId(), ArielConstants.TYPE_LOCATION_UPDATE);
+        Ariel.action().pubnub().sendLocationMessage(loc.getId(), ArielConstants.TYPE_LOCATION_UPDATE, false);
     }
 
     @Override

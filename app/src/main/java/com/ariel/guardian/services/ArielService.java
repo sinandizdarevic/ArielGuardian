@@ -13,10 +13,14 @@ import com.ariel.guardian.library.utils.ArielUtilities;
 
 import javax.inject.Inject;
 
+
+
 /**
  * Created by mikalackis on 8.6.16..
  */
 abstract public class ArielService extends Service {
+
+    public static final String TAG = "ArielService";
 
     private static PowerManager.WakeLock sWakeLock;
 
@@ -50,7 +54,7 @@ abstract public class ArielService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i(getServiceName(), "onDestroy");
+        Log.i(getServiceName(),"onDestroy");
         if (sWakeLock != null && sWakeLock.isHeld()) {
             Log.i(getServiceName(), "sWakeLock existing");
             sWakeLock.release();

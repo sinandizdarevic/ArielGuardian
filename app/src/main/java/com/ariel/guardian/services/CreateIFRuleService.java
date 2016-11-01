@@ -9,6 +9,8 @@ import com.ariel.guardian.GuardianApplication;
 import java.io.File;
 import java.io.FileOutputStream;
 
+
+
 /**
  * Created by mikalackis on 20.7.16..
  */
@@ -40,7 +42,7 @@ public class CreateIFRuleService extends IntentService {
         String packageName = intent.getStringExtra(EXTRA_PACKAGE_NAME);
         boolean status = intent.getBooleanExtra(EXTRA_PACKAGE_STATUS, false);
 
-        Log.i(TAG, "Received intent for "+packageName+" and status "+status);
+        Log.i(TAG,"Received intent for "+packageName+" and status "+status);
 
         if(status){
             // create a rule that will block the app with that package name
@@ -53,7 +55,7 @@ public class CreateIFRuleService extends IntentService {
     }
 
     private void createRuleFile(final String packageName){
-        Log.i(TAG, "Creating rule file");
+        Log.i(TAG,"Creating rule file");
         try {
             File rulesDir = new File(RULES_DIR, String.format(RULE_FILE,packageName));
             FileOutputStream fos = new FileOutputStream(rulesDir);
@@ -69,19 +71,19 @@ public class CreateIFRuleService extends IntentService {
             fos.close();
         }
         catch(Exception e){
-            Log.i(TAG, "Create rule file error");
+            Log.i(TAG,"Create rule file error");
             e.printStackTrace();
         }
     }
 
     private void removeRuleFile(final String packageName){
-        Log.i(TAG, "Removing rule file");
+        Log.i(TAG,"Removing rule file");
         try {
             File rulesDir = new File(RULES_DIR, String.format(RULE_FILE,packageName));
             rulesDir.delete();
         }
         catch(Exception e){
-            Log.i(TAG, "Removing rule file error");
+            Log.i(TAG,"Removing rule file error");
             e.printStackTrace();
         }
     }

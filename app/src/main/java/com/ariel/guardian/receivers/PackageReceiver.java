@@ -12,6 +12,8 @@ import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.services.CreateIFRuleService;
 import com.ariel.guardian.utils.PackageManagerUtilities;
 
+
+
 /**
  * Created by mikalackis on 1.6.16..
  */
@@ -21,7 +23,7 @@ public class PackageReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG, "Package receiver activated: " + intent.getAction() + " packageName: " + intent.getData().getSchemeSpecificPart());
+        Log.i(TAG,"Package receiver activated: " + intent.getAction() + " packageName: " + intent.getData().getSchemeSpecificPart());
 
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
 
@@ -39,7 +41,7 @@ public class PackageReceiver extends BroadcastReceiver {
                                 (deviceApp.getPackageName(), deviceApp.isDisabled()));
                 deviceApp.setUninstalled(false);
                 Ariel.action().database().createOrUpdateApplication(deviceApp);
-                Ariel.action().pubnub().sendApplicationMessage(packageName, ArielConstants.TYPE_APPLICATION_ADDED);
+                Ariel.action().pubnub().sendApplicationMessage(deviceApp, ArielConstants.TYPE_APPLICATION_ADDED, false);
             }
             else{
                 // this is new app, create it in the db
@@ -51,7 +53,7 @@ public class PackageReceiver extends BroadcastReceiver {
                 deviceApplication.setUninstalled(false);
 
                 Ariel.action().database().createOrUpdateApplication(deviceApplication);
-                Ariel.action().pubnub().sendApplicationMessage(packageName, ArielConstants.TYPE_APPLICATION_ADDED);
+                Ariel.action().pubnub().sendApplicationMessage(deviceApplication, ArielConstants.TYPE_APPLICATION_ADDED, false);
             }
         } else if (intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")) {
             // find the app in the database and update its uninstall status
@@ -61,7 +63,7 @@ public class PackageReceiver extends BroadcastReceiver {
                 deviceApp.setUninstalled(true);
 
                 Ariel.action().database().createOrUpdateApplication(deviceApp);
-                Ariel.action().pubnub().sendApplicationMessage(packageName, ArielConstants.TYPE_APPLICATION_REMOVED);
+                Ariel.action().pubnub().sendApplicationMessage(deviceApp, ArielConstants.TYPE_APPLICATION_REMOVED, false);
             }
 
         }
