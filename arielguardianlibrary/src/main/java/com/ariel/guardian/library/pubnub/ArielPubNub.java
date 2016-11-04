@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.database.model.ArielDevice;
+import com.ariel.guardian.library.database.model.ArielMaster;
 import com.ariel.guardian.library.database.model.Configuration;
 import com.ariel.guardian.library.database.model.DeviceApplication;
 import com.ariel.guardian.library.database.model.DeviceLocation;
@@ -19,6 +20,8 @@ import com.pubnub.api.models.consumer.PNPublishResult;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
+
+import io.realm.RealmList;
 
 /**
  * Created by mikalackis on 14.10.16..
@@ -54,6 +57,12 @@ public class ArielPubNub implements ArielPubNubInterface {
         message.setActionType(action);
         message.setMessageType(ArielConstants.MESSAGE_TYPE_APPLICATION);
         message.setDataObject(mGson.toJson(deviceApplication));
+        List<ArielMaster> mastersList = mArielDatabase.getAllMasters();
+        RealmList<ArielMaster> masters = new RealmList<>();
+        if(mastersList!=null && mastersList.size()>0){
+            masters.addAll(mastersList);
+        }
+        message.setMasters(masters);
         message.setReportReception(reportReception);
         mArielDatabase.createWrapperMessage(message);
         return message.getId();

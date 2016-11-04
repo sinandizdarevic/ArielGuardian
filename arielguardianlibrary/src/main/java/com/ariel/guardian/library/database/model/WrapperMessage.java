@@ -1,5 +1,6 @@
 package com.ariel.guardian.library.database.model;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -22,6 +23,8 @@ public class WrapperMessage extends RealmObject {
     private String actionType;
 
     private String dataObject;
+
+    private RealmList<ArielMaster> masters;
 
     private boolean reportReception;
 
@@ -85,5 +88,13 @@ public class WrapperMessage extends RealmObject {
 
     public boolean isReportReception() {
         return reportReception;
+    }
+
+    public RealmList<ArielMaster> getMasters() {
+        return masters;
+    }
+
+    public void setMasters(RealmList<ArielMaster> masters) {
+        this.masters = masters;
     }
 }

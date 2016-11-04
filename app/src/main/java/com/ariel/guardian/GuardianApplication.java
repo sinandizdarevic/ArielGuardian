@@ -3,6 +3,7 @@ package com.ariel.guardian;
 import android.app.Application;
 import android.content.Intent;
 import android.database.ContentObserver;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
@@ -13,6 +14,7 @@ import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.library.database.model.ArielDevice;
+import com.ariel.guardian.library.database.model.ArielMaster;
 import com.ariel.guardian.library.database.model.Configuration;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.library.utils.SharedPrefsManager;
@@ -26,6 +28,8 @@ import javax.inject.Inject;
 
 import ariel.providers.ArielSettings;
 import ariel.security.LockPatternUtilsHelper;
+import io.realm.SyncCredentials;
+import io.realm.SyncUser;
 
 
 /**
@@ -67,6 +71,10 @@ public class GuardianApplication extends Application {
             device.setDeviceUID(ArielUtilities.getUniquePseudoID());
             device.setArielChannel(ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
             mArielDatabase.createDevice(device);
+
+            ArielMaster master = new ArielMaster();
+            master.setDeviceUID("ABVGDDJEZZIJKL");
+            mArielDatabase.createOrUpdateMaster(master);
 
             Configuration configuration = new Configuration();
             configuration.setArielSystemStatus(getResources().getInteger(R.integer.ariel_system_status));

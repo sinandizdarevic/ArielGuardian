@@ -289,7 +289,7 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public void createOrUpdateMaster(ArielMaster master) {
-        Log.i(TAG, "Create device message with id: " + master.getDeviceUID());
+        Log.i(TAG, "Create master device with id: " + master.getDeviceUID());
         Realm realm = realmDatabaseManager.getRealmInstance();
         realm.beginTransaction();
         ArielMaster newMaster = realm.copyToRealmOrUpdate(master);
