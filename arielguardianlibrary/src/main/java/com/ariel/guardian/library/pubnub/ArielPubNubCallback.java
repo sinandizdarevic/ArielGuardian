@@ -2,6 +2,7 @@ package com.ariel.guardian.library.pubnub;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.ariel.guardian.library.database.ArielDatabase;
@@ -13,6 +14,7 @@ import com.ariel.guardian.library.database.model.WrapperMessage;
 import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.gson.Gson;
+import com.google.zxing.WriterException;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNStatusCategory;
@@ -91,6 +93,8 @@ public abstract class ArielPubNubCallback extends SubscribeCallback {
         if (currentMessage != null) {
             // its not a message from me, deal with it
 
+            boolean isArielDevice = false;
+
             // check if the sender is actually an ArielDevice
             ArielDevice arielDevice = mDatabase.getDeviceByID(currentMessage.getSender());
             // if it is ArielDevice, it is some type of report
@@ -98,14 +102,13 @@ public abstract class ArielPubNubCallback extends SubscribeCallback {
                 Log.i(ArielDatabase.TAG,"This message came from an ArielDevice!!");
                 // check if we have a wrapper message of this id locally
                 // remove the local one so that we dont execute the same command again
-                Log.i(ArielDatabase.TAG,"Trying to remove wrapper message with id: "+currentMessage.getId());
-                mDatabase.deleteWrapperMessageByID(currentMessage.getId());
+                isArielDevice = true;
             }
             else{
                 Log.i(ArielDatabase.TAG,"This message is not an ArielDevice");
             }
 
-            RealmObject dataToTransfer = null;
+            Object dataToTransfer = null;
 
             // now deal with it
             if (currentMessage.getActionType().equals(ArielConstants.TYPE_APPLICATION_ADDED)) {
@@ -157,6 +160,18 @@ public abstract class ArielPubNubCallback extends SubscribeCallback {
                 mContext.sendBroadcast(appIntent);
 
                 dataToTransfer = deviceLocation;
+            } else if(currentMessage.getActionType().equals(ArielConstants.TYPE_GET_DEVICE_QR_CODE)){
+                try {
+                    Bitmap qr_code = ArielUtilities.generateDeviceQRCode(ArielUtilities.getUniquePseudoID());
+                    String base64bitmap = ArielUtilities.base64Encode2String(qr_code);
+
+                    dataToTransfer = base64bitmap;
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
+            } else if(currentMessage.getActionType().equals(ArielConstants.TYPE_WRAPPER_MESSAGE_REPORT)){
+                // just a report message, nothing to do except for deleting it
+                Log.i(ArielDatabase.TAG, "This is a report message!");
             }
 
             if (currentMessage.getReportReception()) {
@@ -164,6 +179,7 @@ public abstract class ArielPubNubCallback extends SubscribeCallback {
                 currentMessage.setDataObject(mGson.toJson(dataToTransfer));
                 currentMessage.setReportReception(false);
                 currentMessage.setSender(ArielUtilities.getUniquePseudoID());
+                currentMessage.setActionType(ArielConstants.TYPE_WRAPPER_MESSAGE_REPORT);
                 long id = mPubNub.createWrapperMessage(currentMessage);
                 messageProcessed(id);
             }

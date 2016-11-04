@@ -3,6 +3,10 @@ package com.ariel.guardian.activity;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,7 +16,11 @@ import android.widget.TextView;
 
 import com.ariel.guardian.R;
 import com.ariel.guardian.library.database.model.DeviceApplication;
+import com.ariel.guardian.library.utils.ArielUtilities;
+import com.google.zxing.WriterException;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -23,6 +31,21 @@ import ariel.security.LockPatternUtilsHelper;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "MainActivity";
+
+    private void shareBitmap(Bitmap bitmap, String fileName) {
+        try {
+            String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap,"title", null);
+            Uri screenshotUri = Uri.parse(path);
+            final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(Intent.EXTRA_STREAM, screenshotUri);
+            intent.setType("image/png");
+            startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,20 +62,14 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                try {
+                    Bitmap qr_code = ArielUtilities.generateDeviceQRCode("ABRAKABDARA BREEEE!");
+                    shareBitmap(qr_code, "device_qr_code");
 
-                DeviceApplication app = new DeviceApplication();
-                app.setPackageName("com.google.sava");
-                app.setAppName("Sava");
-                app.setDisabled(false);
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
 
-
-                //LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.getInstance());
-                //ImageView imgView = (ImageView) findViewById(R.id.imageView);
-//                try {
-//                    //imgView.setImageBitmap(ArielLibrary.action().generateDeviceQRCode("SAVA_MIKALACKI"));
-//                } catch (WriterException e) {
-//                    e.printStackTrace();
-//                }
             }
         });
 
@@ -81,16 +98,16 @@ public class MainActivity extends AppCompatActivity {
                 // LockPatternUtilsHelper.performAdminLock("123qwe", MainActivity.this);
                 byte[] unlockPwd = LockPatternUtilsHelper.getUnlockPassword();
                 if (unlockPwd != null && unlockPwd.length > 0) {
-                    Log.i(TAG,"Lock password exists");
+                    Log.i(TAG, "Lock password exists");
                 } else {
-                    Log.i(TAG,"No lock password exists");
+                    Log.i(TAG, "No lock password exists");
                 }
 
                 byte[] unlockPattern = LockPatternUtilsHelper.getUnlockPattern();
                 if (unlockPattern != null && unlockPattern.length > 0) {
-                    Log.i(TAG,"Lock pattern exists");
+                    Log.i(TAG, "Lock pattern exists");
                 } else {
-                    Log.i(TAG,"No lock pattern exists");
+                    Log.i(TAG, "No lock pattern exists");
                 }
             }
         });

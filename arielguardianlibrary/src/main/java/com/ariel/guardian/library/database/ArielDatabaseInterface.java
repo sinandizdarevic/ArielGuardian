@@ -1,6 +1,7 @@
 package com.ariel.guardian.library.database;
 
 import com.ariel.guardian.library.database.model.ArielDevice;
+import com.ariel.guardian.library.database.model.ArielMaster;
 import com.ariel.guardian.library.database.model.Configuration;
 import com.ariel.guardian.library.database.model.DeviceApplication;
 import com.ariel.guardian.library.database.model.DeviceLocation;
@@ -50,5 +51,11 @@ public interface ArielDatabaseInterface {
 
     // Realm methods
     RealmConfiguration getRealmConfiguration();
+
+    // Device master methods
+    void createOrUpdateMaster(final ArielMaster master);
+    void deleteMaster(final ArielMaster master);
+    List<ArielMaster> getAllMasters();
+    ArielMaster getMasterByID(final String uid);
 
 }

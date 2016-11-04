@@ -49,7 +49,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.pubnub:pubnub:4.0.8'
     compile 'com.google.code.gson:gson:2.7'
-    compile 'com.google.zxing:core:3.2.1'
+    compile 'com.google.zxing:core:3.3.0'
     compile 'io.reactivex:rxjava:1.1.6'
 
     compile 'org.parceler:parceler-api:1.1.6'

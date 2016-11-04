@@ -24,11 +24,20 @@ public class ArielConstants {
      * Configuration messages and intents
      */
     public static String TYPE_DEVICE_CONFIG_UPDATE = "ariel.intent.action.device.CONFIG_UPDATE";
+    public static String TYPE_GET_DEVICE_QR_CODE = "ariel.intent.action.device.QR_CODE";
 
     /**
      * DeviceLocation messages and intents
      */
     public static String TYPE_LOCATION_UPDATE = "ariel.intent.action.location.UPDATE";
+
+    /**
+     * Device master messages
+     *
+     */
+    public static String TYPE_ADD_DEVICE_MASTER = "ariel.intent.action.ADD_MASTER";
+    public static String TYPE_REMOVE_DEVICE_MASTER = "ariel.intent.action.REMOVE_MASTER";
+
 
     /**
      * WrapperMessage messages and intents

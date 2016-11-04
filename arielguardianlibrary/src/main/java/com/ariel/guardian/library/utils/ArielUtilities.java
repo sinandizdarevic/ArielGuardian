@@ -1,5 +1,6 @@
 package com.ariel.guardian.library.utils;
 
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.Log;
 
@@ -7,7 +8,13 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.pubnub.api.vendor.Base64;
 
+import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.text.ParseException;
@@ -119,7 +126,7 @@ public class ArielUtilities {
                 .create();
     }
 
-    public static String getEncodedData(final String deviceId, final String cipher, final String secret) {
+    private static String getEncodedData(final String deviceId, final String cipher, final String secret) {
         try {
             AesCbcWithIntegrity.SecretKeys keys = AesCbcWithIntegrity.generateKeyFromPassword(cipher, secret);
             Calendar calendar = Calendar.getInstance();
@@ -139,7 +146,7 @@ public class ArielUtilities {
         }
     }
 
-    public static String getDecodedData(final String cipherTextString, final String cipher, final String secret) {
+    private static String getDecodedData(final String cipherTextString, final String cipher, final String secret) {
         try {
             AesCbcWithIntegrity.SecretKeys keys = AesCbcWithIntegrity.generateKeyFromPassword(cipher, secret);
             AesCbcWithIntegrity.CipherTextIvMac cipherTextIvMac = new AesCbcWithIntegrity.CipherTextIvMac(cipherTextString);
@@ -155,5 +162,46 @@ public class ArielUtilities {
             return null;
         }
     }
+
+    public final static int WHITE = 0xFFFFFFFF;
+    public final static int BLACK = 0xFF000000;
+    public final static int WIDTH = 200;
+    public final static int HEIGHT = 200;
+
+    public static Bitmap generateDeviceQRCode(String str) throws WriterException {
+        BitMatrix result;
+        try {
+            result = new MultiFormatWriter().encode(str, BarcodeFormat.QR_CODE, WIDTH, HEIGHT, null);
+        } catch (IllegalArgumentException iae) {
+            // Unsupported format
+            return null;
+        }
+
+        int width = result.getWidth();
+        int height = result.getHeight();
+        int[] pixels = new int[width * height];
+        for (int y = 0; y < height; y++) {
+            int offset = y * width;
+            for (int x = 0; x < width; x++) {
+                pixels[offset + x] = result.get(x, y) ? BLACK : WHITE;
+            }
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        return bitmap;
+    }
+
+    public static String base64Encode2String(Bitmap bitmap) {
+        return Base64.encodeToString(bitmap2Bytes(bitmap, Bitmap.CompressFormat.PNG), Base64.NO_WRAP);
+    }
+
+    public static byte[] bitmap2Bytes(Bitmap bitmap, Bitmap.CompressFormat format) {
+        if (bitmap == null) return null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(format, 100, baos);
+        return baos.toByteArray();
+    }
+
 
 }

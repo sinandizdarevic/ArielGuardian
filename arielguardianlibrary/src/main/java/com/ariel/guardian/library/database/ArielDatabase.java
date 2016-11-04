@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ariel.guardian.library.database.model.ArielDevice;
+import com.ariel.guardian.library.database.model.ArielMaster;
 import com.ariel.guardian.library.database.model.Configuration;
 import com.ariel.guardian.library.database.model.DeviceApplication;
 import com.ariel.guardian.library.database.model.DeviceLocation;
@@ -28,14 +29,14 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     private RealmDatabaseManager realmDatabaseManager;
 
-    public ArielDatabase(final Context context){
+    public ArielDatabase(final Context context) {
         this.mContext = context;
         realmDatabaseManager = RealmDatabaseManager.getInstance(context);
     }
 
     @Override
     public void createOrUpdateApplication(DeviceApplication deviceApplication) {
-        Log.i(TAG,"Creating application: " + deviceApplication.getPackageName());
+        Log.i(TAG, "Creating application: " + deviceApplication.getPackageName());
         Realm realm = realmDatabaseManager.getRealmInstance();
         realm.beginTransaction();
         DeviceApplication newApp = realm.copyToRealmOrUpdate(deviceApplication);
@@ -45,7 +46,7 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public void deleteApplication(DeviceApplication deviceApplication) {
-        Log.i(TAG,"Removing application: " + deviceApplication.getPackageName());
+        Log.i(TAG, "Removing application: " + deviceApplication.getPackageName());
         Realm realm = realmDatabaseManager.getRealmInstance();
         RealmQuery<DeviceApplication> query = realm.where(DeviceApplication.class);
         query.equalTo("packageName", deviceApplication.getPackageName());
@@ -61,7 +62,7 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public DeviceApplication getApplicationByID(String packageName) {
-        Log.i(TAG,"Get application by id: " + packageName);
+        Log.i(TAG, "Get application by id: " + packageName);
         Realm realm = realmDatabaseManager.getRealmInstance();
         RealmQuery<DeviceApplication> query = realm.where(DeviceApplication.class);
         query.equalTo("packageName", packageName);
@@ -78,7 +79,7 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public List<DeviceApplication> getAllApplications() {
-        Log.i(TAG,"Get all applications");
+        Log.i(TAG, "Get all applications");
         Realm realm = realmDatabaseManager.getRealmInstance();
         RealmQuery<DeviceApplication> query = realm.where(DeviceApplication.class);
         RealmResults<DeviceApplication> result1 = query.findAll();
@@ -89,7 +90,7 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public void createConfiguration(Configuration deviceConfiguration) {
-        Log.i(TAG,"Creating device configuration with id: " + deviceConfiguration.getId());
+        Log.i(TAG, "Creating device configuration with id: " + deviceConfiguration.getId());
         Realm realm = realmDatabaseManager.getRealmInstance();
         realm.beginTransaction();
         Configuration newApp = realm.copyToRealmOrUpdate(deviceConfiguration);
@@ -99,12 +100,12 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public void deleteConfiguration(long id) {
-        Log.i(TAG,"TODO: deleteConfiguration()");
+        Log.i(TAG, "TODO: deleteConfiguration()");
     }
 
     @Override
     public Configuration getConfigurationByID(long id) {
-        Log.i(TAG,"Get configuration by id: " + id);
+        Log.i(TAG, "Get configuration by id: " + id);
         Realm realm = realmDatabaseManager.getRealmInstance();
         RealmQuery<Configuration> query = realm.where(Configuration.class);
         query.equalTo("id", id);
@@ -116,7 +117,7 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public Configuration getActiveConfiguration() {
-        Log.i(TAG,"Get active configuration");
+        Log.i(TAG, "Get active configuration");
         Realm realm = realmDatabaseManager.getRealmInstance();
         RealmQuery<Configuration> query = realm.where(Configuration.class);
         query.equalTo("active", true);
@@ -128,7 +129,7 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public void createLocation(DeviceLocation deviceLocation) {
-        Log.i(TAG,"Create location with id: " + deviceLocation);
+        Log.i(TAG, "Create location with id: " + deviceLocation);
         Realm realm = realmDatabaseManager.getRealmInstance();
         realm.beginTransaction();
         DeviceLocation newApp = realm.copyToRealmOrUpdate(deviceLocation);
@@ -138,12 +139,12 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public void deleteLocation(long id) {
-        Log.i(TAG,"TODO: deleteLocation()");
+        Log.i(TAG, "TODO: deleteLocation()");
     }
 
     @Override
     public DeviceLocation getLocationByID(long id) {
-        Log.i(TAG,"Get location by id: " + id);
+        Log.i(TAG, "Get location by id: " + id);
         Realm realm = realmDatabaseManager.getRealmInstance();
         RealmQuery<DeviceLocation> query = realm.where(DeviceLocation.class);
         query.equalTo("id", id);
@@ -155,60 +156,59 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public DeviceLocation getLastLocation() {
-        Log.i(TAG,"TODO: getLastLocation()");
+        Log.i(TAG, "TODO: getLastLocation()");
         return new DeviceLocation();
     }
 
     @Override
     public void createWrapperMessage(WrapperMessage wrapperMessage) {
-        Log.i(TAG,"Create wrapper message with id: " + wrapperMessage.getId());
+        Log.i(TAG, "Create wrapper message with id: " + wrapperMessage.getId());
         Realm realm = realmDatabaseManager.getRealmInstance();
         realm.beginTransaction();
-        Log.i(TAG, "Number of messages before creation: "+realm.where(WrapperMessage.class).count());
+        Log.i(TAG, "Number of messages before creation: " + realm.where(WrapperMessage.class).count());
         realm.where(WrapperMessage.class).count();
         WrapperMessage newApp = realm.copyToRealmOrUpdate(wrapperMessage);
         realm.commitTransaction();
-        Log.i(TAG, "Number of messages after creation: "+realm.where(WrapperMessage.class).count());
+        Log.i(TAG, "Number of messages after creation: " + realm.where(WrapperMessage.class).count());
         realm.close();
     }
 
     @Override
     public void deleteWrapperMessageByID(long id) {
-        Log.i(TAG,"Delete wrapper message with id: " + id);
+        Log.i(TAG, "Delete wrapper message with id: " + id);
         Realm realm = realmDatabaseManager.getRealmInstance();
-        Log.i(TAG, "Number of messages before delete: "+realm.where(WrapperMessage.class).count());
+        Log.i(TAG, "Number of messages before delete: " + realm.where(WrapperMessage.class).count());
         RealmQuery<WrapperMessage> query = realm.where(WrapperMessage.class);
         query.equalTo("id", id);
         WrapperMessage wrapperMessage = query.findFirst();
-        if(wrapperMessage!=null) {
+        if (wrapperMessage != null) {
             realm.beginTransaction();
-            Log.i(TAG,"Found and deleting wrapper messaage: " + id);
+            Log.i(TAG, "Found and deleting wrapper messaage: " + id);
             wrapperMessage.deleteFromRealm();
             realm.commitTransaction();
         }
-        Log.i(TAG, "Number of messages after delete: "+realm.where(WrapperMessage.class).count());
+        Log.i(TAG, "Number of messages after delete: " + realm.where(WrapperMessage.class).count());
         realm.close();
     }
 
     @Override
     public void deleteWrapperMessage(WrapperMessage wrapperMessage) {
-        Log.i(TAG,"Detelet wrapper message with id: " + wrapperMessage.getId());
+        Log.i(TAG, "Detelet wrapper message with id: " + wrapperMessage.getId());
         deleteWrapperMessageByID(wrapperMessage.getId());
     }
 
     @Override
     public WrapperMessage getWrapperMessageByID(long id) {
-        Log.i(TAG,"Get wrapper message by id: " + id);
+        Log.i(TAG, "Get wrapper message by id: " + id);
         Realm realm = realmDatabaseManager.getRealmInstance();
         RealmQuery<WrapperMessage> query = realm.where(WrapperMessage.class);
         query.equalTo("id", id);
         WrapperMessage message = query.findFirst();
-        if(message!=null) {
+        if (message != null) {
             WrapperMessage wrapperMessage = realm.copyFromRealm(query.findFirst());
             realm.close();
             return wrapperMessage;
-        }
-        else{
+        } else {
             realm.close();
             return null;
         }
@@ -216,13 +216,13 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public List<WrapperMessage> getUnsentWrapperMessages() {
-        Log.i(TAG,"Get all WrapperMessages");
+        Log.i(TAG, "Get all WrapperMessages");
         Realm realm = realmDatabaseManager.getRealmInstance();
         RealmQuery<WrapperMessage> query = realm.where(WrapperMessage.class);
         query.equalTo("sent", false);
         RealmResults<WrapperMessage> result1 = query.findAll();
         List<WrapperMessage> wrapperMessages = null;
-        if(result1!=null) {
+        if (result1 != null) {
             wrapperMessages = realm.copyFromRealm(result1);
         }
         realm.close();
@@ -231,15 +231,14 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public RealmResults<WrapperMessage> getWaitingForExecutionMessages(String messageType) {
-        Log.i(TAG,"getWaitingForExecutionMessages");
+        Log.i(TAG, "getWaitingForExecutionMessages");
         Realm realm = realmDatabaseManager.getRealmInstance();
         RealmQuery<WrapperMessage> query = realm.where(WrapperMessage.class);
         query.equalTo("sent", true).equalTo("messageType", messageType).equalTo("reportReception", true);
         RealmResults<WrapperMessage> result1 = query.findAll();
-        if(result1!=null){
-            Log.i(TAG, "Result size: "+result1.size());
-        }
-        else{
+        if (result1 != null) {
+            Log.i(TAG, "Result size: " + result1.size());
+        } else {
             Log.i(TAG, "Result is null");
         }
         realm.close();
@@ -248,7 +247,7 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public void createDevice(ArielDevice device) {
-        Log.i(TAG,"Create device message with id: " + device.getId());
+        Log.i(TAG, "Create device message with id: " + device.getId());
         Realm realm = realmDatabaseManager.getRealmInstance();
         realm.beginTransaction();
         ArielDevice newDevice = realm.copyToRealmOrUpdate(device);
@@ -258,7 +257,7 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public List<ArielDevice> getAllDevices() {
-        Log.i(TAG,"Get all devices");
+        Log.i(TAG, "Get all devices");
         Realm realm = realmDatabaseManager.getRealmInstance();
         RealmQuery<ArielDevice> query = realm.where(ArielDevice.class);
         RealmResults<ArielDevice> result1 = query.findAll();
@@ -269,16 +268,15 @@ public final class ArielDatabase implements ArielDatabaseInterface {
 
     @Override
     public ArielDevice getDeviceByID(String deviceID) {
-        Log.i(TAG,"Get device by id: "+deviceID);
+        Log.i(TAG, "Get device by id: " + deviceID);
         Realm realm = realmDatabaseManager.getRealmInstance();
         RealmQuery<ArielDevice> query = realm.where(ArielDevice.class);
         query.equalTo("deviceUID", deviceID);
         ArielDevice arielDevice = query.findFirst();
-        if(arielDevice!=null){
-            Log.i(TAG,"Found device: "+arielDevice.getArielChannel());
-        }
-        else{
-            Log.i(TAG,"ArielDevice not found!!!");
+        if (arielDevice != null) {
+            Log.i(TAG, "Found device: " + arielDevice.getArielChannel());
+        } else {
+            Log.i(TAG, "ArielDevice not found!!!");
         }
         realm.close();
         return arielDevice;
@@ -287,5 +285,52 @@ public final class ArielDatabase implements ArielDatabaseInterface {
     @Override
     public RealmConfiguration getRealmConfiguration() {
         return realmDatabaseManager.getRealmConfiguration();
+    }
+
+    @Override
+    public void createOrUpdateMaster(ArielMaster master) {
+        Log.i(TAG, "Create device message with id: " + master.getDeviceUID());
+        Realm realm = realmDatabaseManager.getRealmInstance();
+        realm.beginTransaction();
+        ArielMaster newMaster = realm.copyToRealmOrUpdate(master);
+        realm.commitTransaction();
+        realm.close();
+    }
+
+    @Override
+    public void deleteMaster(ArielMaster master) {
+        Log.i(TAG, "Delete master with id: " + master.getDeviceUID());
+        Realm realm = realmDatabaseManager.getRealmInstance();
+        realm.beginTransaction();
+        master.deleteFromRealm();
+        realm.commitTransaction();
+        realm.close();
+    }
+
+    @Override
+    public List<ArielMaster> getAllMasters() {
+        Log.i(TAG, "Get all masters");
+        Realm realm = realmDatabaseManager.getRealmInstance();
+        RealmQuery<ArielMaster> query = realm.where(ArielMaster.class);
+        RealmResults<ArielMaster> result1 = query.findAll();
+        List<ArielMaster> masters = realm.copyFromRealm(result1);
+        realm.close();
+        return masters;
+    }
+
+    @Override
+    public ArielMaster getMasterByID(String uid) {
+        Log.i(TAG, "Get master by id: " + uid);
+        Realm realm = realmDatabaseManager.getRealmInstance();
+        RealmQuery<ArielMaster> query = realm.where(ArielMaster.class);
+        query.equalTo("deviceUID", uid);
+        ArielMaster arielMaster = query.findFirst();
+        if (arielMaster != null) {
+            Log.i(TAG, "Found master: " + arielMaster.getDeviceUID());
+        } else {
+            Log.i(TAG, "ArielMaster not found!!!");
+        }
+        realm.close();
+        return arielMaster;
     }
 }
