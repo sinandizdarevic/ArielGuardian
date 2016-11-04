@@ -1,18 +1,22 @@
-package com.ariel.guardian.library.services;
+package com.ariel.guardian.sync;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
-import com.ariel.guardian.library.Ariel;
-import com.ariel.guardian.library.db.model.WrapperMessage;
+import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.library.database.ArielDatabase;
+import com.ariel.guardian.library.database.model.WrapperMessage;
 import com.ariel.guardian.library.utils.ArielUtilities;
+import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 
 import java.util.Iterator;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by mikalackis on 7.10.16..
@@ -28,6 +32,18 @@ public class SyncIntentService extends IntentService {
         super("SyncIntentService");
     }
 
+    @Inject
+    ArielDatabase mArielDatabase;
+
+    @Inject
+    ArielPubNub mArielPubNub;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        GuardianApplication.getInstance().getGuardianComponent().inject(this);
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         /**
@@ -38,17 +54,17 @@ public class SyncIntentService extends IntentService {
 
         final long messageId = intent.getLongExtra(EXTRA_MESSAGE_ID, -1);
         if (messageId != -1) {
-            final WrapperMessage message = Ariel.action().database().getWrapperMessageByID(messageId);
-            Log.i(TAG, "DATA TO SEND: " + ArielUtilities.getGson().toJson(message));
+            final WrapperMessage message = mArielDatabase.getWrapperMessageByID(messageId);
+            Log.i(ArielDatabase.TAG, "DATA TO SEND: " + ArielUtilities.getGson().toJson(message));
             sendMessage(message);
         } else {
             // we need to check all the wrapper messages and send them out
-            List<WrapperMessage> wrapperMessages = Ariel.action().database().getUnsentWrapperMessages();
+            List<WrapperMessage> wrapperMessages = mArielDatabase.getUnsentWrapperMessages();
             if (wrapperMessages != null && wrapperMessages.size() > 0) {
                 Iterator<WrapperMessage> itMessages = wrapperMessages.iterator();
                 while (itMessages.hasNext()) {
                     final WrapperMessage message = itMessages.next();
-                    Log.i(TAG, "Sending leftover message: " + ArielUtilities.getGson().toJson(message));
+                    Log.i(ArielDatabase.TAG, "Sending leftover message: " + ArielUtilities.getGson().toJson(message));
                     sendMessage(message);
                 }
             }
@@ -57,29 +73,29 @@ public class SyncIntentService extends IntentService {
     }
 
     private void sendMessage(final WrapperMessage message) {
-        Ariel.action().pubnub().sendMessage(message, new PNCallback<PNPublishResult>() {
+        mArielPubNub.sendMessage(message, new PNCallback<PNPublishResult>() {
             @Override
             public void onResponse(PNPublishResult result, PNStatus status) {
                 if (!status.isError()) {
                     // everything is ok, remove wrapper message from realm
                     if (!message.getReportReception()) {
-                        Log.i(TAG, "Message sent, remove wrapper");
-                        Ariel.action().database().deleteWrapperMessage(message);
+                        Log.i(ArielDatabase.TAG, "Message sent, remove wrapper");
+                        mArielDatabase.deleteWrapperMessage(message);
                     } else {
-                        Log.i(TAG, "Waiting for execution feedback for id: " + message.getId());
+                        Log.i(ArielDatabase.TAG, "Waiting for execution feedback for id: " + message.getId());
                         message.setSent(true);
-                        Ariel.action().database().createWrapperMessage(message);
+                        mArielDatabase.createWrapperMessage(message);
                     }
                 } else {
                     // keep trying until you send the message
                     // this should probably be replaced with some advanced mechanism
-                    Log.i(TAG, "Status is error: " + status.isError());
-                    Log.i(TAG, "Status error details: " + status.getErrorData().getInformation());
-                    Log.i(TAG, "Status error exception: " + status.getErrorData().getThrowable().getMessage());
-                    Log.i(TAG, "Status code: " + status.getStatusCode());
-                    Log.i(TAG, "Message not sent, retry??");
+                    Log.i(ArielDatabase.TAG, "Status is error: " + status.isError());
+                    Log.i(ArielDatabase.TAG, "Status error details: " + status.getErrorData().getInformation());
+                    Log.i(ArielDatabase.TAG, "Status error exception: " + status.getErrorData().getThrowable().getMessage());
+                    Log.i(ArielDatabase.TAG, "Status code: " + status.getStatusCode());
+                    Log.i(ArielDatabase.TAG, "Message not sent, retry??");
                     message.setSent(false);
-                    Ariel.action().database().createWrapperMessage(message);
+                    mArielDatabase.createWrapperMessage(message);
                     status.retry();
                 }
             }
@@ -87,7 +103,7 @@ public class SyncIntentService extends IntentService {
     }
 
     public static Intent getSyncIntent(final long messageId) {
-        Intent appIntent = new Intent(Ariel.getMyApplicationContext(), SyncIntentService.class);
+        Intent appIntent = new Intent(GuardianApplication.getInstance(), SyncIntentService.class);
         appIntent.putExtra(EXTRA_MESSAGE_ID, messageId);
         return appIntent;
     }

@@ -150,7 +150,7 @@
     public *;
  }
 -keep public class com.ariel.guardian.library.ArielLibraryInterface { public static *;}
--keep public class com.ariel.guardian.pubnub.listeners.pubnub.ArielPNCallback     { public protected *; }
+-keep public class com.ariel.guardian.sync.pubnub.listeners.pubnub.ArielPNCallback     { public protected *; }
 -keep public class com.ariel.guardian.library.utils.ArielUtilities     { public protected *; }
 
 -keep class * extends com.raizlabs.android.dbflow.config.DatabaseHolder { *; }

@@ -1,10 +1,10 @@
-package com.ariel.guardian.library.db;
+package com.ariel.guardian.library.database;
 
-import com.ariel.guardian.library.db.model.ArielDevice;
-import com.ariel.guardian.library.db.model.Configuration;
-import com.ariel.guardian.library.db.model.DeviceApplication;
-import com.ariel.guardian.library.db.model.DeviceLocation;
-import com.ariel.guardian.library.db.model.WrapperMessage;
+import com.ariel.guardian.library.database.model.ArielDevice;
+import com.ariel.guardian.library.database.model.Configuration;
+import com.ariel.guardian.library.database.model.DeviceApplication;
+import com.ariel.guardian.library.database.model.DeviceLocation;
+import com.ariel.guardian.library.database.model.WrapperMessage;
 
 import java.util.List;
 

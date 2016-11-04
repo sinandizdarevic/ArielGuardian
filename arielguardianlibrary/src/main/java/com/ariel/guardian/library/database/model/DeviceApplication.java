@@ -1,4 +1,4 @@
-package com.ariel.guardian.library.db.model;
+package com.ariel.guardian.library.database.model;
 
 import io.realm.RealmObject;
 import io.realm.annotations.Ignore;

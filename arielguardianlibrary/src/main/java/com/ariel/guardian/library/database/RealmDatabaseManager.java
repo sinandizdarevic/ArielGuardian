@@ -1,4 +1,4 @@
-package com.ariel.guardian.library.db;
+package com.ariel.guardian.library.database;
 
 import android.content.Context;
 import android.util.Log;
@@ -43,7 +43,6 @@ public final class RealmDatabaseManager {
         mRealmConfiguration = new RealmConfiguration.Builder()
                 //.encryptionKey(key)
                 .name("ariel.realm")
-                .modules(new ArielLibraryModule())
                 .build();
     }
 

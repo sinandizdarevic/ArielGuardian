@@ -183,6 +183,13 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name="receivers.NetworkChangeReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
         <receiver android:name=".receivers.ariel.DeviceApplicationReceiver" >
             <intent-filter>
                 <action android:name="ariel.intent.action.application.ADD" />
@@ -198,6 +205,12 @@
         <service android:name=".services.CreateIFRuleService"></service>
 
         <service android:name=".services.DeviceTrackerService"></service>
+
+        <!-- sync mechanism services -->
+        <service android:name="com.ariel.guardian.sync.InstanceKeeperService"
+            ></service>
+
+        <service android:enabled="true" android:name="com.ariel.guardian.sync.SyncIntentService" />
 
     </application>
 

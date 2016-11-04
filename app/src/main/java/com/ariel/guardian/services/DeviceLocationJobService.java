@@ -19,12 +19,14 @@ package com.ariel.guardian.services;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.ArielJobScheduler;
-import com.ariel.guardian.library.Ariel;
+import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.report.ReportParams;
-import com.ariel.guardian.library.db.model.DeviceLocation;
+import com.ariel.guardian.library.database.model.DeviceLocation;
 import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.library.utils.ArielUtilities;
+import com.ariel.guardian.library.pubnub.ArielPubNub;
+import com.ariel.guardian.sync.SyncIntentService;
 import com.ariel.guardian.utils.LocationManager;
 import com.google.android.gms.common.ConnectionResult;
 
@@ -54,6 +56,12 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
 
     @Inject
     GuardianApplication mApplication;
+
+    @Inject
+    ArielDatabase mArielDatabase;
+
+    @Inject
+    ArielPubNub mArielPubNub;
 
     public DeviceLocationJobService(){
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
@@ -105,8 +113,9 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
         loc.setId(Calendar.getInstance().getTimeInMillis());
         loc.setGoogleMapsUrl(String.format(DeviceLocation.GOOGLE_MAPS_URL,
                 location.getLatitude(), location.getLongitude()));
-        Ariel.action().database().createLocation(loc);
-        Ariel.action().pubnub().sendLocationMessage(loc.getId(), ArielConstants.TYPE_LOCATION_UPDATE, false);
+        mArielDatabase.createLocation(loc);
+        long id = mArielPubNub.createLocationMessage(loc.getId(), ArielConstants.TYPE_LOCATION_UPDATE, false);
+        mApplication.startService(SyncIntentService.getSyncIntent(id));
     }
 
     @Override

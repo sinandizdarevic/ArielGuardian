@@ -1,13 +1,13 @@
-package com.ariel.guardian.library.db;
+package com.ariel.guardian.library.database;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.ariel.guardian.library.db.model.ArielDevice;
-import com.ariel.guardian.library.db.model.Configuration;
-import com.ariel.guardian.library.db.model.DeviceApplication;
-import com.ariel.guardian.library.db.model.DeviceLocation;
-import com.ariel.guardian.library.db.model.WrapperMessage;
+import com.ariel.guardian.library.database.model.ArielDevice;
+import com.ariel.guardian.library.database.model.Configuration;
+import com.ariel.guardian.library.database.model.DeviceApplication;
+import com.ariel.guardian.library.database.model.DeviceLocation;
+import com.ariel.guardian.library.database.model.WrapperMessage;
 
 import java.util.List;
 
@@ -164,8 +164,11 @@ public final class ArielDatabase implements ArielDatabaseInterface {
         Log.i(TAG,"Create wrapper message with id: " + wrapperMessage.getId());
         Realm realm = realmDatabaseManager.getRealmInstance();
         realm.beginTransaction();
+        Log.i(TAG, "Number of messages before creation: "+realm.where(WrapperMessage.class).count());
+        realm.where(WrapperMessage.class).count();
         WrapperMessage newApp = realm.copyToRealmOrUpdate(wrapperMessage);
         realm.commitTransaction();
+        Log.i(TAG, "Number of messages after creation: "+realm.where(WrapperMessage.class).count());
         realm.close();
     }
 
@@ -173,6 +176,7 @@ public final class ArielDatabase implements ArielDatabaseInterface {
     public void deleteWrapperMessageByID(long id) {
         Log.i(TAG,"Delete wrapper message with id: " + id);
         Realm realm = realmDatabaseManager.getRealmInstance();
+        Log.i(TAG, "Number of messages before delete: "+realm.where(WrapperMessage.class).count());
         RealmQuery<WrapperMessage> query = realm.where(WrapperMessage.class);
         query.equalTo("id", id);
         WrapperMessage wrapperMessage = query.findFirst();
@@ -182,6 +186,7 @@ public final class ArielDatabase implements ArielDatabaseInterface {
             wrapperMessage.deleteFromRealm();
             realm.commitTransaction();
         }
+        Log.i(TAG, "Number of messages after delete: "+realm.where(WrapperMessage.class).count());
         realm.close();
     }
 

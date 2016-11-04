@@ -1,8 +1,9 @@
 package com.ariel.guardian;
 
 
-import android.app.Application;
-import android.support.v4.content.LocalBroadcastManager;
+import com.ariel.guardian.library.database.ArielDatabase;
+import com.ariel.guardian.library.pubnub.ArielPubNub;
+import com.ariel.guardian.sync.PubNubCallback;
 
 import javax.inject.Singleton;
 
@@ -32,6 +33,22 @@ public class GuardianModule {
     public ArielJobScheduler providesArielJobScheduler() {
         ArielJobScheduler pnManager = new ArielJobScheduler(mApplication);
         return pnManager;
+    }
+
+    @Provides
+    @Singleton
+    public ArielDatabase providesArielDatabase() {
+        ArielDatabase arielDatabase = new ArielDatabase(mApplication);
+        return arielDatabase;
+    }
+
+    @Provides
+    @Singleton
+    public ArielPubNub providesArielPubNub() {
+        ArielPubNub arielPubNub = new ArielPubNub(mApplication, providesArielDatabase());
+        PubNubCallback callback = new PubNubCallback(mApplication, providesArielDatabase(), arielPubNub);
+        arielPubNub.addSubscribeCallback(callback);
+        return arielPubNub;
     }
 
 }

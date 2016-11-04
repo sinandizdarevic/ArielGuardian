@@ -6,11 +6,12 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.Ariel;
-import com.ariel.guardian.library.db.model.DeviceApplication;
+import com.ariel.guardian.library.database.ArielDatabase;
+import com.ariel.guardian.library.database.model.DeviceApplication;
 import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.services.CreateIFRuleService;
 
+import javax.inject.Inject;
 
 
 /**
@@ -21,12 +22,17 @@ public class DeviceApplicationReceiver extends BroadcastReceiver {
 
     private static final String TAG = "DeviceApplicationReceiver";
 
+    @Inject
+    ArielDatabase mArielDatabase;
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        GuardianApplication.getInstance().getGuardianComponent().inject(this);
+
         String appId = intent.getStringExtra(ArielConstants.EXTRA_DATABASE_ID);
         if (appId != null) {
-            DeviceApplication da = Ariel.action().database().getApplicationByID(appId);
+            DeviceApplication da = mArielDatabase.getApplicationByID(appId);
 
             Log.i(TAG,"Received an appID: "+appId+" with status: "+da.isDisabled());
 

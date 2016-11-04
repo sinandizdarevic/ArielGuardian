@@ -1,12 +1,15 @@
-package com.ariel.guardian.library.services;
+package com.ariel.guardian.sync;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.ariel.guardian.library.db.RealmDatabaseManager;
-import com.ariel.guardian.library.pubnub.PubNubManager;
+import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.library.database.ArielDatabase;
+import com.ariel.guardian.library.pubnub.ArielPubNub;
+
+import javax.inject.Inject;
 
 /**
  * Class responsible for managing PubNubManager instance.
@@ -15,10 +18,21 @@ public class InstanceKeeperService extends Service{
 
     private static final String TAG = "InstanceKeeperService";
 
-    private PubNubManager mPubNubManager;
-    private RealmDatabaseManager mRealmDatabaseManager;
+    private ArielPubNub mArielPubnub;
 
     private boolean mIsRunning;
+
+    @Inject
+    ArielPubNub mArielPubNub;
+
+    @Inject
+    ArielDatabase mArielDatabase;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        GuardianApplication.getInstance().getGuardianComponent().inject(this);
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -26,8 +40,7 @@ public class InstanceKeeperService extends Service{
 
         if(!mIsRunning) {
             Log.i(TAG,"InstanceKeeper not running");
-            mPubNubManager = PubNubManager.getInstance(getApplicationContext());
-            mRealmDatabaseManager = RealmDatabaseManager.getInstance(getApplicationContext());
+            mArielPubNub.reconnect();
             mIsRunning = true;
         }
         else{
@@ -41,8 +54,7 @@ public class InstanceKeeperService extends Service{
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG,"InstanceKeeperService destroyed");
-        mPubNubManager.cleanUp();
-        mRealmDatabaseManager.cleanUp();
+        //arielPubNub.cleanUp();
         mIsRunning = false;
     }
 

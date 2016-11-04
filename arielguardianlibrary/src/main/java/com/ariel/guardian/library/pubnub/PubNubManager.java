@@ -4,9 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ariel.guardian.library.BuildConfig;
-import com.ariel.guardian.library.R;
 import com.ariel.guardian.library.commands.CommandMessage;
-import com.ariel.guardian.library.utils.SharedPrefsManager;
+import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
@@ -20,8 +19,8 @@ import com.pubnub.api.models.consumer.presence.PNWhereNowResult;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Main PubNub manager class. Managed by InstanceKeeperService
@@ -37,20 +36,7 @@ public final class PubNubManager {
 
     private SubscribeCallback mSubscribeListener;
 
-    private static volatile PubNubManager mInstance;
-
-    public static PubNubManager getInstance(final Context context) {
-        if (mInstance == null) {
-            synchronized (PubNubManager.class) {
-                if (mInstance == null) {
-                    mInstance = new PubNubManager(context);
-                }
-            }
-        }
-        return mInstance;
-    }
-
-    private PubNubManager(final Context context) {
+    public PubNubManager(final Context context) {
         mSubscribedChannels = new ArrayList<>();
         if (pubnub != null) {
             cleanUp();
@@ -123,16 +109,21 @@ public final class PubNubManager {
                         // returns a pojo with channels // channel groups which I am part of.
                         Iterator<String> it = result.getChannels().iterator();
                         while (it.hasNext()) {
-                            Log.i(TAG,"CHANNELS: "+ it.next());
+                            Log.i(TAG, "CHANNELS: " + it.next());
                         }
                     }
                 });
     }
 
     public void subscribeToChannels(String... channels) {
-//        pubnub.unsubscribe().channels(mSubscribedChannels);
-//        mSubscribedChannels.clear();
-        Log.i(TAG,"Subscribing to channels: " + channels.toString());
+        Log.i(TAG, "Subscribing to channels: " + channels.toString());
+        List<String> currentChannels = pubnub.getSubscribedChannels();
+        for (String channel : channels) {
+            if(currentChannels.contains(channel)){
+                // dont subscribe to same channel again
+                return;
+            }
+        }
         pubnub.subscribe().channels(Arrays.asList(channels)).withPresence().execute();
         mSubscribedChannels.addAll(Arrays.asList(channels));
     }
@@ -170,15 +161,19 @@ public final class PubNubManager {
      * @param command
      * @param channel
      */
-    public void sendMessage(final Object message, final PNCallback<PNPublishResult> callback, final String... channels) {
-        Log.i("PubNubManager", "ABout to send a message: "+message+" to channel "+channels[0]);
-        if (channels != null && channels.length > 0) {
-            for (String channel : channels
-                    ) {
-                if (callback != null) {
-                    pubnub.publish().channel(channel).message(message).async(callback);
-                } else {
-                    pubnub.publish().channel(channel).message(message);
+    public void sendMessage(final Object message, final PNCallback<PNPublishResult> callback) {
+        if (mSubscribedChannels != null && mSubscribedChannels.size() > 0) {
+            String[] channels = mSubscribedChannels.toArray(new String[mSubscribedChannels.size()]);
+            if (channels != null && channels.length > 0) {
+                Log.i(ArielDatabase.TAG, "Sending message: " + message);
+                for (String channel : channels
+                        ) {
+                    Log.i(ArielDatabase.TAG, "To channel: " + channel);
+                    if (callback != null) {
+                        pubnub.publish().channel(channel).message(message).async(callback);
+                    } else {
+                        pubnub.publish().channel(channel).message(message);
+                    }
                 }
             }
         }

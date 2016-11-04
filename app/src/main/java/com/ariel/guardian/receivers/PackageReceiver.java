@@ -6,12 +6,15 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.Ariel;
-import com.ariel.guardian.library.db.model.DeviceApplication;
+import com.ariel.guardian.library.database.ArielDatabase;
+import com.ariel.guardian.library.database.model.DeviceApplication;
 import com.ariel.guardian.library.utils.ArielConstants;
+import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.services.CreateIFRuleService;
+import com.ariel.guardian.sync.SyncIntentService;
 import com.ariel.guardian.utils.PackageManagerUtilities;
 
+import javax.inject.Inject;
 
 
 /**
@@ -20,6 +23,12 @@ import com.ariel.guardian.utils.PackageManagerUtilities;
 public class PackageReceiver extends BroadcastReceiver {
 
     private static final String TAG = PackageReceiver.class.getSimpleName();
+
+    @Inject
+    ArielDatabase mArielDatabase;
+
+    @Inject
+    ArielPubNub mArielPubNub;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -31,8 +40,7 @@ public class PackageReceiver extends BroadcastReceiver {
 
         if (intent.getAction().equals("android.intent.action.PACKAGE_ADDED")) {
             // check if app already exists in database
-            DeviceApplication deviceApp = Ariel.action().
-                    database().getApplicationByID(packageName);
+            DeviceApplication deviceApp = mArielDatabase.getApplicationByID(packageName);
             if (deviceApp != null) {
                 // good, we had this app before
                 // perform block check and set it to installed
@@ -40,8 +48,9 @@ public class PackageReceiver extends BroadcastReceiver {
                         startService(CreateIFRuleService.getCallingIntent
                                 (deviceApp.getPackageName(), deviceApp.isDisabled()));
                 deviceApp.setUninstalled(false);
-                Ariel.action().database().createOrUpdateApplication(deviceApp);
-                Ariel.action().pubnub().sendApplicationMessage(deviceApp, ArielConstants.TYPE_APPLICATION_ADDED, false);
+                mArielDatabase.createOrUpdateApplication(deviceApp);
+                long id = mArielPubNub.createApplicationMessage(deviceApp, ArielConstants.TYPE_APPLICATION_ADDED, true);
+                context.startService(SyncIntentService.getSyncIntent(id));
             }
             else{
                 // this is new app, create it in the db
@@ -52,18 +61,19 @@ public class PackageReceiver extends BroadcastReceiver {
                 deviceApplication.setDisabled(false);
                 deviceApplication.setUninstalled(false);
 
-                Ariel.action().database().createOrUpdateApplication(deviceApplication);
-                Ariel.action().pubnub().sendApplicationMessage(deviceApplication, ArielConstants.TYPE_APPLICATION_ADDED, false);
+                mArielDatabase.createOrUpdateApplication(deviceApplication);
+                long id = mArielPubNub.createApplicationMessage(deviceApplication, ArielConstants.TYPE_APPLICATION_ADDED, true);
+                context.startService(SyncIntentService.getSyncIntent(id));
             }
         } else if (intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")) {
             // find the app in the database and update its uninstall status
-            DeviceApplication deviceApp = Ariel.action().database()
-                    .getApplicationByID(packageName);
+            DeviceApplication deviceApp = mArielDatabase.getApplicationByID(packageName);
             if(deviceApp!=null) {
                 deviceApp.setUninstalled(true);
 
-                Ariel.action().database().createOrUpdateApplication(deviceApp);
-                Ariel.action().pubnub().sendApplicationMessage(deviceApp, ArielConstants.TYPE_APPLICATION_REMOVED, false);
+                mArielDatabase.createOrUpdateApplication(deviceApp);
+                long id = mArielPubNub.createApplicationMessage(deviceApp, ArielConstants.TYPE_APPLICATION_REMOVED, true);
+                context.startService(SyncIntentService.getSyncIntent(id));
             }
 
         }

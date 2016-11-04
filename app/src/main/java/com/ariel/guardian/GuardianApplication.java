@@ -1,23 +1,24 @@
 package com.ariel.guardian;
 
 import android.app.Application;
+import android.content.Intent;
 import android.database.ContentObserver;
 import android.os.Handler;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.ariel.guardian.command.Command;
 import com.ariel.guardian.command.CommandProducer;
-import com.ariel.guardian.library.*;
+import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
-import com.ariel.guardian.library.db.model.ArielDevice;
-import com.ariel.guardian.library.db.model.Configuration;
-import com.ariel.guardian.library.utils.ArielConstants;
+import com.ariel.guardian.library.database.model.ArielDevice;
+import com.ariel.guardian.library.database.model.Configuration;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.library.utils.SharedPrefsManager;
+import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.services.DeviceLocationJobService;
+import com.ariel.guardian.sync.InstanceKeeperService;
 
 import java.util.Calendar;
 
@@ -42,13 +43,21 @@ public class GuardianApplication extends Application {
     @Inject
     ArielJobScheduler mJobScheduler;
 
+    @Inject
+    ArielDatabase mArielDatabase;
+
+    @Inject
+    ArielPubNub mArielPubNub;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
+        mInstance = this;
+
         Log.i(TAG,"GuardianApplication app created");
 
-        Ariel.init(getApplicationContext());
+        prepareDagger();
 
         if(SharedPrefsManager.getInstance(this).getBoolPreference(SharedPrefsManager.KEY_FIRST_RUN, true)){
             // this is the first run, setup config
@@ -57,7 +66,7 @@ public class GuardianApplication extends Application {
             device.setId(Calendar.getInstance().getTimeInMillis());
             device.setDeviceUID(ArielUtilities.getUniquePseudoID());
             device.setArielChannel(ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
-            Ariel.action().database().createDevice(device);
+            mArielDatabase.createDevice(device);
 
             Configuration configuration = new Configuration();
             configuration.setArielSystemStatus(getResources().getInteger(R.integer.ariel_system_status));
@@ -65,20 +74,16 @@ public class GuardianApplication extends Application {
             configuration.setLocationTrackingInterval(getResources().getInteger(R.integer.location_tracking_interval));
             configuration.setActive(getResources().getBoolean(R.bool.configuration_active));
             configuration.setId(Calendar.getInstance().getTimeInMillis());
-            Ariel.action().database().createConfiguration(configuration);
+            mArielDatabase.createConfiguration(configuration);
 
             SharedPrefsManager.getInstance(this).setBooleanPrefernece(SharedPrefsManager.KEY_FIRST_RUN, false);
 
             //Ariel.action().pubnub().sendConfigurationMessage(id, ArielConstants.TYPE_DEVICE_CONFIG_UPDATE);
         }
 
-        mInstance = this;
-
         getContentResolver().registerContentObserver(
                 ArielSettings.Secure.getUriFor(ArielSettings.Secure.ARIEL_SYSTEM_STATUS),
                 false, mSettingObserver);
-
-        prepareDagger();
 
         fireServices();
 
@@ -89,9 +94,15 @@ public class GuardianApplication extends Application {
     }
 
     private void fireServices(){
-        Configuration configuration = Ariel.action().database().getActiveConfiguration();
+        Configuration configuration = mArielDatabase.getActiveConfiguration();
         mJobScheduler.registerNewJob(new DeviceLocationJobService(configuration.getLocationTrackingInterval()));
-        Ariel.action().pubnub().subscribeToChannelsFromDB();
+        //mArielPubNub.subscribeToChannelsFromDB();
+
+        // start instance keeper
+        Intent instanceKeeper = new Intent(this, InstanceKeeperService.class);
+        startService(instanceKeeper);
+
+        mArielPubNub.subscribeToChannelsFromDB();
     }
 
     private void prepareDagger() {

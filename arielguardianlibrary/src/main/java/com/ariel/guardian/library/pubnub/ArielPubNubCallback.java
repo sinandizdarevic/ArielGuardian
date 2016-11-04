@@ -4,23 +4,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.ariel.guardian.library.Ariel;
-import com.ariel.guardian.library.db.ArielDatabase;
-import com.ariel.guardian.library.db.model.ArielDevice;
-import com.ariel.guardian.library.db.model.Configuration;
-import com.ariel.guardian.library.db.model.DeviceApplication;
-import com.ariel.guardian.library.db.model.DeviceLocation;
-import com.ariel.guardian.library.db.model.WrapperMessage;
-import com.ariel.guardian.library.receiver.NetworkChangeReceiver;
-import com.ariel.guardian.library.services.SyncIntentService;
+import com.ariel.guardian.library.database.ArielDatabase;
+import com.ariel.guardian.library.database.model.ArielDevice;
+import com.ariel.guardian.library.database.model.Configuration;
+import com.ariel.guardian.library.database.model.DeviceApplication;
+import com.ariel.guardian.library.database.model.DeviceLocation;
+import com.ariel.guardian.library.database.model.WrapperMessage;
 import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.gson.Gson;
 import com.pubnub.api.PubNub;
-import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNStatusCategory;
-import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
@@ -30,7 +25,7 @@ import io.realm.RealmObject;
 /**
  * Created by mikalackis on 4.7.16..
  */
-public class ArielPubNubCallback extends SubscribeCallback {
+public abstract class ArielPubNubCallback extends SubscribeCallback {
 
     private final String TAG = "ArielPubNubCallback";
 
@@ -47,13 +42,16 @@ public class ArielPubNubCallback extends SubscribeCallback {
         this.mPubNub = pubnub;
     }
 
+    protected abstract void pubnubConnected();
+
+    protected abstract void messageProcessed(long messageID);
+
     @Override
     public void status(PubNub pubnub, PNStatus status) {
         Log.i(TAG,"Status: " + status.getStatusCode());
         if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
             // internet got lost, do some magic and call reconnect when ready
             Log.i(TAG,"Internet got lost");
-            PubNubUtilities.getInstance().registerNetworkListener();
         } else if (status.getCategory() == PNStatusCategory.PNTimeoutCategory) {
             // do some magic and call reconnect when ready
             Log.i(TAG,"TIMEOUT");
@@ -63,7 +61,7 @@ public class ArielPubNubCallback extends SubscribeCallback {
             /**
              * Check WrapperMessage realm if there are messages to be sent
              */
-            mContext.startService(SyncIntentService.getSyncIntent(-1));
+            pubnubConnected();
             //log.error(status)
         } else {
             Log.i(TAG,"SOMETHING!!!! HAPPENED0!!!: " + status.getStatusCode());
@@ -87,7 +85,7 @@ public class ArielPubNubCallback extends SubscribeCallback {
 
     @Override
     public void message(PubNub pubnub, PNMessageResult message) {
-        Log.i(TAG,"Received pubnub message: " + message.getMessage().toString() + " on channel: " + message.getSubscribedChannel());
+        Log.i(ArielDatabase.TAG,"Received pubnub message: " + message.getMessage().toString() + " on channel: " + message.getSubscribedChannel());
         WrapperMessage currentMessage = parseIncomingMessage(message.getMessage().toString());
 
         if (currentMessage != null) {
@@ -97,11 +95,14 @@ public class ArielPubNubCallback extends SubscribeCallback {
             ArielDevice arielDevice = mDatabase.getDeviceByID(currentMessage.getSender());
             // if it is ArielDevice, it is some type of report
             if (arielDevice != null) {
-                Log.i(TAG,"This message came from an ArielDevice!!");
+                Log.i(ArielDatabase.TAG,"This message came from an ArielDevice!!");
                 // check if we have a wrapper message of this id locally
                 // remove the local one so that we dont execute the same command again
-                Log.i(TAG,"Trying to remove wrapper message with id: "+currentMessage.getId());
+                Log.i(ArielDatabase.TAG,"Trying to remove wrapper message with id: "+currentMessage.getId());
                 mDatabase.deleteWrapperMessageByID(currentMessage.getId());
+            }
+            else{
+                Log.i(ArielDatabase.TAG,"This message is not an ArielDevice");
             }
 
             RealmObject dataToTransfer = null;
@@ -115,9 +116,7 @@ public class ArielPubNubCallback extends SubscribeCallback {
                 appIntent.setAction(ArielConstants.TYPE_APPLICATION_ADDED);
                 appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, deviceApp.getPackageName());
                 mContext.sendBroadcast(appIntent);
-
                 dataToTransfer = deviceApp;
-
             }
             if (currentMessage.getActionType().equals(ArielConstants.TYPE_APPLICATION_UPDATED)) {
                 // add an app to the realm database
@@ -161,14 +160,19 @@ public class ArielPubNubCallback extends SubscribeCallback {
             }
 
             if (currentMessage.getReportReception()) {
-                // send the message with the new object
+                Log.i(ArielDatabase.TAG,"This message requires report reception");
                 currentMessage.setDataObject(mGson.toJson(dataToTransfer));
                 currentMessage.setReportReception(false);
                 currentMessage.setSender(ArielUtilities.getUniquePseudoID());
-                mPubNub.sendWrapperMessage(currentMessage);
+                long id = mPubNub.createWrapperMessage(currentMessage);
+                messageProcessed(id);
+            }
+            else{
+                Log.i(ArielDatabase.TAG,"This message does not require report reception");
+                mDatabase.deleteWrapperMessageByID(currentMessage.getId());
             }
         } else {
-            Log.i(TAG,"This was my message so ignore it");
+            Log.i(ArielDatabase.TAG,"This was my message so ignore it");
             // my message or a parsing error, needs to be handled
         }
 

@@ -55,6 +55,9 @@ dependencies {
     compile 'javax.inject:javax.inject:1'
     compile project(':arielguardianlibrary')
 
+    compile 'org.parceler:parceler-api:1.1.6'
+    apt 'org.parceler:parceler:1.1.6'
+
 }
 
 //apply plugin: 'com.google.gms.google-services'

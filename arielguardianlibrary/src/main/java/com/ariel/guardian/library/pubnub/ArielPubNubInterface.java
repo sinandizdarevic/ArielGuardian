@@ -1,8 +1,9 @@
 package com.ariel.guardian.library.pubnub;
 
-import com.ariel.guardian.library.db.model.DeviceApplication;
-import com.ariel.guardian.library.db.model.WrapperMessage;
+import com.ariel.guardian.library.database.model.DeviceApplication;
+import com.ariel.guardian.library.database.model.WrapperMessage;
 import com.pubnub.api.callbacks.PNCallback;
+import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
 
 /**
@@ -12,13 +13,13 @@ import com.pubnub.api.models.consumer.PNPublishResult;
 public interface ArielPubNubInterface {
 
     // pubnub methods
-    void sendApplicationMessage(final DeviceApplication application, final String action, final boolean reportReception);
+    long createApplicationMessage(final DeviceApplication application, final String action, final boolean reportReception);
 
-    void sendLocationMessage(final long locationId, final String action, final boolean reportReception);
+    long createLocationMessage(final long locationId, final String action, final boolean reportReception);
 
-    void sendWrapperMessage(final WrapperMessage message);
+    long createConfigurationMessage(final long configID, final String action, final boolean reportReception);
 
-    void sendConfigurationMessage(final long configID, final String action, final boolean reportReception);
+    long createWrapperMessage(final WrapperMessage message);
 
     void sendMessage(final Object commandMessage, final PNCallback<PNPublishResult> callback);
 
@@ -27,5 +28,7 @@ public interface ArielPubNubInterface {
     void subscribeToChannels(final String... channels);
 
     void subscribeToChannelsFromDB();
+
+    void addSubscribeCallback(final SubscribeCallback callback);
 
 }
