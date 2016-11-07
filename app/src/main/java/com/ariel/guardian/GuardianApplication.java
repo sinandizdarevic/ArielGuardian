@@ -28,9 +28,6 @@ import javax.inject.Inject;
 
 import ariel.providers.ArielSettings;
 import ariel.security.LockPatternUtilsHelper;
-import io.realm.SyncCredentials;
-import io.realm.SyncUser;
-
 
 /**
  * @author mikalackis
