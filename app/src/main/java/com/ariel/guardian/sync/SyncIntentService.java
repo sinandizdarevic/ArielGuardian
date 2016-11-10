@@ -78,14 +78,13 @@ public class SyncIntentService extends IntentService {
             public void onResponse(PNPublishResult result, PNStatus status) {
                 if (!status.isError()) {
                     // everything is ok, remove wrapper message from realm
-                    if (!message.getReportReception()) {
-                        Log.i(ArielDatabase.TAG, "Message sent, remove wrapper");
-                        mArielDatabase.deleteWrapperMessage(message);
-                    } else {
-                        Log.i(ArielDatabase.TAG, "Waiting for execution feedback for id: " + message.getId());
-                        message.setSent(true);
-                        mArielDatabase.createWrapperMessage(message);
-                    }
+                    Log.i(ArielDatabase.TAG, "Message sent, remove wrapper");
+                    // this part of code should be on parent side
+//                    message.setSent(true);
+//                    mArielDatabase.createWrapperMessage(message);
+
+                    // since im an ArielDevice, i need to remove the message
+                    mArielDatabase.deleteWrapperMessageByID(message.getId());
                 } else {
                     // keep trying until you send the message
                     // this should probably be replaced with some advanced mechanism
@@ -94,8 +93,6 @@ public class SyncIntentService extends IntentService {
                     Log.i(ArielDatabase.TAG, "Status error exception: " + status.getErrorData().getThrowable().getMessage());
                     Log.i(ArielDatabase.TAG, "Status code: " + status.getStatusCode());
                     Log.i(ArielDatabase.TAG, "Message not sent, retry??");
-                    message.setSent(false);
-                    mArielDatabase.createWrapperMessage(message);
                     status.retry();
                 }
             }

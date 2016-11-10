@@ -31,4 +31,6 @@ public interface ArielPubNubInterface {
 
     void addSubscribeCallback(final SubscribeCallback callback);
 
+    void getMissedMessages();
+
 }

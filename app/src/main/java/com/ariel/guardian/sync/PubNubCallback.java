@@ -32,13 +32,8 @@ public class PubNubCallback extends ArielPubNubCallback {
     @Override
     protected void pubnubConnected() {
         Log.i(TAG, "invoking pubnubConnected");
+        // send any remaining messages
         mContext.startService(SyncIntentService.getSyncIntent(-1));
-    }
-
-    @Override
-    protected void messageProcessed(long messageID) {
-        Log.i(TAG, "invoking messageProcessed for messageID: "+messageID);
-        mContext.startService(SyncIntentService.getSyncIntent(messageID));
     }
 
 }

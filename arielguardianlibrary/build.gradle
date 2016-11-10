@@ -47,7 +47,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.pubnub:pubnub:4.0.8'
+    compile 'com.pubnub:pubnub:4.2.0'
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.google.zxing:core:3.3.0'
     compile 'io.reactivex:rxjava:1.1.6'

@@ -14,6 +14,8 @@ public class SharedPrefsManager {
 
     public static final String KEY_FIRST_RUN="key_first_run";
 
+    public static final String KEY_LAST_PUBNUB_MESSAGE = "key_last_pubnub_message";
+
     private static SharedPrefsManager sInstance;
 
     private SharedPreferences mSharedPreferences;
@@ -40,6 +42,16 @@ public class SharedPrefsManager {
     public void setBooleanPrefernece(final String key, final boolean value) {
         final SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putBoolean(key, value);
+        editor.commit();
+    }
+
+    public long getLongPreferences(final String key, final long defaultValue) {
+        return mSharedPreferences.getLong(key, defaultValue);
+    }
+
+    public void setLongPreferences(final String key, final long value) {
+        final SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putLong(key, value);
         editor.commit();
     }
 

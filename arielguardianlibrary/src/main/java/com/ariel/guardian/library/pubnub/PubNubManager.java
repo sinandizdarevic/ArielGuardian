@@ -7,6 +7,7 @@ import com.ariel.guardian.library.BuildConfig;
 import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.utils.ArielUtilities;
+import com.ariel.guardian.library.utils.SharedPrefsManager;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
@@ -14,6 +15,8 @@ import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNLogVerbosity;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.history.PNHistoryItemResult;
+import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.presence.PNWhereNowResult;
 
 import java.lang.ref.WeakReference;
@@ -21,13 +24,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Main PubNub manager class. Managed by InstanceKeeperService
  */
 public final class PubNubManager {
 
-    private final String TAG = "PubNubManager";
+    public static final String TAG = "PubNubManager";
 
     private PubNub pubnub = null;
     private WeakReference<Context> refContext;
@@ -68,6 +72,10 @@ public final class PubNubManager {
 //            restoreChannelSubscription();
 //        }
 
+    }
+
+    public PubNub getPubnub(){
+        return pubnub;
     }
 
     /**
@@ -119,14 +127,16 @@ public final class PubNubManager {
         Log.i(TAG, "Subscribing to channels: " + channels.toString());
         List<String> currentChannels = pubnub.getSubscribedChannels();
         for (String channel : channels) {
-            if(currentChannels.contains(channel)){
+            if (currentChannels.contains(channel)) {
                 // dont subscribe to same channel again
                 return;
             }
         }
         pubnub.subscribe().channels(Arrays.asList(channels)).withPresence().execute();
         mSubscribedChannels.addAll(Arrays.asList(channels));
+
     }
+
 
     public void reconnect() {
         pubnub.reconnect();

@@ -13,6 +13,7 @@ import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.library.database.model.ArielDevice;
+import com.ariel.guardian.library.database.model.ArielMaster;
 import com.ariel.guardian.library.database.model.Configuration;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.library.utils.SharedPrefsManager;
@@ -68,6 +69,10 @@ public class GuardianApplication extends Application {
             device.setArielChannel(ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
             mArielDatabase.createDevice(device);
 
+            ArielMaster masterDevice = new ArielMaster();
+            masterDevice.setDeviceUID("00000000-738d-4550-ffff-ffffe203cca2");
+            mArielDatabase.createOrUpdateMaster(masterDevice);
+
             Configuration configuration = new Configuration();
             configuration.setArielSystemStatus(getResources().getInteger(R.integer.ariel_system_status));
             configuration.setConstantTracking(getResources().getBoolean(R.bool.constant_location_tracking));
@@ -103,6 +108,8 @@ public class GuardianApplication extends Application {
         startService(instanceKeeper);
 
         mArielPubNub.subscribeToChannelsFromDB();
+
+        //mArielPubNub.getMissedMessages();
     }
 
     private void prepareDagger() {

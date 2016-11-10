@@ -114,7 +114,7 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
         loc.setGoogleMapsUrl(String.format(DeviceLocation.GOOGLE_MAPS_URL,
                 location.getLatitude(), location.getLongitude()));
         mArielDatabase.createLocation(loc);
-        long id = mArielPubNub.createLocationMessage(loc.getId(), ArielConstants.TYPE_LOCATION_UPDATE, false);
+        long id = mArielPubNub.createLocationMessage(loc.getId(), ArielConstants.ACTIONS.LOCATION_UPDATE, false);
         mApplication.startService(SyncIntentService.getSyncIntent(id));
     }
 
