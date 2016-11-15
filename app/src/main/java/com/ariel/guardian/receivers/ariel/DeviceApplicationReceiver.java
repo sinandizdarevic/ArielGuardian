@@ -10,9 +10,9 @@ import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.database.model.DeviceApplication;
 import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.services.CreateIFRuleService;
+import com.orhanobut.logger.Logger;
 
 import javax.inject.Inject;
-
 
 /**
  * Created by mikalackis on 8.10.16..
@@ -34,11 +34,15 @@ public class DeviceApplicationReceiver extends BroadcastReceiver {
         if (appId != null) {
             DeviceApplication da = mArielDatabase.getApplicationByID(appId);
 
-            Log.i(TAG,"Received an appID: "+appId+" with status: "+da.isDisabled());
+            Logger.d("Received an appID: "+appId+" with status: "+da.isDisabled());
+
+            // check until field and create an alarm that will enable the app
+            // once the time is set
 
             GuardianApplication.getInstance().
                     startService(CreateIFRuleService.getCallingIntent
                             (da.getPackageName(), da.isDisabled()));
+
         }
 
     }

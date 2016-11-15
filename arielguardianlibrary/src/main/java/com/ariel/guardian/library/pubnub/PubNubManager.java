@@ -8,6 +8,7 @@ import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.library.utils.SharedPrefsManager;
+import com.orhanobut.logger.Logger;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
@@ -117,14 +118,14 @@ public final class PubNubManager {
                         // returns a pojo with channels // channel groups which I am part of.
                         Iterator<String> it = result.getChannels().iterator();
                         while (it.hasNext()) {
-                            Log.i(TAG, "CHANNELS: " + it.next());
+                            Logger.d( "CHANNELS: " + it.next());
                         }
                     }
                 });
     }
 
     public void subscribeToChannels(String... channels) {
-        Log.i(TAG, "Subscribing to channels: " + channels.toString());
+        Logger.d("Subscribing to channels: ", channels);
         List<String> currentChannels = pubnub.getSubscribedChannels();
         for (String channel : channels) {
             if (currentChannels.contains(channel)) {
@@ -175,10 +176,10 @@ public final class PubNubManager {
         if (mSubscribedChannels != null && mSubscribedChannels.size() > 0) {
             String[] channels = mSubscribedChannels.toArray(new String[mSubscribedChannels.size()]);
             if (channels != null && channels.length > 0) {
-                Log.i(ArielDatabase.TAG, "Sending message: " + message);
+                Logger.d(ArielDatabase.TAG, "Sending message: " + message);
                 for (String channel : channels
                         ) {
-                    Log.i(ArielDatabase.TAG, "To channel: " + channel);
+                    Logger.d(ArielDatabase.TAG, "To channel: " + channel);
                     if (callback != null) {
                         pubnub.publish().channel(channel).message(message).async(callback);
                     } else {

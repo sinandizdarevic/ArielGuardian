@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
+import com.orhanobut.logger.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,7 +43,7 @@ public class CreateIFRuleService extends IntentService {
         String packageName = intent.getStringExtra(EXTRA_PACKAGE_NAME);
         boolean status = intent.getBooleanExtra(EXTRA_PACKAGE_STATUS, false);
 
-        Log.i(TAG,"Received intent for "+packageName+" and status "+status);
+        Logger.d("Received intent for "+packageName+" and status "+status);
 
         if(status){
             // create a rule that will block the app with that package name
@@ -55,7 +56,7 @@ public class CreateIFRuleService extends IntentService {
     }
 
     private void createRuleFile(final String packageName){
-        Log.i(TAG,"Creating rule file");
+        Logger.d("Creating rule file");
         try {
             File rulesDir = new File(RULES_DIR, String.format(RULE_FILE,packageName));
             FileOutputStream fos = new FileOutputStream(rulesDir);
@@ -71,19 +72,19 @@ public class CreateIFRuleService extends IntentService {
             fos.close();
         }
         catch(Exception e){
-            Log.i(TAG,"Create rule file error");
+            Logger.d("Create rule file error");
             e.printStackTrace();
         }
     }
 
     private void removeRuleFile(final String packageName){
-        Log.i(TAG,"Removing rule file");
+        Logger.d("Removing rule file");
         try {
             File rulesDir = new File(RULES_DIR, String.format(RULE_FILE,packageName));
             rulesDir.delete();
         }
         catch(Exception e){
-            Log.i(TAG,"Removing rule file error");
+            Logger.d("Removing rule file error");
             e.printStackTrace();
         }
     }

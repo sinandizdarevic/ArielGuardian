@@ -1,6 +1,7 @@
 package com.ariel.guardian;
 
 
+import com.ariel.guardian.command.CommandProducer;
 import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.sync.PubNubCallback;
@@ -40,6 +41,13 @@ public class GuardianModule {
     public ArielDatabase providesArielDatabase() {
         ArielDatabase arielDatabase = new ArielDatabase(mApplication);
         return arielDatabase;
+    }
+
+    @Provides
+    @Singleton
+    public CommandProducer providesCommandProducer() {
+        CommandProducer commandProducer = new CommandProducer(mApplication);
+        return commandProducer;
     }
 
     @Provides

@@ -24,6 +24,7 @@ import com.ariel.guardian.library.commands.location.LocationCommands;
 import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.utils.LocationManager;
 import com.google.android.gms.common.ConnectionResult;
+import com.orhanobut.logger.Logger;
 
 import android.content.Intent;
 import android.location.Location;
@@ -52,7 +53,7 @@ public class DeviceTrackerService extends ArielService implements LocationManage
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG,"Service starting");
+        Logger.d("Service starting");
 
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
 
@@ -74,7 +75,7 @@ public class DeviceTrackerService extends ArielService implements LocationManage
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i(TAG,"Service stopped");
+        Logger.d("Service stopped");
         mIsRunning = false;
         mLocationManager.stopUpdates();
         mLocationManager = null;
@@ -98,7 +99,7 @@ public class DeviceTrackerService extends ArielService implements LocationManage
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i(TAG,"Got location: " + location.toString());
+        Logger.d("Got location: " + location.toString());
         //DeviceLocation deviceLocation = new DeviceLocation(location.getTime(), location.getLatitude(), location.getLongitude());
         if (mReportBySms) {
             // // TODO: 29.7.16. send SMS location with google maps URL

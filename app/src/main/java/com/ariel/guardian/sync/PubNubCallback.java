@@ -8,6 +8,8 @@ import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.library.pubnub.ArielPubNubCallback;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.gson.Gson;
+import com.orhanobut.logger.Logger;
+
 /**
  * Created by mikalackis on 4.7.16..
  */
@@ -31,7 +33,7 @@ public class PubNubCallback extends ArielPubNubCallback {
 
     @Override
     protected void pubnubConnected() {
-        Log.i(TAG, "invoking pubnubConnected");
+        Logger.d( "invoking pubnubConnected");
         // send any remaining messages
         mContext.startService(SyncIntentService.getSyncIntent(-1));
     }

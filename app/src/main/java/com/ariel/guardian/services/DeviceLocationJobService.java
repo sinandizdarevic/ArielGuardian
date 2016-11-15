@@ -29,6 +29,7 @@ import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.sync.SyncIntentService;
 import com.ariel.guardian.utils.LocationManager;
 import com.google.android.gms.common.ConnectionResult;
+import com.orhanobut.logger.Logger;
 
 import android.app.job.JobInfo;
 import android.app.job.JobParameters;
@@ -69,7 +70,7 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
 
     public DeviceLocationJobService(final long locationUpdateInterval){
         super();
-        Log.i(TAG,"Define location job with interval: "+locationUpdateInterval);
+        Logger.d("Define location job with interval: "+locationUpdateInterval);
         this.locationUpdateInterval=locationUpdateInterval;
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
     }
@@ -77,7 +78,7 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         this.mJobParams = jobParameters;
-        Log.i(TAG,"Location job starting");
+        Logger.d("Location job starting");
         if (!mIsRunning) {
             mLocationManager = new LocationManager.LocationManagerBuilder(this, this)
                                    .locationAccuracyThreshold(5)
@@ -105,7 +106,7 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i(TAG,"Got location: "+location.toString());
+        Logger.d("Got location: "+location.toString());
         DeviceLocation loc = new DeviceLocation();
         loc.setLatitude(location.getLatitude());
         loc.setLongitude(location.getLongitude());

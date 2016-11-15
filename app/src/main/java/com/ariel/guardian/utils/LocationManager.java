@@ -12,6 +12,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.orhanobut.logger.Logger;
 
 import java.lang.ref.WeakReference;
 
@@ -48,7 +49,7 @@ public class LocationManager implements LocationListener,
     private int mUpdateCount = 0;
 
     public void initAndStartLocationUpdates() {
-        Log.i(TAG,"LocationManager initializing...");
+        Logger.d("LocationManager initializing...");
         final Context context = mContext.get();
         if(context!=null) {
             final ContentResolver contentResolver = context.getContentResolver();
@@ -65,7 +66,7 @@ public class LocationManager implements LocationListener,
 
             buildGoogleApiClient();
         }
-        Log.i(TAG,"LocationManager started!");
+        Logger.d("LocationManager started!");
     }
 
     /**
@@ -84,7 +85,7 @@ public class LocationManager implements LocationListener,
     }
 
     private void restartLocationUpdates() {
-        Log.i(TAG,"Starting location updates");
+        Logger.d("Starting location updates");
         mUpdateCount = 0;
         Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (lastLocation != null) {
@@ -134,7 +135,7 @@ public class LocationManager implements LocationListener,
     public void onConnectionSuspended(int cause) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
-        Log.i(TAG,"Connection suspended");
+        Logger.d("Connection suspended");
         mGoogleApiClient.connect();
     }
 
@@ -144,11 +145,11 @@ public class LocationManager implements LocationListener,
         if (!constantReporting) {
             if ((mUpdateCount != 0)
                     && (accuracy <= locationAccuracyThreshold || mUpdateCount == maxLocationUpdates)) {
-                Log.i(TAG,"Stopping updates");
+                Logger.d("Stopping updates");
                 stopUpdates();
             }
         } else {
-            Log.i(TAG,"Constant reporting in progress");
+            Logger.d("Constant reporting in progress");
         }
     }
 

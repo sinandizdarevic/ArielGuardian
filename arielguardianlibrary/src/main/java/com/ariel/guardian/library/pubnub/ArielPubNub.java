@@ -3,7 +3,6 @@ package com.ariel.guardian.library.pubnub;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.database.model.ArielDevice;
@@ -17,6 +16,7 @@ import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.library.utils.SharedPrefsManager;
 import com.google.gson.Gson;
 import com.google.zxing.WriterException;
+import com.orhanobut.logger.Logger;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
@@ -125,10 +125,10 @@ public class ArielPubNub implements ArielPubNubInterface {
     @Override
     public void subscribeToChannelsFromDB() {
         if(mPubNubChannels!=null && mPubNubChannels.length>0){
-            Log.i(TAG, "Already subscribed to channels");
+            Logger.d("Already subscribed to channels");
         }
         else{
-            Log.i(TAG, "Not subscribed to channels, do it now");
+            Logger.d("Not subscribed to channels, do it now");
             mPubNubChannels = getChannelsFromDatabase();
 
             if (mPubNubChannels != null) {
@@ -165,7 +165,7 @@ public class ArielPubNub implements ArielPubNubInterface {
             int i = 0;
             while (devicesIt.hasNext()) {
                 ArielDevice device = devicesIt.next();
-                Log.i(ArielDatabase.TAG, "Adding channel from missed messages: " + device.getArielChannel() + " with index: "+i);
+                Logger.d("Adding channel from missed messages: " + device.getArielChannel() + " with index: "+i);
                 dbChannels[i] = device.getArielChannel();
                 i++;
             }
@@ -177,8 +177,8 @@ public class ArielPubNub implements ArielPubNubInterface {
     @Override
     public void getMissedMessages() {
         long lastMessage = SharedPrefsManager.getInstance(mContext).getLongPreferences(SharedPrefsManager.KEY_LAST_PUBNUB_MESSAGE, -1);
-        Log.i(TAG, "Last message time: "+lastMessage);
-        Log.i(TAG, "Current time: "+System.currentTimeMillis());
+        Logger.d( "Last message time: "+lastMessage);
+        Logger.d( "Current time: "+System.currentTimeMillis());
 
         String[] channels = getChannelsFromDatabase();
 
@@ -199,20 +199,20 @@ public class ArielPubNub implements ArielPubNubInterface {
                                         if(message!=null){
                                             processPubNubMessage(message);
                                         }
-                                        Log.i(TAG, "HIstory message time: "+item.getTimetoken());
-                                        Log.i(TAG, "HIstory message: "+item.getEntry().toString());
+                                        Logger.d( "HIstory message time: "+item.getTimetoken());
+                                        Logger.d( "HIstory message: "+item.getEntry().toString());
                                     }
                                     subscribeToChannelsFromDB();
                                 }
                                 else{
-                                    Log.i(TAG, "No old messages");
+                                    Logger.d( "No old messages");
                                     subscribeToChannelsFromDB();
                                 }
                             }
                         });
             }
         } else{
-            Log.i(TAG, "No old messages");
+            Logger.d( "No old messages");
             subscribeToChannelsFromDB();
         }
     }
@@ -222,30 +222,30 @@ public class ArielPubNub implements ArielPubNubInterface {
         // check if the sender is actually an ArielDevice
         ArielDevice arielDevice = mArielDatabase.getDeviceByID(currentMessage.getSender());
         if (arielDevice != null) {
-            Log.i(TAG, "This message came from an ArielDevice!!");
+            Logger.d( "This message came from an ArielDevice!!");
             messageForMasterDevice(currentMessage);
         } else {
             // Checking if the sender is the ArielMaster device.
             ArielMaster arielMaster = mArielDatabase.getMasterByID(currentMessage.getSender());
             if (arielMaster != null) {
-                Log.i(TAG, "This message came from an ArielMaster!!");
+                Logger.d( "This message came from an ArielMaster!!");
                 // this was a message from the ArielMaster device, deal with it
                 // First, check if I am a master device
                 ArielMaster amIMaster = mArielDatabase.getMasterByID(ArielUtilities.getUniquePseudoID());
                 if (amIMaster != null) {
-                    Log.i(TAG, "I'm also a master device");
+                    Logger.d( "I'm also a master device");
                     // I'm also a master device and the message was from master device, so store the data
                     // and store the wrappermessage which will be deleted on report
                     messageForMasterDevice(currentMessage);
                     currentMessage.setSent(true);
                     mArielDatabase.createWrapperMessage(currentMessage);
                 } else {
-                    Log.i(TAG, "I'm an ArielDevice!");
+                    Logger.d( "I'm an ArielDevice!");
                     messageForArielDevice(currentMessage);
                 }
 
             } else {
-                Log.i(TAG, "This is weird, unknown message???");
+                Logger.d( "This is weird, unknown message???");
             }
         }
     }
@@ -382,7 +382,7 @@ public class ArielPubNub implements ArielPubNubInterface {
             public void onResponse(PNPublishResult result, PNStatus status) {
                 if (!status.isError()) {
                     // everything is ok, remove wrapper message from realm
-                    Log.i(ArielDatabase.TAG, "Message sent, remove wrapper");
+                    Logger.i("Message sent, remove wrapper");
                     // this part of code should be on parent side
 //                    message.setSent(true);
 //                    mArielDatabase.createWrapperMessage(message);
@@ -392,11 +392,11 @@ public class ArielPubNub implements ArielPubNubInterface {
                 } else {
                     // keep trying until you send the message
                     // this should probably be replaced with some advanced mechanism
-                    Log.i(ArielDatabase.TAG, "Status is error: " + status.isError());
-                    Log.i(ArielDatabase.TAG, "Status error details: " + status.getErrorData().getInformation());
-                    Log.i(ArielDatabase.TAG, "Status error exception: " + status.getErrorData().getThrowable().getMessage());
-                    Log.i(ArielDatabase.TAG, "Status code: " + status.getStatusCode());
-                    Log.i(ArielDatabase.TAG, "Message not sent, retry??");
+                    Logger.i("Status is error: " + status.isError());
+                    Logger.i("Status error details: " + status.getErrorData().getInformation());
+                    Logger.i("Status error exception: " + status.getErrorData().getThrowable().getMessage());
+                    Logger.i("Status code: " + status.getStatusCode());
+                    Logger.i("Message not sent, retry??");
                     status.retry();
                 }
             }
@@ -407,7 +407,7 @@ public class ArielPubNub implements ArielPubNubInterface {
 
 
 //            if (currentMessage.getReportReception()) {
-//                Log.i(ArielDatabase.TAG,"This message requires report reception");
+//                Logger.d(ArielDatabase.TAG,"This message requires report reception");
 //                currentMessage.setDataObject(mGson.toJson(dataToTransfer));
 //                currentMessage.setReportReception(false);
 //                currentMessage.setSender(ArielUtilities.getUniquePseudoID());
@@ -416,7 +416,7 @@ public class ArielPubNub implements ArielPubNubInterface {
 //                messageProcessed(id);
 //            }
 //            else{
-//                Log.i(ArielDatabase.TAG,"This message does not require report reception");
+//                Logger.d(ArielDatabase.TAG,"This message does not require report reception");
 //                mDatabase.deleteWrapperMessageByID(currentMessage.getId());
 //            }
 

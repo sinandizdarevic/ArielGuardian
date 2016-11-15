@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
+import com.orhanobut.logger.Logger;
 
 import javax.inject.Inject;
 
@@ -18,7 +19,7 @@ public class ShutdownReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG,"Shutdown received, should send data ");
+        Logger.d("Shutdown received, should send data ");
 
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
 

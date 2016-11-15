@@ -198,6 +198,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".receivers.ariel.DeviceConfigReceiver" >
+            <intent-filter>
+                <action android:name="ariel.intent.action.device.CONFIG_UPDATE" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".services.DeviceLocationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />

@@ -18,6 +18,7 @@ import com.ariel.guardian.R;
 import com.ariel.guardian.library.database.model.DeviceApplication;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.zxing.WriterException;
+import com.orhanobut.logger.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 //                ApplicationParams ap = new ApplicationParams.ApplicationParamBuilder("com.example.android").build();
 //                Gson gson = new Gson();
 //                String json = gson.toJson(ap);
-//                Log.i(TAG,"MainActivity", json);
+//                Logger.d("MainActivity", json);
             }
         });
 
@@ -98,16 +99,16 @@ public class MainActivity extends AppCompatActivity {
                 // LockPatternUtilsHelper.performAdminLock("123qwe", MainActivity.this);
                 byte[] unlockPwd = LockPatternUtilsHelper.getUnlockPassword();
                 if (unlockPwd != null && unlockPwd.length > 0) {
-                    Log.i(TAG, "Lock password exists");
+                    Logger.d( "Lock password exists");
                 } else {
-                    Log.i(TAG, "No lock password exists");
+                    Logger.d( "No lock password exists");
                 }
 
                 byte[] unlockPattern = LockPatternUtilsHelper.getUnlockPattern();
                 if (unlockPattern != null && unlockPattern.length > 0) {
-                    Log.i(TAG, "Lock pattern exists");
+                    Logger.d( "Lock pattern exists");
                 } else {
-                    Log.i(TAG, "No lock pattern exists");
+                    Logger.d( "No lock pattern exists");
                 }
             }
         });

@@ -12,6 +12,7 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.orhanobut.logger.Logger;
 import com.pubnub.api.vendor.Base64;
 
 import java.io.ByteArrayOutputStream;
@@ -58,13 +59,13 @@ public class ArielUtilities {
     }
 
     public static String getPubNubArielChannel(final String deviceId) {
-        Log.i(TAG,"Config topic: " + String.format(PUBNUB_ARIEL_CHANNEL, deviceId));
+        Logger.d("Config topic: " + String.format(PUBNUB_ARIEL_CHANNEL, deviceId));
         return String.format(PUBNUB_ARIEL_CHANNEL, deviceId);
     }
 
     //support multiple devices
 //    public static String getPubNubUserChanel(final String uuid){
-//        Log.i(TAG,"Config topic: "+String.format(PUBNUB_USER_CHANNEL, uuid));
+//        Logger.d("Config topic: "+String.format(PUBNUB_USER_CHANNEL, uuid));
 //        return String.format(PUBNUB_USER_CHANNEL, uuid);
 //    }
 

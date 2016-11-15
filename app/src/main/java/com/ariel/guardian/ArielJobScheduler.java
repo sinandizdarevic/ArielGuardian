@@ -3,9 +3,8 @@ package com.ariel.guardian;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.Context;
-import android.util.Log;
-
 import com.ariel.guardian.services.ArielJobService;
+import com.orhanobut.logger.Logger;
 
 import java.util.Iterator;
 
@@ -33,7 +32,7 @@ public class ArielJobScheduler {
     }
 
     public void registerNewJob(final ArielJobService service){
-        Log.i(TAG,"JOB SCHEDULED");
+        Logger.d("JOB SCHEDULED");
         mJobScheduler.schedule(service.getJobInfo());
     }
 
@@ -41,7 +40,7 @@ public class ArielJobScheduler {
         Iterator<JobInfo> it = mJobScheduler.getAllPendingJobs().iterator();
         while(it.hasNext()){
             JobInfo ji = it.next();
-            Log.i(TAG,"JOB INFO: "+ji.toString());
+            Logger.d("JOB INFO: "+ji.toString());
         }
     }
 

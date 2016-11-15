@@ -2,6 +2,7 @@
 package com.ariel.guardian.receivers;
 
 import com.ariel.guardian.GuardianApplication;
+import com.orhanobut.logger.Logger;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,7 +20,7 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG,"Boot received, should send data ");
+        Logger.d("Boot received, should send data ");
 
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
 

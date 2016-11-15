@@ -8,6 +8,7 @@ import android.util.Log;
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.pubnub.ArielPubNub;
+import com.orhanobut.logger.Logger;
 
 import javax.inject.Inject;
 
@@ -36,15 +37,15 @@ public class InstanceKeeperService extends Service{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "Initating Instances");
+        Logger.d( "Initating Instances");
 
         if(!mIsRunning) {
-            Log.i(TAG,"InstanceKeeper not running");
+            Logger.d("InstanceKeeper not running");
             mArielPubNub.reconnect();
             mIsRunning = true;
         }
         else{
-            Log.i(TAG,"InstanceKeeper running");
+            Logger.d("InstanceKeeper running");
         }
 
         return START_STICKY;
@@ -53,7 +54,7 @@ public class InstanceKeeperService extends Service{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i(TAG,"InstanceKeeperService destroyed");
+        Logger.d("InstanceKeeperService destroyed");
         //arielPubNub.cleanUp();
         mIsRunning = false;
     }

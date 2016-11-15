@@ -50,7 +50,7 @@ public class PackageManagerUtilities {
 //        Iterator<ActivityManager.RecentTaskInfo> it = am.getRecentTasks(100, ActivityManager.RECENT_WITH_EXCLUDED).iterator();
 //        while(it.hasNext()){
 //            ActivityManager.RecentTaskInfo task = it.next();
-//            Log.i(TAG,"PackageManagerUtil", "Recent package name: "+task.baseIntent.getComponent().getPackageName());
+//            Logger.d("PackageManagerUtil", "Recent package name: "+task.baseIntent.getComponent().getPackageName());
 //            if(task.baseIntent.getComponent().getPackageName().contains(packageName)){
 //                am.remo
 //                break;

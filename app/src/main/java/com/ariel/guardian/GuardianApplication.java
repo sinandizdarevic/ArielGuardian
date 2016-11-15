@@ -20,6 +20,7 @@ import com.ariel.guardian.library.utils.SharedPrefsManager;
 import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.services.DeviceLocationJobService;
 import com.ariel.guardian.sync.InstanceKeeperService;
+import com.orhanobut.logger.Logger;
 
 import java.util.Calendar;
 
@@ -50,13 +51,18 @@ public class GuardianApplication extends Application {
     @Inject
     ArielPubNub mArielPubNub;
 
+    @Inject
+    CommandProducer mCommandProducer;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
         mInstance = this;
 
-        Log.i(TAG,"GuardianApplication app created");
+        Logger.init("ArielGuardian");
+
+        Logger.i(TAG,"GuardianApplication app created");
 
         prepareDagger();
 
@@ -69,9 +75,13 @@ public class GuardianApplication extends Application {
             device.setArielChannel(ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
             mArielDatabase.createDevice(device);
 
-            ArielMaster masterDevice = new ArielMaster();
-            masterDevice.setDeviceUID("00000000-738d-4550-ffff-ffffe203cca2");
-            mArielDatabase.createOrUpdateMaster(masterDevice);
+            ArielMaster masterDevice1 = new ArielMaster();
+            masterDevice1.setDeviceUID("00000000-738d-4550-ffff-ffffe203cca2");
+            mArielDatabase.createOrUpdateMaster(masterDevice1);
+
+            ArielMaster masterDevice2 = new ArielMaster();
+            masterDevice2.setDeviceUID("00000000-4438-2cd8-ffff-fffffeacc937");
+            mArielDatabase.createOrUpdateMaster(masterDevice2);
 
             Configuration configuration = new Configuration();
             configuration.setArielSystemStatus(getResources().getInteger(R.integer.ariel_system_status));
@@ -85,6 +95,11 @@ public class GuardianApplication extends Application {
 
             //Ariel.action().pubnub().sendConfigurationMessage(id, ArielConstants.TYPE_DEVICE_CONFIG_UPDATE);
         }
+
+//        int arielSystemStatus = ArielSettings.Secure.getInt(getContentResolver(),
+//                ArielSettings.Secure.ARIEL_SYSTEM_STATUS, ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
+//
+//        mCommandProducer.checkArielSystemStatus(arielSystemStatus);
 
         getContentResolver().registerContentObserver(
                 ArielSettings.Secure.getUriFor(ArielSettings.Secure.ARIEL_SYSTEM_STATUS),
@@ -130,62 +145,8 @@ public class GuardianApplication extends Application {
         public void onChange(boolean selfChange, android.net.Uri uri, int userId) {
             int arielSystemStatus = ArielSettings.Secure.getInt(getContentResolver(),
                     ArielSettings.Secure.ARIEL_SYSTEM_STATUS, ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
-            Log.i(TAG,"Ariel system status changed: " + arielSystemStatus);
-            switch (arielSystemStatus) {
-                case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_LOCKDOWN: {
-                    // // TODO: 29.7.16.
-                    /**
-                     * Steps to do in case of LOCKDOWN mode:
-                     * 1. Activate lockscreen
-                     */
-                    break;
-                }
-                case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_PANIC: {
-                    // // TODO: 29.7.16.
-                    /**
-                     * Steps to do in case of PANIC mode:
-                     * 1. Activate lockscreen
-                     * 2. Start continuous location tracking
-                     * 3. Keep reporting location to backend and SMS
-                     * 4. Disable power button
-                     * 5. Maybe activate camera face detection?
-                     */
-
-                    // Lock the screen
-                    LockPatternUtilsHelper.performAdminLock("123qwe", GuardianApplication.this);
-
-                    // Start location tracking
-                    Command locationTracking = CommandProducer.getInstance().getCommand(LocationCommands.TRACKING_START_COMMAND);
-                    locationTracking.execute(new LocationParams.LocationParamBuilder().smsLocationReport(true).build());
-                    break;
-                }
-                case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_THEFT: {
-                    // // TODO: 29.7.16.
-                    break;
-                }
-                case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL: {
-                    // // TODO: 29.7.16.
-                    /**
-                     * Steps to perform for NORMAL mode:
-                     * 1. Restore previous lock screen and clear current one
-                     * 2. Stop continuous location tracking
-                     * 4. Enable power button
-                     * 5. Deactivate camera face detection?
-                     */
-
-                    // Clear screen lock
-                    LockPatternUtilsHelper.clearLock(GuardianApplication.this);
-
-                    // Stop location tracking
-                    Command locationTracking = CommandProducer.getInstance().getCommand(LocationCommands.TRACKING_STOP_COMMAND);
-                    locationTracking.execute(null);
-                    break;
-                }
-                default: {
-                    // // TODO: 29.7.16.
-                    break;
-                }
-            }
+            Logger.d("Ariel system status changed: " + arielSystemStatus);
+            mCommandProducer.checkArielSystemStatus(arielSystemStatus);
             Toast.makeText(GuardianApplication.this, "Ariel System status changed: " + arielSystemStatus, Toast.LENGTH_LONG).show();
         }
     };

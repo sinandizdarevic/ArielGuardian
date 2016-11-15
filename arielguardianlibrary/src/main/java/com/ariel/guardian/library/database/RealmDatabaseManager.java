@@ -3,6 +3,8 @@ package com.ariel.guardian.library.database;
 import android.content.Context;
 import android.util.Log;
 
+import com.orhanobut.logger.Logger;
+
 import java.io.File;
 import java.security.SecureRandom;
 
@@ -38,8 +40,8 @@ public final class RealmDatabaseManager {
         byte[] key = new byte[64];
         new SecureRandom().nextBytes(key);
         final File externalFilesDir = context.getExternalFilesDir(null);
-        Log.i(TAG,"File path: " + externalFilesDir.getAbsolutePath());
-        Log.i(TAG, "Context files dir path: " + context.getFilesDir().getAbsolutePath());
+        Logger.d("File path: " + externalFilesDir.getAbsolutePath());
+        Logger.d( "Context files dir path: " + context.getFilesDir().getAbsolutePath());
         mRealmConfiguration = new RealmConfiguration.Builder()
                 //.encryptionKey(key)
                 .name("ariel.realm")

@@ -3,6 +3,7 @@ package com.ariel.guardian;
 import com.ariel.guardian.command.Command;
 import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.receivers.NetworkChangeReceiver;
+import com.ariel.guardian.receivers.ariel.DeviceConfigReceiver;
 import com.ariel.guardian.sync.PubNubCallback;
 import com.ariel.guardian.receivers.BootReceiver;
 import com.ariel.guardian.receivers.ariel.DeviceApplicationReceiver;
@@ -31,6 +32,7 @@ public interface GuardianComponent {
     void inject(PackageReceiver receiver);
     void inject(BootReceiver receiver);
     void inject(DeviceApplicationReceiver receiver);
+    void inject(DeviceConfigReceiver receiver);
     void inject(NetworkChangeReceiver receiver);
 
     //services

@@ -10,6 +10,7 @@ import android.util.Log;
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.utils.ArielUtilities;
+import com.orhanobut.logger.Logger;
 
 import javax.inject.Inject;
 
@@ -54,9 +55,9 @@ abstract public class ArielService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i(getServiceName(),"onDestroy");
+        Logger.d(getServiceName(),"onDestroy");
         if (sWakeLock != null && sWakeLock.isHeld()) {
-            Log.i(getServiceName(), "sWakeLock existing");
+            Logger.d(getServiceName(), "sWakeLock existing");
             sWakeLock.release();
         }
     }

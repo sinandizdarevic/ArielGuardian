@@ -16,6 +16,7 @@ import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.library.utils.SharedPrefsManager;
 import com.google.gson.Gson;
 import com.google.zxing.WriterException;
+import com.orhanobut.logger.Logger;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNStatusCategory;
@@ -49,16 +50,16 @@ public abstract class ArielPubNubCallback extends SubscribeCallback {
 
     @Override
     public void status(PubNub pubnub, PNStatus status) {
-        Log.i(TAG, "Status: " + status.getStatusCode());
+        Logger.i("Status: " + status.getStatusCode());
         if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
             // internet got lost, do some magic and call reconnect when ready
-            Log.i(TAG, "Internet got lost");
+            Logger.i("Internet got lost");
         } else if (status.getCategory() == PNStatusCategory.PNTimeoutCategory) {
             // do some magic and call reconnect when ready
-            Log.i(TAG, "TIMEOUT");
+            Logger.i("TIMEOUT");
             //pubnub.reconnect();
         } else if (status.getCategory() == PNStatusCategory.PNConnectedCategory) {
-            Log.i(TAG, "YAY!!!! CONNECTED!!!");
+            Logger.i("YAY!!!! CONNECTED!!!");
             /**
              * Check WrapperMessage realm if there are messages to be sent
              */
@@ -66,26 +67,27 @@ public abstract class ArielPubNubCallback extends SubscribeCallback {
             pubnubConnected();
             //log.error(status)
         } else {
-            Log.i(TAG, "SOMETHING!!!! HAPPENED0!!!: " + status.getStatusCode());
+            Logger.d( "SOMETHING!!!! HAPPENED0!!!: " + status.getStatusCode());
         }
     }
 
     @Override
     public void message(PubNub pubnub, PNMessageResult message) {
-        Log.i(ArielDatabase.TAG, "Received pubnub message: " + message.getMessage().toString() + " on channel: " + message.getSubscribedChannel());
+        Logger.i("Received pubnub message on channel: " + message.getSubscribedChannel());
+        Logger.json(message.getMessage().toString());
         WrapperMessage currentMessage = mPubNub.parseIncomingMessage(message.getMessage().toString());
         SharedPrefsManager.getInstance(mContext).setLongPreferences(SharedPrefsManager.KEY_LAST_PUBNUB_MESSAGE, message.getTimetoken());
         if (currentMessage != null) {
             mPubNub.processPubNubMessage(currentMessage);
         } else {
-            Log.i(ArielDatabase.TAG, "This was my message so ignore it");
+            Logger.i("This was my message so ignore it");
             // my message or a parsing error, needs to be handled
         }
     }
 
     @Override
     public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-        Log.i(TAG, "Presence of " + presence.getUuid());
+        Logger.i("Presence of " + presence.getUuid());
     }
 
 }

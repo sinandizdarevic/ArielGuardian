@@ -13,6 +13,7 @@ import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.services.CreateIFRuleService;
 import com.ariel.guardian.sync.SyncIntentService;
 import com.ariel.guardian.utils.PackageManagerUtilities;
+import com.orhanobut.logger.Logger;
 
 import javax.inject.Inject;
 
@@ -32,7 +33,7 @@ public class PackageReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(TAG,"Package receiver activated: " + intent.getAction() + " packageName: " + intent.getData().getSchemeSpecificPart());
+        Logger.d("Package receiver activated: " + intent.getAction() + " packageName: " + intent.getData().getSchemeSpecificPart());
 
         GuardianApplication.getInstance().getGuardianComponent().inject(this);
 
