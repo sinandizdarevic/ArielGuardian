@@ -3,13 +3,12 @@ package com.ariel.guardian.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.database.model.DeviceApplication;
-import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.library.pubnub.ArielPubNub;
+import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.services.CreateIFRuleService;
 import com.ariel.guardian.sync.SyncIntentService;
 import com.ariel.guardian.utils.PackageManagerUtilities;
@@ -47,10 +46,10 @@ public class PackageReceiver extends BroadcastReceiver {
                 // perform block check and set it to installed
                 GuardianApplication.getInstance().
                         startService(CreateIFRuleService.getCallingIntent
-                                (deviceApp.getPackageName(), deviceApp.isDisabled()));
+                                (deviceApp.getPackageName(), deviceApp.isDisabled(), null));
                 deviceApp.setUninstalled(false);
                 mArielDatabase.createOrUpdateApplication(deviceApp);
-                long id = mArielPubNub.createApplicationMessage(deviceApp, ArielConstants.ACTIONS.APPLICATION_ADDED, false);
+                long id = mArielPubNub.createApplicationMessage(deviceApp, ArielConstants.ACTIONS.APPLICATION_ADDED, false, true);
                 context.startService(SyncIntentService.getSyncIntent(id));
             }
             else{
@@ -63,7 +62,7 @@ public class PackageReceiver extends BroadcastReceiver {
                 deviceApplication.setUninstalled(false);
 
                 mArielDatabase.createOrUpdateApplication(deviceApplication);
-                long id = mArielPubNub.createApplicationMessage(deviceApplication, ArielConstants.ACTIONS.APPLICATION_ADDED, false);
+                long id = mArielPubNub.createApplicationMessage(deviceApplication, ArielConstants.ACTIONS.APPLICATION_ADDED, false, true);
                 context.startService(SyncIntentService.getSyncIntent(id));
             }
         } else if (intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")) {
@@ -73,7 +72,7 @@ public class PackageReceiver extends BroadcastReceiver {
                 deviceApp.setUninstalled(true);
 
                 mArielDatabase.createOrUpdateApplication(deviceApp);
-                long id = mArielPubNub.createApplicationMessage(deviceApp, ArielConstants.ACTIONS.APPLICATION_REMOVED, false);
+                long id = mArielPubNub.createApplicationMessage(deviceApp, ArielConstants.ACTIONS.APPLICATION_REMOVED, false, true);
                 context.startService(SyncIntentService.getSyncIntent(id));
             }
 

@@ -2,7 +2,7 @@ package com.ariel.guardian.services;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
+import android.os.ResultReceiver;
 
 import com.ariel.guardian.GuardianApplication;
 import com.orhanobut.logger.Logger;
@@ -19,8 +19,12 @@ public class CreateIFRuleService extends IntentService {
 
     private final String TAG = "CreateIFRuleService";
 
+    public static final int ACTION_OK = 1;
+    public static final int ACTION_FAILED = 2;
+
     public static final String EXTRA_PACKAGE_NAME = "package_name";
     public static final String EXTRA_PACKAGE_STATUS = "package_status";
+    public static final String EXTRA_RESULT_RECEIVER = "receiver";
 
     private final String RULES_DIR = "/data/system/ifw";
     private final String RULE_FILE = "%s.xml";
@@ -29,10 +33,11 @@ public class CreateIFRuleService extends IntentService {
         super("CreateIFRuleService");
     }
 
-    public static Intent getCallingIntent(final String packageName, final boolean status){
+    public static Intent getCallingIntent(final String packageName, final boolean status, final ResultReceiver receiver){
         Intent serviceIntent = new Intent(GuardianApplication.getInstance(), CreateIFRuleService.class);
         serviceIntent.putExtra(CreateIFRuleService.EXTRA_PACKAGE_NAME, packageName);
         serviceIntent.putExtra(CreateIFRuleService.EXTRA_PACKAGE_STATUS, status);
+        serviceIntent.putExtra(CreateIFRuleService.EXTRA_RESULT_RECEIVER, receiver);
         return serviceIntent;
     }
 
@@ -43,19 +48,30 @@ public class CreateIFRuleService extends IntentService {
         String packageName = intent.getStringExtra(EXTRA_PACKAGE_NAME);
         boolean status = intent.getBooleanExtra(EXTRA_PACKAGE_STATUS, false);
 
+        ResultReceiver receiver = intent.getParcelableExtra(EXTRA_RESULT_RECEIVER);
+
         Logger.d("Received intent for "+packageName+" and status "+status);
+
+        boolean result = false;
 
         if(status){
             // create a rule that will block the app with that package name
-            createRuleFile(packageName);
+            result = createRuleFile(packageName);
         }
         else{
-            removeRuleFile(packageName);
+            result = removeRuleFile(packageName);
         }
 
+        if(receiver!=null){
+            if(result){
+                receiver.send(ACTION_OK, null);
+            } else{
+                receiver.send(ACTION_FAILED, null);
+            }
+        }
     }
 
-    private void createRuleFile(final String packageName){
+    private boolean createRuleFile(final String packageName){
         Logger.d("Creating rule file");
         try {
             File rulesDir = new File(RULES_DIR, String.format(RULE_FILE,packageName));
@@ -70,22 +86,26 @@ public class CreateIFRuleService extends IntentService {
             fos.write(sb.toString().getBytes());
             fos.flush();
             fos.close();
+            return true;
         }
         catch(Exception e){
             Logger.d("Create rule file error");
             e.printStackTrace();
+            return false;
         }
     }
 
-    private void removeRuleFile(final String packageName){
+    private boolean removeRuleFile(final String packageName){
         Logger.d("Removing rule file");
         try {
             File rulesDir = new File(RULES_DIR, String.format(RULE_FILE,packageName));
             rulesDir.delete();
+            return true;
         }
         catch(Exception e){
             Logger.d("Removing rule file error");
             e.printStackTrace();
+            return false;
         }
     }
 

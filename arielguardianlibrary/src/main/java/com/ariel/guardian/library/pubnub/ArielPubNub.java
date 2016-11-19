@@ -2,7 +2,6 @@ package com.ariel.guardian.library.pubnub;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 
 import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.database.model.ArielDevice;
@@ -15,7 +14,6 @@ import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.library.utils.SharedPrefsManager;
 import com.google.gson.Gson;
-import com.google.zxing.WriterException;
 import com.orhanobut.logger.Logger;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
@@ -55,7 +53,7 @@ public class ArielPubNub implements ArielPubNubInterface {
     }
 
     @Override
-    public long createApplicationMessage(DeviceApplication deviceApplication, String action, boolean reportReception) {
+    public long createApplicationMessage(DeviceApplication deviceApplication, String action, boolean reportReception, boolean executed) {
         final WrapperMessage message = new WrapperMessage();
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
@@ -63,7 +61,14 @@ public class ArielPubNub implements ArielPubNubInterface {
         message.setMessageType(ArielConstants.MESSAGES.APPLICATION);
         message.setDataObject(mGson.toJson(deviceApplication));
         message.setReportReception(reportReception);
+        if(reportReception){
+            // if this action requires report, save the message id
+            // in the object so that UI can now about it
+            deviceApplication.setPendingActionId(message.getId());
+            mArielDatabase.createOrUpdateApplication(deviceApplication);
+        }
         message.setOriginalMessageType(null);
+        message.setExecuted(executed);
         mArielDatabase.createWrapperMessage(message);
         return message.getId();
     }
@@ -94,6 +99,20 @@ public class ArielPubNub implements ArielPubNubInterface {
         message.setActionType(action);
         message.setMessageType(ArielConstants.MESSAGES.CONFIGURATION);
         message.setDataObject(mGson.toJson(deviceConfiguration));
+        message.setReportReception(reportReception);
+        message.setOriginalMessageType(null);
+        mArielDatabase.createWrapperMessage(message);
+        return message.getId();
+    }
+
+    @Override
+    public long createQRCodeMessage(String qrCode, String action, boolean reportReception) {
+        final WrapperMessage message = new WrapperMessage();
+        message.setId(Calendar.getInstance().getTimeInMillis());
+        message.setSender(ArielUtilities.getUniquePseudoID());
+        message.setActionType(action);
+        message.setMessageType(ArielConstants.MESSAGES.REPORT);
+        message.setDataObject(qrCode);
         message.setReportReception(reportReception);
         message.setOriginalMessageType(null);
         mArielDatabase.createWrapperMessage(message);
@@ -217,13 +236,17 @@ public class ArielPubNub implements ArielPubNubInterface {
         }
     }
 
-    public void processPubNubMessage(final WrapperMessage currentMessage) {
+    public boolean processPubNubMessage(final WrapperMessage currentMessage) {
+
+        boolean processed = false;
+
         // its not a message from me, deal with it
         // check if the sender is actually an ArielDevice
         ArielDevice arielDevice = mArielDatabase.getDeviceByID(currentMessage.getSender());
         if (arielDevice != null) {
             Logger.d( "This message came from an ArielDevice!!");
             messageForMasterDevice(currentMessage);
+            processed = true;
         } else {
             // Checking if the sender is the ArielMaster device.
             ArielMaster arielMaster = mArielDatabase.getMasterByID(currentMessage.getSender());
@@ -239,21 +262,27 @@ public class ArielPubNub implements ArielPubNubInterface {
                     messageForMasterDevice(currentMessage);
                     currentMessage.setSent(true);
                     mArielDatabase.createWrapperMessage(currentMessage);
+                    processed = true;
                 } else {
                     Logger.d( "I'm an ArielDevice!");
-                    messageForArielDevice(currentMessage);
+                    //messageForArielDevice(currentMessage);
+                    // do nothing, pass the message to the ArielDevice Guardian application
+                    processed = false;
                 }
-
             } else {
                 Logger.d( "This is weird, unknown message???");
             }
         }
+
+        return processed;
     }
 
     private void messageForMasterDevice(final WrapperMessage currentMessage) {
         String messageType = currentMessage.getMessageType();
         if(messageType!=null && messageType.length()>0){
             if(messageType.equals(ArielConstants.MESSAGES.REPORT)){
+                // we need to remove the wrapper message
+                mArielDatabase.deleteWrapperMessage(currentMessage);
                 // get the original message type
                 String originalMessageType = currentMessage.getOriginalMessageType();
                 // first, lets process the data and see what it contains
@@ -264,8 +293,6 @@ public class ArielPubNub implements ArielPubNubInterface {
                 } else if(originalMessageType.equals(ArielConstants.MESSAGES.CONFIGURATION)){
                     handleConfigurationMessage(currentMessage);
                 }
-                // we need to remove the wrapper message
-                mArielDatabase.deleteWrapperMessage(currentMessage);
             } else if(messageType.equals(ArielConstants.MESSAGES.APPLICATION)){
                 handleApplicationMessage(currentMessage);
             } else if(messageType.equals(ArielConstants.MESSAGES.LOCATION)){
@@ -274,46 +301,6 @@ public class ArielPubNub implements ArielPubNubInterface {
                 handleConfigurationMessage(currentMessage);
             }
         }
-    }
-
-    private void messageForArielDevice(final WrapperMessage currentMessage) {
-        String messageType = currentMessage.getMessageType();
-        if(messageType!=null && messageType.length()>0){
-            if(messageType.equals(ArielConstants.MESSAGES.REPORT)){
-                // get the original message type
-                String originalMessageType = currentMessage.getOriginalMessageType();
-                // first, lets process the data and see what it contains
-                if(originalMessageType.equals(ArielConstants.MESSAGES.APPLICATION)){
-                    handleApplicationMessage(currentMessage);
-                } else if(originalMessageType.equals(ArielConstants.MESSAGES.LOCATION)){
-                    handleLocationMessage(currentMessage);
-                } else if(originalMessageType.equals(ArielConstants.MESSAGES.CONFIGURATION)){
-                    handleConfigurationMessage(currentMessage);
-                }
-                // we need to remove the wrapper message
-                mArielDatabase.deleteWrapperMessage(currentMessage);
-            } else if(messageType.equals(ArielConstants.MESSAGES.APPLICATION)){
-                handleApplicationMessage(currentMessage);
-            } else if(messageType.equals(ArielConstants.MESSAGES.LOCATION)){
-                handleLocationMessage(currentMessage);
-            } else if(messageType.equals(ArielConstants.MESSAGES.CONFIGURATION)){
-                handleConfigurationMessage(currentMessage);
-            }
-
-        }
-        // send the report
-        // first, set the original messageType
-        currentMessage.setOriginalMessageType(currentMessage.getMessageType());
-        // now mark this message as report
-        currentMessage.setMessageType(ArielConstants.MESSAGES.REPORT);
-        currentMessage.setSent(true);
-        currentMessage.setSender(ArielUtilities.getUniquePseudoID());
-        long id = createWrapperMessage(currentMessage);
-        sendMessage(currentMessage);
-    }
-
-    private void handleReportMessage(WrapperMessage currentMessage){
-
     }
 
     private void handleLocationMessage(WrapperMessage currentMessage){
@@ -332,6 +319,8 @@ public class ArielPubNub implements ArielPubNubInterface {
         if (currentMessage.getActionType().equals(ArielConstants.ACTIONS.APPLICATION_UPDATED)) {
             // add an app to the realm database
             DeviceApplication deviceApp = mGson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
+            // remove its pending action id
+            deviceApp.setPendingActionId(0);
             mArielDatabase.createOrUpdateApplication(deviceApp);
             Intent appIntent = new Intent();
             appIntent.setAction(ArielConstants.ACTIONS.APPLICATION_UPDATED);
@@ -341,6 +330,8 @@ public class ArielPubNub implements ArielPubNubInterface {
         } else if (currentMessage.getActionType().equals(ArielConstants.ACTIONS.APPLICATION_ADDED)) {
             // add an app to the realm database
             DeviceApplication deviceApp = mGson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
+            // remove its pending action id
+            deviceApp.setPendingActionId(0);
             mArielDatabase.createOrUpdateApplication(deviceApp);
             Intent appIntent = new Intent();
             appIntent.setAction(ArielConstants.ACTIONS.APPLICATION_ADDED);
@@ -349,6 +340,8 @@ public class ArielPubNub implements ArielPubNubInterface {
         } else if (currentMessage.getActionType().equals(ArielConstants.ACTIONS.APPLICATION_REMOVED)) {
             // remove an app from the realm database
             DeviceApplication deviceApp = mGson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
+            // remove its pending action id
+            deviceApp.setPendingActionId(0);
             mArielDatabase.deleteApplication(deviceApp);
             Intent appIntent = new Intent();
             appIntent.setAction(ArielConstants.ACTIONS.APPLICATION_REMOVED);
@@ -366,58 +359,8 @@ public class ArielPubNub implements ArielPubNubInterface {
             appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, deviceConfig.getId());
             mContext.sendBroadcast(appIntent);
         } else if (currentMessage.getActionType().equals(ArielConstants.ACTIONS.GET_DEVICE_QR_CODE)) {
-            try {
-                Bitmap qr_code = ArielUtilities.generateDeviceQRCode(ArielUtilities.getUniquePseudoID());
-                String base64bitmap = ArielUtilities.base64Encode2String(qr_code);
-//                    dataToTransfer = base64bitmap;
-            } catch (WriterException e) {
-                e.printStackTrace();
-            }
+            Logger.i("Recived qrcode: "+currentMessage.getDataObject());
         }
     }
-
-    private void sendMessage(final WrapperMessage message) {
-        sendMessage(message, new PNCallback<PNPublishResult>() {
-            @Override
-            public void onResponse(PNPublishResult result, PNStatus status) {
-                if (!status.isError()) {
-                    // everything is ok, remove wrapper message from realm
-                    Logger.i("Message sent, remove wrapper");
-                    // this part of code should be on parent side
-//                    message.setSent(true);
-//                    mArielDatabase.createWrapperMessage(message);
-
-                    // since im an ArielDevice, i need to remove the message
-                    mArielDatabase.deleteWrapperMessageByID(message.getId());
-                } else {
-                    // keep trying until you send the message
-                    // this should probably be replaced with some advanced mechanism
-                    Logger.i("Status is error: " + status.isError());
-                    Logger.i("Status error details: " + status.getErrorData().getInformation());
-                    Logger.i("Status error exception: " + status.getErrorData().getThrowable().getMessage());
-                    Logger.i("Status code: " + status.getStatusCode());
-                    Logger.i("Message not sent, retry??");
-                    status.retry();
-                }
-            }
-        });
-    }
-//
-//            Object dataToTransfer = null;
-
-
-//            if (currentMessage.getReportReception()) {
-//                Logger.d(ArielDatabase.TAG,"This message requires report reception");
-//                currentMessage.setDataObject(mGson.toJson(dataToTransfer));
-//                currentMessage.setReportReception(false);
-//                currentMessage.setSender(ArielUtilities.getUniquePseudoID());
-//                currentMessage.setActionType(ArielConstants.TYPE_WRAPPER_MESSAGE_REPORT);
-//                long id = mPubNub.createWrapperMessage(currentMessage);
-//                messageProcessed(id);
-//            }
-//            else{
-//                Logger.d(ArielDatabase.TAG,"This message does not require report reception");
-//                mDatabase.deleteWrapperMessageByID(currentMessage.getId());
-//            }
 
 }

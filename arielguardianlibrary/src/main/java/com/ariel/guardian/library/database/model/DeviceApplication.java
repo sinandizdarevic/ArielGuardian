@@ -37,6 +37,8 @@ public class DeviceApplication extends RealmObject {
      */
     private boolean uninstalled;
 
+    private long pendingActionId;
+
     public String getPackageName() {
         return packageName;
     }
@@ -83,5 +85,13 @@ public class DeviceApplication extends RealmObject {
 
     public void setPending(boolean pending) {
         this.pending = pending;
+    }
+
+    public long getPendingActionId() {
+        return pendingActionId;
+    }
+
+    public void setPendingActionId(long pendingActionId) {
+        this.pendingActionId = pendingActionId;
     }
 }

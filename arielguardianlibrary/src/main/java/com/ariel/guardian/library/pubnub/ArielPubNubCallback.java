@@ -1,21 +1,12 @@
 package com.ariel.guardian.library.pubnub;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.ariel.guardian.library.database.ArielDatabase;
-import com.ariel.guardian.library.database.model.ArielDevice;
-import com.ariel.guardian.library.database.model.Configuration;
-import com.ariel.guardian.library.database.model.DeviceApplication;
-import com.ariel.guardian.library.database.model.DeviceLocation;
 import com.ariel.guardian.library.database.model.WrapperMessage;
-import com.ariel.guardian.library.utils.ArielConstants;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.library.utils.SharedPrefsManager;
 import com.google.gson.Gson;
-import com.google.zxing.WriterException;
 import com.orhanobut.logger.Logger;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
@@ -23,8 +14,6 @@ import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
-
-import io.realm.RealmObject;
 
 /**
  * Created by mikalackis on 4.7.16..
@@ -48,6 +37,8 @@ public abstract class ArielPubNubCallback extends SubscribeCallback {
 
     protected abstract void pubnubConnected();
 
+    protected abstract void handleMessage(WrapperMessage message);
+
     @Override
     public void status(PubNub pubnub, PNStatus status) {
         Logger.i("Status: " + status.getStatusCode());
@@ -56,8 +47,9 @@ public abstract class ArielPubNubCallback extends SubscribeCallback {
             Logger.i("Internet got lost");
         } else if (status.getCategory() == PNStatusCategory.PNTimeoutCategory) {
             // do some magic and call reconnect when ready
+            // register a network change listener here
             Logger.i("TIMEOUT");
-            //pubnub.reconnect();
+            mPubNub.reconnect();
         } else if (status.getCategory() == PNStatusCategory.PNConnectedCategory) {
             Logger.i("YAY!!!! CONNECTED!!!");
             /**
@@ -78,7 +70,13 @@ public abstract class ArielPubNubCallback extends SubscribeCallback {
         WrapperMessage currentMessage = mPubNub.parseIncomingMessage(message.getMessage().toString());
         SharedPrefsManager.getInstance(mContext).setLongPreferences(SharedPrefsManager.KEY_LAST_PUBNUB_MESSAGE, message.getTimetoken());
         if (currentMessage != null) {
-            mPubNub.processPubNubMessage(currentMessage);
+            if(mPubNub.processPubNubMessage(currentMessage)){
+                Logger.i("Message processed!");
+            }
+            else{
+                Logger.i("Message to be forwarded to other handler!");
+                handleMessage(currentMessage);
+            }
         } else {
             Logger.i("This was my message so ignore it");
             // my message or a parsing error, needs to be handled

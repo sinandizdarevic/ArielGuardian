@@ -17,25 +17,21 @@
 package com.ariel.guardian.services;
 
 
-import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.ArielJobScheduler;
-import com.ariel.guardian.library.database.ArielDatabase;
-import com.ariel.guardian.library.commands.location.LocationCommands;
-import com.ariel.guardian.library.commands.report.ReportParams;
-import com.ariel.guardian.library.database.model.DeviceLocation;
-import com.ariel.guardian.library.utils.ArielConstants;
-import com.ariel.guardian.library.utils.ArielUtilities;
-import com.ariel.guardian.library.pubnub.ArielPubNub;
-import com.ariel.guardian.sync.SyncIntentService;
-import com.ariel.guardian.utils.LocationManager;
-import com.google.android.gms.common.ConnectionResult;
-import com.orhanobut.logger.Logger;
-
 import android.app.job.JobInfo;
 import android.app.job.JobParameters;
 import android.content.ComponentName;
 import android.location.Location;
-import android.util.Log;
+
+import com.ariel.guardian.ArielJobScheduler;
+import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.library.database.ArielDatabase;
+import com.ariel.guardian.library.database.model.DeviceLocation;
+import com.ariel.guardian.library.pubnub.ArielPubNub;
+import com.ariel.guardian.library.utils.ArielConstants;
+import com.ariel.guardian.sync.SyncIntentService;
+import com.ariel.guardian.utils.LocationManager;
+import com.google.android.gms.common.ConnectionResult;
+import com.orhanobut.logger.Logger;
 
 import java.util.Calendar;
 
@@ -87,11 +83,11 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
                                    .locationUpdateInterval(5000)
                                    .build();
             mLocationManager.initAndStartLocationUpdates();
-            reportCommandExecution(new ReportParams.ReportParamBuilder()
-                    .invokedCommand(LocationCommands.LOCATE_NOW_COMMAND)
-                    .commandStatus(true)
-                    .errorMsg(null)
-                    .build(), ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
+//            reportCommandExecution(new ReportParams.ReportParamBuilder()
+//                    .invokedCommand(LocationCommands.LOCATE_NOW_COMMAND)
+//                    .commandStatus(true)
+//                    .errorMsg(null)
+//                    .build(), ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
         }
         return true;
     }
@@ -126,11 +122,11 @@ public class DeviceLocationJobService extends ArielJobService implements Locatio
 
     @Override
     public void onGoogleClientError(ConnectionResult connectionResult) {
-        reportCommandExecution(new ReportParams.ReportParamBuilder()
-                .invokedCommand(LocationCommands.LOCATE_NOW_COMMAND)
-                .commandStatus(false)
-                .errorMsg("Error starting google client")
-                .build(), ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
+//        reportCommandExecution(new ReportParams.ReportParamBuilder()
+//                .invokedCommand(LocationCommands.LOCATE_NOW_COMMAND)
+//                .commandStatus(false)
+//                .errorMsg("Error starting google client")
+//                .build(), ArielUtilities.getPubNubArielChannel(ArielUtilities.getUniquePseudoID()));
         jobFinished(mJobParams, true);
     }
 

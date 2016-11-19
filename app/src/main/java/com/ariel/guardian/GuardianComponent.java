@@ -1,17 +1,20 @@
 package com.ariel.guardian;
 
-import com.ariel.guardian.command.Command;
+import com.ariel.guardian.command.ApplicationCommand;
+import com.ariel.guardian.command.ConfigurationCommand;
+import com.ariel.guardian.command.LocateNowCommand;
+import com.ariel.guardian.command.MasterCommand;
 import com.ariel.guardian.library.pubnub.ArielPubNub;
-import com.ariel.guardian.receivers.NetworkChangeReceiver;
-import com.ariel.guardian.receivers.ariel.DeviceConfigReceiver;
-import com.ariel.guardian.sync.PubNubCallback;
 import com.ariel.guardian.receivers.BootReceiver;
-import com.ariel.guardian.receivers.ariel.DeviceApplicationReceiver;
+import com.ariel.guardian.receivers.NetworkChangeReceiver;
 import com.ariel.guardian.receivers.PackageReceiver;
 import com.ariel.guardian.receivers.ShutdownReceiver;
+import com.ariel.guardian.receivers.ariel.DeviceApplicationReceiver;
+import com.ariel.guardian.receivers.ariel.DeviceConfigReceiver;
 import com.ariel.guardian.services.ArielService;
 import com.ariel.guardian.services.DeviceLocationJobService;
 import com.ariel.guardian.sync.InstanceKeeperService;
+import com.ariel.guardian.sync.PubNubCallback;
 import com.ariel.guardian.sync.SyncIntentService;
 
 import javax.inject.Singleton;
@@ -39,9 +42,6 @@ public interface GuardianComponent {
     void inject(DeviceLocationJobService deviceLocationJobService);
     void inject(ArielService service);
 
-    //Commands
-    void inject(Command command);
-
     //DeviceApplication class
     void inject(GuardianApplication application);
 
@@ -54,5 +54,9 @@ public interface GuardianComponent {
     // sync service
     void inject(SyncIntentService syncIntentService);
 
+    void inject(ApplicationCommand command);
+    void inject(LocateNowCommand command);
+    void inject(ConfigurationCommand command);
+    void inject(MasterCommand command);
 
 }

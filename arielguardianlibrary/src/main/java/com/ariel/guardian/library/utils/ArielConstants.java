@@ -19,18 +19,13 @@ public final class ArielConstants {
          */
         String DEVICE_CONFIG_UPDATE = "ariel.intent.action.device.CONFIG_UPDATE";
         String GET_DEVICE_QR_CODE = "ariel.intent.action.device.QR_CODE";
+        String ADD_MASTER_DEVICE = "ariel.intent.action.device.ADD_MASTER";
 
         /**
          * DeviceLocation messages and intents
          */
         String LOCATION_UPDATE = "ariel.intent.action.location.UPDATE";
 
-        /**
-         * Device master messages
-         *
-         */
-        String ADD_DEVICE_MASTER = "ariel.intent.action.ADD_MASTER";
-        String REMOVE_DEVICE_MASTER = "ariel.intent.action.REMOVE_MASTER";
     }
 
     public interface MESSAGES {
@@ -48,6 +43,7 @@ public final class ArielConstants {
      * Local broadcast extras
      */
     public static String EXTRA_DATABASE_ID = "database_id";
+    public static String EXTRA_WRAPPER_ID = "wrapper_id";
 
 
 

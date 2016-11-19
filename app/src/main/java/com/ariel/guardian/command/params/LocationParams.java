@@ -1,6 +1,4 @@
-package com.ariel.guardian.library.commands.location;
-
-import com.ariel.guardian.library.commands.Params;
+package com.ariel.guardian.command.params;
 
 /**
  * Created by mikalackis on 18.8.16..
@@ -17,7 +15,6 @@ public class LocationParams extends Params {
     private boolean smsLocationReport;
 
     public LocationParams(final LocationParamBuilder builder){
-        super(LocationParams.class.getSimpleName());
         this.smsLocationReport = builder.smsLocationReport;
     }
 

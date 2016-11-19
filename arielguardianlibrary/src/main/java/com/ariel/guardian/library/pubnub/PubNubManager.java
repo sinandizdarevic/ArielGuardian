@@ -1,13 +1,10 @@
 package com.ariel.guardian.library.pubnub;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.ariel.guardian.library.BuildConfig;
-import com.ariel.guardian.library.commands.CommandMessage;
 import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.utils.ArielUtilities;
-import com.ariel.guardian.library.utils.SharedPrefsManager;
 import com.orhanobut.logger.Logger;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
@@ -16,8 +13,6 @@ import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNLogVerbosity;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
-import com.pubnub.api.models.consumer.history.PNHistoryItemResult;
-import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.presence.PNWhereNowResult;
 
 import java.lang.ref.WeakReference;
@@ -25,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Main PubNub manager class. Managed by InstanceKeeperService
@@ -147,24 +141,24 @@ public final class PubNubManager {
         pubnub.subscribe().channels(mSubscribedChannels).execute();
     }
 
-    /**
-     * Method used to send a command to specific channel
-     *
-     * @param command
-     * @param channel
-     */
-    public void sendCommand(final CommandMessage command, final PNCallback<PNPublishResult> callback, final String... channels) {
-        if (channels.length > 0) {
-            for (String channel : channels
-                    ) {
-                if (callback != null) {
-                    pubnub.publish().channel(channel).message(command).async(callback);
-                } else {
-                    pubnub.publish().channel(channel).message(command);
-                }
-            }
-        }
-    }
+//    /**
+//     * Method used to send a command to specific channel
+//     *
+//     * @param command
+//     * @param channel
+//     */
+//    public void sendCommand(final CommandMessage command, final PNCallback<PNPublishResult> callback, final String... channels) {
+//        if (channels.length > 0) {
+//            for (String channel : channels
+//                    ) {
+//                if (callback != null) {
+//                    pubnub.publish().channel(channel).message(command).async(callback);
+//                } else {
+//                    pubnub.publish().channel(channel).message(command);
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Method used to send a a message to specific channel

@@ -4,12 +4,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.utils.ArielUtilities;
 import com.orhanobut.logger.Logger;
 
 import javax.inject.Inject;
@@ -62,7 +59,7 @@ abstract public class ArielService extends Service {
         }
     }
 
-    abstract String getServiceName();
+    protected abstract String getServiceName();
 
     //public abstract void injectComponent(final GuardianComponent component);
 

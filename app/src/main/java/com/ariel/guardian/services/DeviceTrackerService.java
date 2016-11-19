@@ -19,18 +19,16 @@ package com.ariel.guardian.services;
  * limitations under the License.
  */
 
-import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.commands.location.LocationCommands;
-import com.ariel.guardian.library.commands.location.LocationParams;
-import com.ariel.guardian.utils.LocationManager;
-import com.google.android.gms.common.ConnectionResult;
-import com.orhanobut.logger.Logger;
-
 import android.content.Intent;
 import android.location.Location;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
+
+import com.ariel.guardian.GuardianApplication;
+import com.ariel.guardian.command.params.LocationParams;
+import com.ariel.guardian.utils.LocationManager;
+import com.google.android.gms.common.ConnectionResult;
+import com.orhanobut.logger.Logger;
 
 import javax.inject.Inject;
 
@@ -88,7 +86,7 @@ public class DeviceTrackerService extends ArielService implements LocationManage
     }
 
     @Override
-    String getServiceName() {
+    protected String getServiceName() {
         return "DeviceTrackerService";
     }
 
@@ -102,7 +100,7 @@ public class DeviceTrackerService extends ArielService implements LocationManage
         Logger.d("Got location: " + location.toString());
         //DeviceLocation deviceLocation = new DeviceLocation(location.getTime(), location.getLatitude(), location.getLongitude());
         if (mReportBySms) {
-            // // TODO: 29.7.16. send SMS location with google maps URL
+            // TODO: 29.7.16. send SMS location with google maps URL
         }
     }
 

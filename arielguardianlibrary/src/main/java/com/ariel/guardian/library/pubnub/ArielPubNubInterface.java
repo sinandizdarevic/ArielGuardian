@@ -13,11 +13,13 @@ import com.pubnub.api.models.consumer.PNPublishResult;
 public interface ArielPubNubInterface {
 
     // pubnub methods
-    long createApplicationMessage(final DeviceApplication application, final String action, final boolean reportReception);
+    long createApplicationMessage(final DeviceApplication application, final String action, final boolean reportReception, final boolean executed);
 
     long createLocationMessage(final long locationId, final String action, final boolean reportReception);
 
     long createConfigurationMessage(final long configID, final String action, final boolean reportReception);
+
+    long createQRCodeMessage(final String qrCode, final String action, final boolean reportReception);
 
     long createWrapperMessage(final WrapperMessage message);
 

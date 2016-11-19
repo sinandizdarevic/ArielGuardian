@@ -1,22 +1,13 @@
-package com.ariel.guardian.library.commands.application;
-
-import com.ariel.guardian.library.commands.Params;
+package com.ariel.guardian.command.params;
 
 /**
  * DeviceApplication command available parameters
  */
 public class ApplicationParams extends Params {
 
-    // application params
-    /**
-     * Name of the application package that should be updated
-     */
-    public static final String PARAM_PACKAGE_NAME = "package_name";
-
     private final String packageName;
 
     public ApplicationParams(final ApplicationParamBuilder builder){
-        super(ApplicationParams.class.getSimpleName());
         this.packageName = builder.packageName;
     }
 

@@ -3,7 +3,6 @@ package com.ariel.guardian.receivers.ariel;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.database.ArielDatabase;
@@ -41,7 +40,7 @@ public class DeviceApplicationReceiver extends BroadcastReceiver {
 
             GuardianApplication.getInstance().
                     startService(CreateIFRuleService.getCallingIntent
-                            (da.getPackageName(), da.isDisabled()));
+                            (da.getPackageName(), da.isDisabled(), null));
 
         }
 

@@ -3,16 +3,12 @@ package com.ariel.guardian.receivers.ariel;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.ariel.guardian.ArielJobScheduler;
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.command.CommandProducer;
 import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.database.model.Configuration;
-import com.ariel.guardian.library.database.model.DeviceApplication;
 import com.ariel.guardian.library.utils.ArielConstants;
-import com.ariel.guardian.services.CreateIFRuleService;
 import com.ariel.guardian.services.DeviceLocationJobService;
 
 import javax.inject.Inject;

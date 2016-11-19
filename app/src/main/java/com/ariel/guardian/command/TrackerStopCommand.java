@@ -1,17 +1,19 @@
 package com.ariel.guardian.command;
 
 import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.commands.Params;
 import com.ariel.guardian.services.DeviceTrackerService;
 
 /**
  * Created by mikalackis on 6.7.16..
  */
-public class TrackerStop extends Command {
+public class TrackerStopCommand extends Command {
+
+    public TrackerStopCommand() {
+        super(null);
+    }
 
     @Override
-    public void execute(final Params params) {
-        reportCommand("Stop tracking");
+    public void execute() {
         GuardianApplication.getInstance().stopService(DeviceTrackerService.getCallingIntent(null));
     }
 

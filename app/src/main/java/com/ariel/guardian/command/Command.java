@@ -1,35 +1,68 @@
 package com.ariel.guardian.command;
 
-import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-
-import com.ariel.guardian.ArielJobScheduler;
-import com.ariel.guardian.GuardianApplication;
-import com.ariel.guardian.library.commands.Params;
-import com.ariel.guardian.library.utils.ArielUtilities;
-
-import javax.inject.Inject;
+import com.ariel.guardian.command.params.Params;
+import com.ariel.guardian.library.database.model.WrapperMessage;
 
 /**
  * Created by mikalackis on 6.7.16..
  */
-public abstract class Command {
+public class Command<T extends Params> {
 
-    @Inject
-    ArielJobScheduler mJobScheduler;
+    protected WrapperMessage message = null;
 
-    public Command(){
-        GuardianApplication.getInstance().getGuardianComponent().inject(this);
-        //injectComponent(GuardianApplication.getInstance().getGuardianComponent());
+    protected Command next = null;
+
+    protected T params = null;
+
+    protected Command(AbstractBuilder builder){
+        message = builder.message;
+        next = builder.next;
+        params = (T)builder.params;
     }
 
-    public abstract void execute(final Params params);
+    public void setWrapperMessage(final WrapperMessage message){
+        this.message = message;
+    }
+
+    protected void execute(){
+        // to override
+    }
+
+    protected void onNextCommand(){
+        next.execute();
+    }
 
     //public abstract void injectComponent(final GuardianComponent component);
 
-    protected void reportCommand(String command){
-        //ArielLibrary.action().firebase().reportAction(command);
+    protected void reportToMaster(){
+        // override in concrete command implementation
+    }
+
+    public static abstract class AbstractBuilder<BuilderT extends AbstractBuilder<BuilderT, ParamsT>, ParamsT extends Params> {
+
+        private Command next;
+        private ParamsT params;
+        private WrapperMessage message;
+
+        protected abstract BuilderT me();
+
+        public abstract Command build();
+
+        public BuilderT nextCommand(final Command next) {
+            this.next = next;
+            return me();
+        }
+
+        public BuilderT withParams(final ParamsT params){
+            this.params = params;
+            return me();
+        }
+
+        public BuilderT withMessage(final WrapperMessage message){
+            this.message = message;
+            return me();
+        }
+
     }
 
 }

@@ -4,20 +4,15 @@ import android.app.Application;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.ariel.guardian.command.Command;
-import com.ariel.guardian.command.CommandProducer;
 import com.ariel.guardian.library.database.ArielDatabase;
-import com.ariel.guardian.library.commands.location.LocationCommands;
-import com.ariel.guardian.library.commands.location.LocationParams;
 import com.ariel.guardian.library.database.model.ArielDevice;
 import com.ariel.guardian.library.database.model.ArielMaster;
 import com.ariel.guardian.library.database.model.Configuration;
+import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.library.utils.SharedPrefsManager;
-import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.services.DeviceLocationJobService;
 import com.ariel.guardian.sync.InstanceKeeperService;
 import com.orhanobut.logger.Logger;
@@ -50,9 +45,6 @@ public class GuardianApplication extends Application {
 
     @Inject
     ArielPubNub mArielPubNub;
-
-    @Inject
-    CommandProducer mCommandProducer;
 
     @Override
     public void onCreate() {
@@ -146,10 +138,68 @@ public class GuardianApplication extends Application {
             int arielSystemStatus = ArielSettings.Secure.getInt(getContentResolver(),
                     ArielSettings.Secure.ARIEL_SYSTEM_STATUS, ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL);
             Logger.d("Ariel system status changed: " + arielSystemStatus);
-            mCommandProducer.checkArielSystemStatus(arielSystemStatus);
+            checkArielSystemStatus(arielSystemStatus);
             Toast.makeText(GuardianApplication.this, "Ariel System status changed: " + arielSystemStatus, Toast.LENGTH_LONG).show();
         }
     };
+
+    public void checkArielSystemStatus(final int arielSystemStatus){
+        switch (arielSystemStatus) {
+            case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_LOCKDOWN: {
+                // // TODO: 29.7.16.
+                /**
+                 * Steps to do in case of LOCKDOWN mode:
+                 * 1. Activate lockscreen
+                 */
+                break;
+            }
+            case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_PANIC: {
+                // // TODO: 29.7.16.
+                /**
+                 * Steps to do in case of PANIC mode:
+                 * 1. Activate lockscreen
+                 * 2. Start continuous location tracking
+                 * 3. Keep reporting location to backend and SMS
+                 * 4. Disable power button
+                 * 5. Maybe activate camera face detection?
+                 */
+
+                // Lock the screen
+                LockPatternUtilsHelper.performAdminLock("123qwe", this);
+
+                // Start location tracking
+//                Command locationTracking = getCommand(LocationCommands.TRACKING_START_COMMAND);
+//                locationTracking.execute(new LocationParams.LocationParamBuilder().smsLocationReport(true).build());
+                break;
+            }
+            case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_THEFT: {
+                // // TODO: 29.7.16.
+                break;
+            }
+            case ArielSettings.Secure.ARIEL_SYSTEM_STATUS_NORMAL: {
+                // // TODO: 29.7.16.
+                /**
+                 * Steps to perform for NORMAL mode:
+                 * 1. Restore previous lock screen and clear current one
+                 * 2. Stop continuous location tracking
+                 * 4. Enable power button
+                 * 5. Deactivate camera face detection?
+                 */
+
+                // Clear screen lock
+                LockPatternUtilsHelper.clearLock(this);
+
+                // Stop location tracking
+//                Command locationTracking = getCommand(LocationCommands.TRACKING_STOP_COMMAND);
+//                locationTracking.execute(null);
+                break;
+            }
+            default: {
+                // // TODO: 29.7.16.
+                break;
+            }
+        }
+    }
 
     @Override
     public void onTerminate() {

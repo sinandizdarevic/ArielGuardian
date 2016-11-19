@@ -25,6 +25,8 @@ public class WrapperMessage extends RealmObject {
 
     private boolean reportReception;
 
+    private boolean executed;
+
     // this field should be used only in combination with report messages
     private String originalMessageType;
 
@@ -92,5 +94,17 @@ public class WrapperMessage extends RealmObject {
 
     public void setOriginalMessageType(String originalMessageType) {
         this.originalMessageType = originalMessageType;
+    }
+
+    public boolean isReportReception() {
+        return reportReception;
+    }
+
+    public boolean isExecuted() {
+        return executed;
+    }
+
+    public void setExecuted(boolean executed) {
+        this.executed = executed;
     }
 }
