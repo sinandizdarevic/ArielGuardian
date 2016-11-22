@@ -58,7 +58,7 @@ public class ArielPubNub implements ArielPubNubInterface {
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
         message.setActionType(action);
-        message.setMessageType(ArielConstants.MESSAGES.APPLICATION);
+        message.setMessageType(ArielConstants.MESSAGE_TYPE.APPLICATION);
         message.setDataObject(mGson.toJson(deviceApplication));
         message.setReportReception(reportReception);
         if(reportReception){
@@ -75,14 +75,18 @@ public class ArielPubNub implements ArielPubNubInterface {
 
     @Override
     public long createLocationMessage(long locationId, String action, boolean reportReception) {
-        DeviceLocation deviceLocation = mArielDatabase
-                .getLocationByID(locationId);
+        String dataToSend = null;
+        if(locationId!=-1){
+            DeviceLocation deviceLocation = mArielDatabase
+                    .getLocationByID(locationId);
+            dataToSend = mGson.toJson(deviceLocation);
+        }
         final WrapperMessage message = new WrapperMessage();
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
         message.setActionType(action);
-        message.setMessageType(ArielConstants.MESSAGES.LOCATION);
-        message.setDataObject(mGson.toJson(deviceLocation));
+        message.setMessageType(ArielConstants.MESSAGE_TYPE.LOCATION);
+        message.setDataObject(dataToSend);
         message.setReportReception(reportReception);
         message.setOriginalMessageType(null);
         mArielDatabase.createWrapperMessage(message);
@@ -97,7 +101,7 @@ public class ArielPubNub implements ArielPubNubInterface {
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
         message.setActionType(action);
-        message.setMessageType(ArielConstants.MESSAGES.CONFIGURATION);
+        message.setMessageType(ArielConstants.MESSAGE_TYPE.CONFIGURATION);
         message.setDataObject(mGson.toJson(deviceConfiguration));
         message.setReportReception(reportReception);
         message.setOriginalMessageType(null);
@@ -111,7 +115,7 @@ public class ArielPubNub implements ArielPubNubInterface {
         message.setId(Calendar.getInstance().getTimeInMillis());
         message.setSender(ArielUtilities.getUniquePseudoID());
         message.setActionType(action);
-        message.setMessageType(ArielConstants.MESSAGES.REPORT);
+        message.setMessageType(ArielConstants.MESSAGE_TYPE.CONFIGURATION);
         message.setDataObject(qrCode);
         message.setReportReception(reportReception);
         message.setOriginalMessageType(null);
@@ -280,85 +284,85 @@ public class ArielPubNub implements ArielPubNubInterface {
     private void messageForMasterDevice(final WrapperMessage currentMessage) {
         String messageType = currentMessage.getMessageType();
         if(messageType!=null && messageType.length()>0){
-            if(messageType.equals(ArielConstants.MESSAGES.REPORT)){
+            if(messageType.equals(ArielConstants.MESSAGE_TYPE.REPORT)){
                 // we need to remove the wrapper message
                 mArielDatabase.deleteWrapperMessage(currentMessage);
                 // get the original message type
                 String originalMessageType = currentMessage.getOriginalMessageType();
                 // first, lets process the data and see what it contains
-                if(originalMessageType.equals(ArielConstants.MESSAGES.APPLICATION)){
+                if(originalMessageType.equals(ArielConstants.MESSAGE_TYPE.APPLICATION)){
                     handleApplicationMessage(currentMessage);
-                } else if(originalMessageType.equals(ArielConstants.MESSAGES.LOCATION)){
+                } else if(originalMessageType.equals(ArielConstants.MESSAGE_TYPE.LOCATION)){
                     handleLocationMessage(currentMessage);
-                } else if(originalMessageType.equals(ArielConstants.MESSAGES.CONFIGURATION)){
+                } else if(originalMessageType.equals(ArielConstants.MESSAGE_TYPE.CONFIGURATION)){
                     handleConfigurationMessage(currentMessage);
                 }
-            } else if(messageType.equals(ArielConstants.MESSAGES.APPLICATION)){
+            } else if(messageType.equals(ArielConstants.MESSAGE_TYPE.APPLICATION)){
                 handleApplicationMessage(currentMessage);
-            } else if(messageType.equals(ArielConstants.MESSAGES.LOCATION)){
+            } else if(messageType.equals(ArielConstants.MESSAGE_TYPE.LOCATION)){
                 handleLocationMessage(currentMessage);
-            } else if(messageType.equals(ArielConstants.MESSAGES.CONFIGURATION)){
+            } else if(messageType.equals(ArielConstants.MESSAGE_TYPE.CONFIGURATION)){
                 handleConfigurationMessage(currentMessage);
             }
         }
     }
 
     private void handleLocationMessage(WrapperMessage currentMessage){
-        if (currentMessage.getActionType().equals(ArielConstants.ACTIONS.LOCATION_UPDATE)) {
+        if (currentMessage.getActionType().equals(ArielConstants.ACTION.LOCATION_UPDATE)) {
             // update device location and broadcast change
             DeviceLocation deviceLocation = mGson.fromJson(currentMessage.getDataObject(), DeviceLocation.class);
             mArielDatabase.createLocation(deviceLocation);
             Intent appIntent = new Intent();
-            appIntent.setAction(ArielConstants.ACTIONS.LOCATION_UPDATE);
+            appIntent.setAction(ArielConstants.ACTION.LOCATION_UPDATE);
             appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, deviceLocation.getId());
             mContext.sendBroadcast(appIntent);
         }
     }
 
     private void handleApplicationMessage(WrapperMessage currentMessage){
-        if (currentMessage.getActionType().equals(ArielConstants.ACTIONS.APPLICATION_UPDATED)) {
+        if (currentMessage.getActionType().equals(ArielConstants.ACTION.APPLICATION_UPDATED)) {
             // add an app to the realm database
             DeviceApplication deviceApp = mGson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
             // remove its pending action id
             deviceApp.setPendingActionId(0);
             mArielDatabase.createOrUpdateApplication(deviceApp);
             Intent appIntent = new Intent();
-            appIntent.setAction(ArielConstants.ACTIONS.APPLICATION_UPDATED);
+            appIntent.setAction(ArielConstants.ACTION.APPLICATION_UPDATED);
             appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, deviceApp.getPackageName());
             mContext.sendBroadcast(appIntent);
 
-        } else if (currentMessage.getActionType().equals(ArielConstants.ACTIONS.APPLICATION_ADDED)) {
+        } else if (currentMessage.getActionType().equals(ArielConstants.ACTION.APPLICATION_ADDED)) {
             // add an app to the realm database
             DeviceApplication deviceApp = mGson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
             // remove its pending action id
             deviceApp.setPendingActionId(0);
             mArielDatabase.createOrUpdateApplication(deviceApp);
             Intent appIntent = new Intent();
-            appIntent.setAction(ArielConstants.ACTIONS.APPLICATION_ADDED);
+            appIntent.setAction(ArielConstants.ACTION.APPLICATION_ADDED);
             appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, deviceApp.getPackageName());
             mContext.sendBroadcast(appIntent);
-        } else if (currentMessage.getActionType().equals(ArielConstants.ACTIONS.APPLICATION_REMOVED)) {
+        } else if (currentMessage.getActionType().equals(ArielConstants.ACTION.APPLICATION_REMOVED)) {
             // remove an app from the realm database
             DeviceApplication deviceApp = mGson.fromJson(currentMessage.getDataObject(), DeviceApplication.class);
             // remove its pending action id
             deviceApp.setPendingActionId(0);
             mArielDatabase.deleteApplication(deviceApp);
             Intent appIntent = new Intent();
-            appIntent.setAction(ArielConstants.ACTIONS.APPLICATION_REMOVED);
+            appIntent.setAction(ArielConstants.ACTION.APPLICATION_REMOVED);
             mContext.sendBroadcast(appIntent);
         }
     }
 
     private void handleConfigurationMessage(WrapperMessage currentMessage){
-        if (currentMessage.getActionType().equals(ArielConstants.ACTIONS.DEVICE_CONFIG_UPDATE)) {
+        if (currentMessage.getActionType().equals(ArielConstants.ACTION.DEVICE_CONFIG_UPDATE)) {
             // update device configuration and broadcast change
             Configuration deviceConfig = mGson.fromJson(currentMessage.getDataObject(), Configuration.class);
             mArielDatabase.createConfiguration(deviceConfig);
             Intent appIntent = new Intent();
-            appIntent.setAction(ArielConstants.ACTIONS.DEVICE_CONFIG_UPDATE);
+            appIntent.setAction(ArielConstants.ACTION.DEVICE_CONFIG_UPDATE);
             appIntent.putExtra(ArielConstants.EXTRA_DATABASE_ID, deviceConfig.getId());
             mContext.sendBroadcast(appIntent);
-        } else if (currentMessage.getActionType().equals(ArielConstants.ACTIONS.GET_DEVICE_QR_CODE)) {
+        } else if (currentMessage.getActionType().equals(ArielConstants.ACTION.GET_DEVICE_QR_CODE)) {
             Logger.i("Recived qrcode: "+currentMessage.getDataObject());
         }
     }

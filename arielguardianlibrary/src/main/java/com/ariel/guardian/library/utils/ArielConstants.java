@@ -6,7 +6,7 @@ package com.ariel.guardian.library.utils;
 
 public final class ArielConstants {
 
-    public interface ACTIONS {
+    public interface ACTION {
         /**
          * Application messages and intents
          */
@@ -28,7 +28,7 @@ public final class ArielConstants {
 
     }
 
-    public interface MESSAGES {
+    public interface MESSAGE_TYPE {
         /**
          * PubNub message types
          */

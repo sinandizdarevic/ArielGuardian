@@ -96,10 +96,6 @@ public class WrapperMessage extends RealmObject {
         this.originalMessageType = originalMessageType;
     }
 
-    public boolean isReportReception() {
-        return reportReception;
-    }
-
     public boolean isExecuted() {
         return executed;
     }

@@ -1,9 +1,6 @@
 package com.ariel.guardian;
 
-import com.ariel.guardian.command.ApplicationCommand;
-import com.ariel.guardian.command.ConfigurationCommand;
-import com.ariel.guardian.command.LocateNowCommand;
-import com.ariel.guardian.command.MasterCommand;
+import com.ariel.guardian.command.Command;
 import com.ariel.guardian.library.pubnub.ArielPubNub;
 import com.ariel.guardian.receivers.BootReceiver;
 import com.ariel.guardian.receivers.NetworkChangeReceiver;
@@ -54,9 +51,12 @@ public interface GuardianComponent {
     // sync service
     void inject(SyncIntentService syncIntentService);
 
-    void inject(ApplicationCommand command);
-    void inject(LocateNowCommand command);
-    void inject(ConfigurationCommand command);
-    void inject(MasterCommand command);
+//    void inject(ApplicationCommand command);
+//    void inject(LocateNowCommand command);
+//    void inject(ConfigurationCommand command);
+//    void inject(MasterCommand command);
+//    void inject(QRCodeCommand command);
+
+    void inject(Command command);
 
 }

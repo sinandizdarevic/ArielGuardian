@@ -6,22 +6,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.ariel.guardian.R;
-import com.ariel.guardian.library.database.model.DeviceApplication;
 import com.ariel.guardian.library.utils.ArielUtilities;
 import com.google.zxing.WriterException;
 import com.orhanobut.logger.Logger;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -78,12 +74,6 @@ public class MainActivity extends AppCompatActivity {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                //LockPatternUtilsHelper.clearLock(GuardianApplication.getInstance());
-//                ApplicationParams ap = new ApplicationParams.ApplicationParamBuilder("com.example.android").build();
-//                Gson gson = new Gson();
-//                String json = gson.toJson(ap);
-//                Logger.d("MainActivity", json);
             }
         });
 

@@ -2,13 +2,12 @@ package com.ariel.guardian.sync;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
 
 import com.ariel.guardian.GuardianApplication;
 import com.ariel.guardian.library.database.ArielDatabase;
 import com.ariel.guardian.library.database.model.WrapperMessage;
-import com.ariel.guardian.library.utils.ArielUtilities;
 import com.ariel.guardian.library.pubnub.ArielPubNub;
+import com.ariel.guardian.library.utils.ArielUtilities;
 import com.orhanobut.logger.Logger;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
@@ -79,13 +78,15 @@ public class SyncIntentService extends IntentService {
             public void onResponse(PNPublishResult result, PNStatus status) {
                 if (!status.isError()) {
                     // everything is ok, remove wrapper message from realm
-                    Logger.d(ArielDatabase.TAG, "Message sent, remove wrapper");
-                    // this part of code should be on parent side
-//                    message.setSent(true);
-//                    mArielDatabase.createWrapperMessage(message);
-
-                    // since im an ArielDevice, i need to remove the message
-                    mArielDatabase.deleteWrapperMessageByID(message.getId());
+                    if (!message.getReportReception()) {
+                        Logger.i(TAG, "Message sent, remove wrapper");
+                        message.setSent(true);
+                        mArielDatabase.deleteWrapperMessage(message);
+                    } else {
+                        Logger.i(TAG, "Waiting for execution feedback for id: " + message.getId());
+                        message.setSent(true);
+                        mArielDatabase.createWrapperMessage(message);
+                    }
                 } else {
                     // keep trying until you send the message
                     // this should probably be replaced with some advanced mechanism
@@ -94,6 +95,8 @@ public class SyncIntentService extends IntentService {
                     Logger.d(ArielDatabase.TAG, "Status error exception: " + status.getErrorData().getThrowable().getMessage());
                     Logger.d(ArielDatabase.TAG, "Status code: " + status.getStatusCode());
                     Logger.d(ArielDatabase.TAG, "Message not sent, retry??");
+                    message.setSent(false);
+                    mArielDatabase.createWrapperMessage(message);
                     status.retry();
                 }
             }
